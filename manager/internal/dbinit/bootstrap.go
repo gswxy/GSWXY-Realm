@@ -205,7 +205,11 @@ func BuildPipeline(p platform.Paths) []SQLFile {
 	add(filepath.Join(mod, "characters"), "acore_characters", "playerbots")
 	add(filepath.Join(mod, "world"), "acore_world", "playerbots")
 
-	add(p.LocaleDir(), "*", "locale/zhCN")
+	// GSWXY zhCN locale: world/ targets the world DB (base-column UPDATEs),
+	// playerbots/ targets the characters DB (bot name pools). The import
+	// client runs each file against its mapped database.
+	add(filepath.Join(p.LocaleDir(), "world"), "acore_world", "locale/zhCN")
+	add(filepath.Join(p.LocaleDir(), "playerbots"), "acore_characters", "locale/zhCN")
 	return files
 }
 
