@@ -221,8 +221,9 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 
 // setRootPassword authenticates as root on a fresh datadir (empty
 // password thanks to --auth-root-authentication-method=normal) and
-// applies the generated root password. If the password is already set
-// (re-run), the empty-password connection fails and this is a no-op.
+// applies the generated root password to EVERY root@host account
+// (install-db creates several: localhost, 127.0.0.1, ::1, hostname —
+// host-specific matches would otherwise shadow the new password).
 func setRootPassword(creds *Credentials, log *logging.Logger) error {
 	dsn := fmt.Sprintf("root@tcp(127.0.0.1:%d)/?charset=utf8mb4", creds.Port)
 	db, err := sql.Open("mysql", dsn)
@@ -234,13 +235,28 @@ func setRootPassword(creds *Credentials, log *logging.Logger) error {
 		// Root already password-protected: nothing to do.
 		return nil
 	}
-	q := fmt.Sprintf("SET PASSWORD FOR 'root'@'localhost' = PASSWORD('%s')", creds.Root)
-	if _, err := db.Exec(q); err != nil {
-		return fmt.Errorf("set root password: %w", err)
+	rows, err := db.Query(`SELECT Host FROM mysql.user WHERE User = 'root'`)
+	if err != nil {
+		return fmt.Errorf("list root accounts: %w", err)
 	}
-	// Same for the TCP root account (mariadb-install-db creates
-	// root@localhost only; the loopback TCP entry maps to it).
-	log.Info("root password configured")
+	var hosts []string
+	for rows.Next() {
+		var h string
+		if rows.Scan(&h) == nil {
+			hosts = append(hosts, h)
+		}
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, h := range hosts {
+		q := fmt.Sprintf("ALTER USER 'root'@'%s' IDENTIFIED BY '%s'", h, creds.Root)
+		if _, err := db.Exec(q); err != nil {
+			return fmt.Errorf("set root password for %s: %w", h, err)
+		}
+	}
+	log.Info("root password configured for %d root accounts", len(hosts))
 	return nil
 }
 
