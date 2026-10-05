@@ -1,0 +1,13 @@
+{
+  "_comment": "公共 GitHub Release 代理池（fallback）。官方源永远第一优先级，写死在 versions/upstream.json 的 client_data.url。代理失效不得影响手动导入功能。{version}/{filename} 会被替换为资源版本与文件名。",
+  "mirrors": [
+    {
+      "name": "公共代理 1",
+      "url": "https://ghproxy.net/https://github.com/wowgaming/client-data/releases/download/{version}/{filename}"
+    },
+    {
+      "name": "公共代理 2",
+      "url": "https://mirror.ghproxy.com/https://github.com/wowgaming/client-data/releases/download/{version}/{filename}"
+    }
+  ]
+}

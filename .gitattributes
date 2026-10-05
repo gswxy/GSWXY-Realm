@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.png binary
+*.fpk binary
+*.zip binary
+*.tar.gz binary
+*.sha256 text eol=lf

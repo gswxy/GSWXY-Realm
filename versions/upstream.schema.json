@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GSWXY Realm upstream version lock",
+  "type": "object",
+  "required": ["core", "playerbots", "client_data", "database_runtime"],
+  "properties": {
+    "locked_at": { "type": "string" },
+    "core": {
+      "type": "object",
+      "required": ["repository", "branch", "commit"],
+      "properties": {
+        "repository": { "type": "string", "format": "uri" },
+        "branch": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "verified_at": { "type": "string" }
+      }
+    },
+    "playerbots": {
+      "type": "object",
+      "required": ["repository", "branch", "commit"],
+      "properties": {
+        "repository": { "type": "string", "format": "uri" },
+        "branch": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "verified_at": { "type": "string" },
+        "module_path": { "type": "string" }
+      }
+    },
+    "client_data": {
+      "type": "object",
+      "required": ["version", "url"],
+      "properties": {
+        "version": { "type": "string", "pattern": "^v" },
+        "label": { "type": "string" },
+        "repository": { "type": "string" },
+        "asset": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "published_at": { "type": "string" },
+        "requires": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "database_runtime": {
+      "type": "object",
+      "required": ["flavor", "version", "url"],
+      "properties": {
+        "flavor": { "type": "string", "enum": ["mariadb", "mysql"] },
+        "version": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "license": { "type": "string" },
+        "bundled": { "type": "boolean" },
+        "listen": { "type": "string" },
+        "port": { "type": "integer" },
+        "port_note": { "type": "string" }
+      }
+    },
+    "platform": {
+      "type": "object",
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "package": { "type": "string" },
+        "package_id": { "type": "string" }
+      }
+    },
+    "gswxy_locale": {
+      "type": "object",
+      "properties": {
+        "language": { "type": "string" },
+        "version": { "type": "string" },
+        "source": { "type": "string" }
+      }
+    },
+    "config_schema": {
+      "type": "object",
+      "properties": { "version": { "type": "string" } }
+    }
+  }
+}

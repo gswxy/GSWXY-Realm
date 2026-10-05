@@ -1,0 +1,37 @@
+# 构建产物
+*.fpk
+*.fpk.sha256
+/build/
+/dist/
+/out/
+*.zip
+*.tar.gz
+*.tar.xz
+Data.zip
+
+# Go
+manager/gswxy-manager
+manager/bin/
+*.test
+*.out
+
+# Node / 前端
+node_modules/
+
+# 运行时与本地数据
+runtime/var/
+*.log
+*.pid
+.env
+
+# 本地工具链
+tools-local/
+
+# 敏感信息
+**/credentials*
+**/*secret*
+!resources/mirrors.json
+
+# 系统
+.DS_Store
+Thumbs.db

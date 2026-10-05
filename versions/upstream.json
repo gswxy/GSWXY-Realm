@@ -1,0 +1,52 @@
+{
+  "$schema": "./upstream.schema.json",
+  "locked_at": "2026-10-05T14:25:00+08:00",
+  "core": {
+    "repository": "https://github.com/mod-playerbots/azerothcore-wotlk.git",
+    "branch": "Playerbot",
+    "commit": "f19a18799a35f7c24bdcdc9ea399c601f166259b",
+    "verified_at": "2026-10-05T14:10:00+08:00"
+  },
+  "playerbots": {
+    "repository": "https://github.com/mod-playerbots/mod-playerbots.git",
+    "branch": "master",
+    "commit": "037c01418b5d01506917a3db9b44fd56ac5f965c",
+    "verified_at": "2026-10-05T14:10:00+08:00",
+    "module_path": "modules/mod-playerbots"
+  },
+  "client_data": {
+    "version": "v20.0",
+    "label": "AC Data v20 enUS",
+    "repository": "https://github.com/wowgaming/client-data",
+    "asset": "Data.zip",
+    "url": "https://github.com/wowgaming/client-data/releases/download/v20.0/Data.zip",
+    "size_bytes": 1196191335,
+    "sha256": "PENDING_VERIFIED_DOWNLOAD",
+    "published_at": "2026-07-19T11:28:09Z",
+    "requires": ["dbc", "maps", "vmaps", "mmaps", "Cameras"]
+  },
+  "database_runtime": {
+    "flavor": "mariadb",
+    "version": "11.4.8",
+    "url": "https://archive.mariadb.org/mariadb-11.4.8/bintar-linux-systemd-x86_64/mariadb-11.4.8-linux-systemd-x86_64.tar.gz",
+    "license": "GPL-2.0-only",
+    "bundled": true,
+    "listen": "127.0.0.1",
+    "port": 0,
+    "port_note": "Manager 分配 127.0.0.1 随机高位端口或 Unix Socket；不暴露 LAN"
+  },
+  "platform": {
+    "os": "fnOS",
+    "arch": "x86_64",
+    "package": "fpk",
+    "package_id": "com.gswxy.realm"
+  },
+  "gswxy_locale": {
+    "language": "zhCN",
+    "version": "1.0.0",
+    "source": "GSWXY 耳语魔兽（只读提取，过滤 custom 内容）"
+  },
+  "config_schema": {
+    "version": "1.0.0"
+  }
+}
