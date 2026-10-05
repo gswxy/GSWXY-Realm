@@ -91,7 +91,7 @@ res = {
     "size_bytes": cd.get("size_bytes", 0),
     "sha256": cd.get("sha256", "") if cd.get("sha256", "").startswith(tuple("0123456789abcdef")) else "",
     "requires": cd["requires"],
-    "mirrors": [m["url"].format(version=cd["version"], filename=cd["asset"]) for m in mirrors],
+    "mirrors": [m["url"].format(version=cd["version"], filename=cd["asset"]) for m in mirrors.get("mirrors", [])],
 }
 open(app + "/resources.json", "w").write(json.dumps(res, indent=2, ensure_ascii=False))
 print("resources.json written:", res["version"])
