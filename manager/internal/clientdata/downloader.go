@@ -170,8 +170,24 @@ func (m *Manager) downloadChain(ctx context.Context, res *Resource) (string, err
 	return "", fmt.Errorf("所有下载源均失败，最后一个错误: %w", lastErr)
 }
 
-// downloadOne streams to <path>.part with HTTP Range resume.
+// downloadOne streams to <path>.part with HTTP Range resume. A complete
+// local file (exact size + valid sha256 when pinned) short-circuits the
+// network entirely — pre-seeded caches and retries just work.
 func (m *Manager) downloadOne(ctx context.Context, url string, res *Resource, path string) error {
+	if st, err := os.Stat(path); err == nil {
+		sizeOK := res.SizeBytes == 0 || st.Size() == res.SizeBytes
+		if sizeOK {
+			if res.SHA256 != "" {
+				if sum, err := checksumFile(path); err == nil && sum == res.SHA256 {
+					m.log.Info("reusing complete local file %s", path)
+					return nil
+				}
+			} else {
+				m.log.Info("reusing existing local file %s (size match)", path)
+				return nil
+			}
+		}
+	}
 	part := path + ".part"
 	_ = os.MkdirAll(m.paths.Downloads(), 0o755)
 
