@@ -112,8 +112,16 @@ fi
 # -L dereferences symlinks (bintar ships mariadbd -> mysqld links).
 mkdir -p "$APP/mysql/bin" "$APP/mysql/share" "$APP/mysql/lib/plugin"
 cp -aL "$EXTRACT/bin/mariadbd" "$APP/mysql/bin/" 2>/dev/null || cp -aL "$EXTRACT/bin/mysqld" "$APP/mysql/bin/"
-for t in mariadb mysql mariadb-admin mysqladmin mariadb-dump mysqldump mariadb-install-db mysql_install_db my_print_defaults resolveip; do
+for t in mariadb mysql mariadb-admin mysqladmin mariadb-dump mysqldump my_print_defaults resolveip; do
   if [ -f "$EXTRACT/bin/$t" ]; then cp -aL "$EXTRACT/bin/$t" "$APP/mysql/bin/"; fi
+done
+# MariaDB bintar 把 install-db 放在 scripts/ 而不是 bin/（实测 11.4.8）
+for s in mariadb-install-db mysql_install_db; do
+  if [ ! -f "$APP/mysql/bin/$s" ] && [ -f "$EXTRACT/scripts/$s" ]; then
+    cp -aL "$EXTRACT/scripts/$s" "$APP/mysql/bin/"
+  elif [ -f "$EXTRACT/bin/$s" ]; then
+    cp -aL "$EXTRACT/bin/$s" "$APP/mysql/bin/"
+  fi
 done
 cp -a "$EXTRACT/share/." "$APP/mysql/share/" 2>/dev/null || true
 # only language + charsets needed
