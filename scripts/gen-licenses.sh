@@ -40,8 +40,8 @@ MARIA_VER=$(python3 -c "import json;print(json.load(open('versions/upstream.json
   echo "below when available."
   echo "--------------------------------------------------------------------"
   echo
-  for f in "$CACHE"/mariadb-${MARIA_VER}/COPYING \
-           "$CACHE"/mariadb-${MARIA_VER}/README.md; do
+  for f in "$CACHE"/mysql-${MARIA_VER}/LICENSE \
+           "$CACHE"/mysql-${MARIA_VER}/README; do
     if [ -f "$f" ]; then
       echo "=== $f ==="
       cat "$f"
