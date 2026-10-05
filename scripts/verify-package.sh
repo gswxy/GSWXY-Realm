@@ -4,7 +4,11 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-FPK="${1:-$ROOT/dist/GSWXY-Realm-1.0.0-x86_64.fpk}"
+FPK="${1:-}"
+if [ -z "$FPK" ]; then
+  # 默认取 dist 下最新的 fpk
+  FPK=$(find "$ROOT/dist" -maxdepth 1 -name "*.fpk" -type f | sort | tail -1)
+fi
 
 [ -f "$FPK" ] || { echo "fpk not found: $FPK" >&2; exit 1; }
 TMP=$(mktemp -d)
