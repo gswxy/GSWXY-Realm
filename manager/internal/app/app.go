@@ -5,6 +5,7 @@ package app
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -100,6 +101,7 @@ func New(p platform.Paths) (*App, error) {
 		CD:    clientdata.NewManager(p, log),
 		Ver:   version.Load(p.BuildInfo()),
 	}
+	a.reconcileClientData()
 	a.CD.OnInstalled = func(version string) {
 		_ = st.Update(func(d *state.Data) {
 			d.ClientData.Version = version
@@ -169,6 +171,32 @@ func (a *App) resolveBins() Binaries {
 		b.InstallDB = "mariadb-install-db"
 	}
 	return b
+}
+
+// reconcileClientData repairs the persisted client-data record when the
+// unpacked data + version marker already exist (e.g. written by a previous
+// run before a crash, or restored alongside the data directory).
+func (a *App) reconcileClientData() {
+	raw, err := os.ReadFile(a.Paths.ClientData() + ".json")
+	if err != nil {
+		return
+	}
+	var marker struct {
+		Version string `json:"version"`
+	}
+	if json.Unmarshal(raw, &marker) != nil || marker.Version == "" {
+		return
+	}
+	st := a.State.Get()
+	if st.ClientData.Installed && st.ClientData.Version == marker.Version {
+		return
+	}
+	_ = a.State.Update(func(d *state.Data) {
+		d.ClientData.Version = marker.Version
+		d.ClientData.Installed = true
+		d.ClientData.VerifiedAt = time.Now().Format(time.RFC3339)
+	})
+	a.Log.Info("reconciled client data state to version %s", marker.Version)
 }
 
 // registerProcs wires the three managed processes.
