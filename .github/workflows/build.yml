@@ -41,7 +41,7 @@ jobs:
             libboost1.83-dev libboost-system-dev libboost-filesystem-dev \
             libboost-thread-dev libboost-program-options-dev libboost-iostreams-dev \
             libboost-regex-dev libboost-date-time-dev libssl-dev \
-            libmariadb-dev libmariadb-dev-compat libreadline-dev zlib1g-dev libbz2-dev p7zip-full
+            libmysqlclient-dev libreadline-dev zlib1g-dev libbz2-dev p7zip-full
 
       - name: 缓存 ccache
         uses: actions/cache@v4
