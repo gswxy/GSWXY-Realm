@@ -42,3 +42,5 @@ fnos/app/resources.json
 fnos/app/config-schema.json
 *.token*
 .joblog*
+.runid.txt
+.jobid.txt
