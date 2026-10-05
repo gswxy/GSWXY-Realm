@@ -87,7 +87,8 @@
     "WorldDatabaseInfo": "127.0.0.1;0;acore;acore;acore_world",
     "CharacterDatabaseInfo": "127.0.0.1;0;acore;acore;acore_characters",
     "PlayerbotsDatabaseInfo": "127.0.0.1;0;acore;acore;acore_playerbots",
-    "Update.Database.AlwaysAuto": "1"
+    "Update.Database.AlwaysAuto": "1",
+    "Updates.EnableDatabases": "0 1 2 3"
   },
   "authserver.conf": {
     "LoginDatabaseInfo": "127.0.0.1;0;acore;acore;acore_auth",

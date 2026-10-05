@@ -311,32 +311,21 @@ func BuildPipeline(p platform.Paths) []SQLFile {
 			}
 		}
 	}
+	// Base snapshots only — dated updates are applied by the worldserver
+	// auto-updater on first start (the canonical AC flow: it creates the
+	// updates tracking tables, skips ARCHIVED entries and records what it
+	// applies). Importing updates here would fight that machinery.
 	base := p.SQLDir()
 	add(filepath.Join(base, "base", "db_auth"), "acore_auth", "core/base")
 	add(filepath.Join(base, "base", "db_characters"), "acore_characters", "core/base")
 	add(filepath.Join(base, "base", "db_world"), "acore_world", "core/base")
-	addU := func(dir, db string) {
-		if fs, err := walkSQL(dir); err == nil {
-			for _, f := range fs {
-				files = append(files, SQLFile{Path: f, Database: db, Label: "core/updates", CheckUpdates: true})
-			}
-		}
-	}
-	addU(filepath.Join(base, "updates", "db_auth"), "acore_auth")
-	addU(filepath.Join(base, "updates", "db_characters"), "acore_characters")
-	addU(filepath.Join(base, "updates", "db_world"), "acore_world")
 
-	// Module dumps mirror the core layout (base/updates/archive/create/
-	// custom); only base/ and updates/ belong in the automatic pipeline —
-	// create/ holds destructive DROP helpers and archive/custom are not
-	// meant for fresh installs.
+	// Module base dumps. Never walk create/ (destructive DROP helpers),
+	// archive/ (squashed updates) or custom/ (operator content).
 	mod := filepath.Join(p.AppDest, "modules", "mod-playerbots", "data", "sql")
 	add(filepath.Join(mod, "playerbots", "base"), "acore_playerbots", "playerbots")
 	add(filepath.Join(mod, "characters", "base"), "acore_characters", "playerbots")
 	add(filepath.Join(mod, "world", "base"), "acore_world", "playerbots")
-	addU(filepath.Join(mod, "playerbots", "updates"), "acore_playerbots")
-	addU(filepath.Join(mod, "characters", "updates"), "acore_characters")
-	addU(filepath.Join(mod, "world", "updates"), "acore_world")
 
 	// GSWXY zhCN locale: world/ targets the world DB (base-column UPDATEs),
 	// playerbots/ targets the characters DB (bot name pools). The import
