@@ -76,12 +76,28 @@ func ImportFile(p platform.Paths, mysqlBin, rootPass, dbName, path string,
 		args = append(args, "--init-command=SET autocommit=0")
 	}
 	cmd := exec.Command(mysqlBin, args...)
-	in, err := os.Open(path)
-	if err != nil {
-		return err
+
+	// Module dumps hard-code `CREATE DATABASE x; USE x;` — the pipeline
+	// already created and selected the right database, so strip those
+	// statements from module files instead of failing on them.
+	var stdin io.Reader
+	closeIn := func() {}
+	if isModuleSQL(path) {
+		raw, rerr := os.ReadFile(path)
+		if rerr != nil {
+			return rerr
+		}
+		stdin = strings.NewReader(stripDatabaseStatements(string(raw)))
+	} else {
+		f, ferr := os.Open(path)
+		if ferr != nil {
+			return ferr
+		}
+		stdin = f
+		closeIn = func() { _ = f.Close() }
 	}
-	defer in.Close()
-	cmd.Stdin = in
+	defer closeIn()
+	cmd.Stdin = stdin
 	// Never inherit the Manager's environment wholesale.
 	cmd.Env = minimalEnv()
 	out, err := cmd.CombinedOutput()
@@ -163,6 +179,29 @@ func defaultsFile(p platform.Paths, rootPass string) string {
 	content := fmt.Sprintf("[client]\nhost=127.0.0.1\nport=%d\nuser=root\npassword=%s\n", port, rootPass)
 	_ = os.WriteFile(path, []byte(content), 0o600)
 	return path
+}
+
+// isModuleSQL reports whether the file comes from a module dump that
+// may carry its own CREATE DATABASE / USE statements.
+func isModuleSQL(path string) bool {
+	return strings.Contains(path, "modules")
+}
+
+// stripDatabaseStatements removes leading CREATE DATABASE / USE lines
+// (statement-per-line upstream dumps make line filtering reliable).
+func stripDatabaseStatements(sql string) string {
+	lines := strings.Split(sql, "\n")
+	out := lines[:0]
+	for _, l := range lines {
+		up := strings.ToUpper(strings.TrimSpace(l))
+		if strings.HasPrefix(up, "CREATE DATABASE") ||
+			strings.HasPrefix(up, "USE `") ||
+			strings.HasPrefix(up, "USE ") && strings.HasSuffix(up, ";") {
+			continue
+		}
+		out = append(out, l)
+	}
+	return strings.Join(out, "\n")
 }
 
 func minimalEnv() []string {
