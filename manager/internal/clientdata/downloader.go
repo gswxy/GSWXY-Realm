@@ -39,6 +39,9 @@ type Resource struct {
 type Manager struct {
 	paths platform.Paths
 	log   *logging.Logger
+	// OnInstalled is invoked after a verified install so the caller can
+	// persist the version into its own state store.
+	OnInstalled func(version string)
 
 	mu      sync.Mutex
 	active  bool
@@ -360,6 +363,9 @@ func (m *Manager) succeed(res *Resource) {
 	m.mu.Lock()
 	m.progress.Error = ""
 	m.mu.Unlock()
+	if m.OnInstalled != nil {
+		m.OnInstalled(res.Version)
+	}
 	m.log.Info("client data %s installed and verified", res.Version)
 }
 
