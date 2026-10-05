@@ -59,13 +59,6 @@ func BootstrapPrepare(p platform.Paths, log *logging.Logger, st StateRecorder,
 		return nil, err
 	}
 
-	if !datadirInitialized(p.MySQLData()) {
-		progress("installing datadir")
-		if err := runInstallDB(p, installDbBin); err != nil {
-			return nil, fmt.Errorf("mariadb-install-db: %w", err)
-		}
-	}
-
 	if creds == nil {
 		// Fresh credentials + a random high port; persisted 0600.
 		port, err := freePort()
@@ -84,8 +77,16 @@ func BootstrapPrepare(p platform.Paths, log *logging.Logger, st StateRecorder,
 		log.Info("generated new database credentials (port %d)", port)
 	}
 	st.SetDBPort(creds.Port)
+	// my.cnf must exist BEFORE runInstallDB / mariadbd reference it.
 	if err := writeMyCnf(p, creds); err != nil {
 		return nil, err
+	}
+
+	if !datadirInitialized(p.MySQLData()) {
+		progress("installing datadir")
+		if err := runInstallDB(p, installDbBin); err != nil {
+			return nil, fmt.Errorf("mariadb-install-db: %w", err)
+		}
 	}
 	return creds, nil
 }

@@ -124,8 +124,8 @@ for s in mariadb-install-db mysql_install_db; do
   fi
 done
 cp -a "$EXTRACT/share/." "$APP/mysql/share/" 2>/dev/null || true
-# only language + charsets needed
-find "$APP/mysql/share" -maxdepth 1 -mindepth 1 ! -name 'charsets' ! -name 'english' -exec rm -rf {} + 2>/dev/null || true
+# 保留完整 share/：mariadb-install-db 需要 fill_help_tables.sql 与
+# sys_schema，errmsg 多语言文件体积可接受
 # shared libs mariadbd needs (libaio comes from fnOS; copy plugin dir too)
 cp -a "$EXTRACT/lib/" "$APP/mysql/lib/" 2>/dev/null || true
 mkdir -p "$APP/mysql/lib/plugin"
