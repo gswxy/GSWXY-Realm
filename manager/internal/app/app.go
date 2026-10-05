@@ -150,8 +150,17 @@ func (a *App) resolveBins() Binaries {
 // registerProcs wires the three managed processes.
 func (a *App) registerProcs() {
 	creds, _ := dbinit.LoadCreds(a.Paths)
-	st := a.State.Get()
 
+	a.registerMysqld()
+	if creds != nil && creds.Port > 0 {
+		a.registerServers()
+	}
+}
+
+// registerMysqld (re-)registers the mariadbd spec. Called again after
+// credentials are generated so the spec carries the real port.
+func (a *App) registerMysqld() {
+	st := a.State.Get()
 	mysqldArgs := []string{
 		"--defaults-file=" + dbinit.MyCnfPath(a.Paths),
 		"--datadir=" + a.Paths.MySQLData(),
@@ -166,24 +175,24 @@ func (a *App) registerProcs() {
 		Dir: a.Paths.MySQLRuntime(), PidFile: filepath.Join(a.Paths.Var, "mysqld.pid"),
 		StopGrace: 60 * time.Second,
 	})
+}
 
-	if creds != nil {
-		worldArgs := []string{"-c", a.CM.RunPath("worldserver.conf")}
-		a.Sup.Register(proc.Spec{
-			Name: "worldserver", Bin: a.Bins.Worldserver, Args: worldArgs,
-			Dir: a.Paths.BinDir(), PidFile: filepath.Join(a.Paths.Var, "worldserver.pid"),
-			Stdin: true, StopGrace: 45 * time.Second,
-			Env: a.serverEnv(),
-		})
-		authArgs := []string{"-c", a.CM.RunPath("authserver.conf")}
-		a.Sup.Register(proc.Spec{
-			Name: "authserver", Bin: a.Bins.Authserver, Args: authArgs,
-			Dir: a.Paths.BinDir(), PidFile: filepath.Join(a.Paths.Var, "authserver.pid"),
-			StopGrace: 30 * time.Second,
-			Env:       a.serverEnv(),
-		})
-	}
-	_ = creds
+// registerServers registers authserver/worldserver (DB credentials known).
+func (a *App) registerServers() {
+	worldArgs := []string{"-c", a.CM.RunPath("worldserver.conf")}
+	a.Sup.Register(proc.Spec{
+		Name: "worldserver", Bin: a.Bins.Worldserver, Args: worldArgs,
+		Dir: a.Paths.BinDir(), PidFile: filepath.Join(a.Paths.Var, "worldserver.pid"),
+		Stdin: true, StopGrace: 45 * time.Second,
+		Env: a.serverEnv(),
+	})
+	authArgs := []string{"-c", a.CM.RunPath("authserver.conf")}
+	a.Sup.Register(proc.Spec{
+		Name: "authserver", Bin: a.Bins.Authserver, Args: authArgs,
+		Dir: a.Paths.BinDir(), PidFile: filepath.Join(a.Paths.Var, "authserver.pid"),
+		StopGrace: 30 * time.Second,
+		Env:       a.serverEnv(),
+	})
 }
 
 func (a *App) socketPath() string {
@@ -387,16 +396,22 @@ func (a *App) MarkApplied(label, sum string) error {
 	})
 }
 
-// RunSetup executes the first-run pipeline step by step.
+// RunSetup executes the first-run pipeline step by step. Re-runnable:
+// it resumes from the first incomplete step and clears stale errors.
 func (a *App) RunSetup(progress func(step, detail string)) error {
 	st := a.State.Get()
 	if st.Setup.InProgress {
 		return fmt.Errorf("初始化已在进行中")
 	}
-	step := st.Setup.Current
-	if step == "" {
-		step = state.StepEnvCheck
+	step := st.PendingStep()
+	if step == state.StepDone {
+		return nil
 	}
+	_ = a.State.Update(func(d *state.Data) {
+		d.Setup.Current = step
+		d.Setup.Error = ""
+		d.Setup.InProgress = true
+	})
 	setErr := func(err error) {
 		_ = a.State.Update(func(d *state.Data) { d.Setup.Error = err.Error() })
 	}
@@ -408,7 +423,6 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 		}
 		return err
 	}
-	_ = a.State.Update(func(d *state.Data) { d.Setup.InProgress = true })
 
 	for {
 		switch step {
@@ -426,23 +440,36 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 			if progress != nil {
 				progress(step, "初始化内置数据库")
 			}
+			// Phase A: datadir + my.cnf + credentials (before mariadbd).
+			if _, err := dbinit.BootstrapPrepare(a.Paths, a.Log, a,
+				a.Bins.MariaDBD, a.Bins.InstallDB,
+				func(detail string) {
+					if progress != nil {
+						progress(step, "初始化内置数据库: "+detail)
+					}
+				}); err != nil {
+				return fail(err)
+			}
+			// Re-register with the real port, then start.
+			a.registerMysqld()
 			if !a.Sup.Running("mysqld") {
 				if err := a.Sup.Start("mysqld"); err != nil {
 					return fail(err)
 				}
 			}
-			if err := waitTCP("127.0.0.1", a.State.Get().Database.Port, 90*time.Second); err != nil {
+			port := a.State.Get().Database.Port
+			if err := waitTCP("127.0.0.1", port, 90*time.Second); err != nil {
 				return fail(err)
 			}
+			// Phase B: root password, databases, app user.
 			creds, err := dbinit.LoadCreds(a.Paths)
 			if err != nil || creds == nil {
 				return fail(fmt.Errorf("数据库凭据缺失"))
 			}
-			// Set root password on first bootstrap (fresh datadir keeps
-			// root passwordless) and provision everything.
 			if err := dbinit.ProvisionAccounts(a.Paths, creds, a.Log); err != nil {
 				return fail(err)
 			}
+			a.registerServers()
 			_ = a.State.MarkStepDone(step)
 			step = state.NextStep(step)
 

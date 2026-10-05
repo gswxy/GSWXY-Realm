@@ -136,18 +136,28 @@ func (s *Store) Update(fn func(d *Data)) error {
 	return s.Save()
 }
 
-// MarkStepDone records a finished setup step.
+// MarkStepDone records a finished setup step and advances the cursor
+// from the step that was completed.
 func (s *Store) MarkStepDone(step string) error {
 	return s.Update(func(d *Data) {
 		d.Setup.Completed[step] = time.Now().Format(time.RFC3339)
-		next := NextStep(d.Setup.Current)
-		d.Setup.Current = next
-		if next == StepDone {
+		d.Setup.Current = NextStep(step)
+		if d.Setup.Current == StepDone {
 			d.Setup.InProgress = false
 			d.Setup.Initialized = true
 			d.Setup.Error = ""
 		}
 	})
+}
+
+// PendingStep returns the first setup step without a completed record.
+func (d *Data) PendingStep() string {
+	for _, st := range stepOrder {
+		if _, ok := d.Setup.Completed[st]; !ok {
+			return st
+		}
+	}
+	return StepDone
 }
 
 // NextStep returns the step after cur.
