@@ -196,6 +196,16 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 		if _, err := db.Exec(q); err != nil {
 			return fmt.Errorf("create %s: %w", name, err)
 		}
+		// AC 标准的更新跟踪表（worldserver 自动更新器与导入管线共用）。
+		tq := "CREATE TABLE IF NOT EXISTS `" + name + "`.`updates` (" +
+			"`name` VARCHAR(200) NOT NULL, `hash` CHAR(40) DEFAULT '', " +
+			"`state` ENUM('RELEASED','CUSTOM','MODULE','ARCHIVED','PENDING') NOT NULL DEFAULT 'RELEASED', " +
+			"`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+			"`speed` INT UNSIGNED NOT NULL DEFAULT 0, PRIMARY KEY(`name`)) " +
+			"ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+		if _, err := db.Exec(tq); err != nil {
+			return fmt.Errorf("create updates table in %s: %w", name, err)
+		}
 	}
 	// App user: localhost only, least privilege on the AC databases.
 	stmts := []string{
@@ -316,10 +326,17 @@ func BuildPipeline(p platform.Paths) []SQLFile {
 	addU(filepath.Join(base, "updates", "db_characters"), "acore_characters")
 	addU(filepath.Join(base, "updates", "db_world"), "acore_world")
 
+	// Module dumps mirror the core layout (base/updates/archive/create/
+	// custom); only base/ and updates/ belong in the automatic pipeline —
+	// create/ holds destructive DROP helpers and archive/custom are not
+	// meant for fresh installs.
 	mod := filepath.Join(p.AppDest, "modules", "mod-playerbots", "data", "sql")
-	add(filepath.Join(mod, "playerbots"), "acore_playerbots", "playerbots")
-	add(filepath.Join(mod, "characters"), "acore_characters", "playerbots")
-	add(filepath.Join(mod, "world"), "acore_world", "playerbots")
+	add(filepath.Join(mod, "playerbots", "base"), "acore_playerbots", "playerbots")
+	add(filepath.Join(mod, "characters", "base"), "acore_characters", "playerbots")
+	add(filepath.Join(mod, "world", "base"), "acore_world", "playerbots")
+	addU(filepath.Join(mod, "playerbots", "updates"), "acore_playerbots")
+	addU(filepath.Join(mod, "characters", "updates"), "acore_characters")
+	addU(filepath.Join(mod, "world", "updates"), "acore_world")
 
 	// GSWXY zhCN locale: world/ targets the world DB (base-column UPDATEs),
 	// playerbots/ targets the characters DB (bot name pools). The import
