@@ -410,6 +410,22 @@ func (a *App) MarkApplied(label, sum string) error {
 	})
 }
 
+// ensureDBRunning starts mariadbd (and waits for it) if it is not
+// running — resumed setup runs must not assume a warm database.
+func (a *App) ensureDBRunning() error {
+	if a.Sup.Running("mysqld") {
+		return nil
+	}
+	if _, err := dbinit.LoadCreds(a.Paths); err != nil {
+		return err
+	}
+	a.registerMysqld()
+	if err := a.Sup.Start("mysqld"); err != nil {
+		return err
+	}
+	return waitTCP("127.0.0.1", a.State.Get().Database.Port, 90*time.Second)
+}
+
 // RunSetup executes the first-run pipeline step by step. Re-runnable:
 // it resumes from the first incomplete step and clears stale errors.
 func (a *App) RunSetup(progress func(step, detail string)) error {
@@ -494,6 +510,9 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 			if progress != nil {
 				progress(step, "导入数据库（基础 + 更新 + 模块）")
 			}
+			if err := a.ensureDBRunning(); err != nil {
+				return fail(err)
+			}
 			creds, _ := dbinit.LoadCreds(a.Paths)
 			files := dbinit.BuildPipeline(a.Paths)
 			var localeFiles, coreFiles []dbinit.SQLFile
@@ -519,6 +538,9 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 			if progress != nil {
 				progress(step, "初始化 Playerbot 数据")
 			}
+			if err := a.ensureDBRunning(); err != nil {
+				return fail(err)
+			}
 			// Playerbots module SQL ran in the pipeline; ensure bot tables
 			// exist by checking one marker table.
 			if db, err := a.DB(); err == nil {
@@ -535,6 +557,9 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 		case state.StepLocaleImport:
 			if progress != nil {
 				progress(step, "导入 GSWXY 中文数据")
+			}
+			if err := a.ensureDBRunning(); err != nil {
+				return fail(err)
 			}
 			creds, _ := dbinit.LoadCreds(a.Paths)
 			files := dbinit.BuildPipeline(a.Paths)
@@ -572,6 +597,9 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 		case state.StepRealm:
 			if progress != nil {
 				progress(step, "注册 Realm 与最终配置")
+			}
+			if err := a.ensureDBRunning(); err != nil {
+				return fail(err)
 			}
 			if err := a.regenerateFull(); err != nil {
 				return fail(err)
