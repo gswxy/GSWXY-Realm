@@ -2,7 +2,7 @@
 # collect-runtime.sh — assemble the fnOS payload (fnos/app) from:
 #   build/staging/server  (binaries, confs, data dirs, sql)
 #   manager build output  (gswxy-manager + embedded webui)
-#   MariaDB runtime       (stripped bintar)
+#   MySQL runtime         (stripped minimal tarball)
 #   config-schema/locale resources
 set -euo pipefail
 
@@ -11,6 +11,7 @@ STAGING="${STAGING:-$ROOT/build/staging}"
 APP="${APP:-$ROOT/fnos/app}"
 SRC="${SRC:-$ROOT/build/src}"
 
+# DB runtime URL/版本统一来自 versions/upstream.json（当前为 MySQL）
 MARIA_URL=$(python3 - "$ROOT" <<'EOF'
 import json
 print(json.load(open("versions/upstream.json"))["database_runtime"]["url"])
@@ -120,43 +121,33 @@ open(app + "/resources.json", "w").write(json.dumps(res, indent=2, ensure_ascii=
 print("resources.json written:", res["version"])
 EOF
 
-echo "== MariaDB runtime (stripped) =="
-TARBALL="$CACHE/mariadb-$MARIA_VER-linux-systemd-x86_64.tar.gz"
+echo "== MySQL runtime (stripped) =="
+TARBALL="$CACHE/mysql-$MARIA_VER-linux-glibc2.17-x86_64-minimal.tar.xz"
 if [ ! -f "$TARBALL" ]; then
-  echo "downloading MariaDB runtime..."
+  echo "downloading MySQL runtime..."
   curl -sL --retry 3 -o "$TARBALL" "$MARIA_URL"
 fi
-EXTRACT="$CACHE/mariadb-$MARIA_VER"
+EXTRACT="$CACHE/mysql-$MARIA_VER"
 if [ ! -d "$EXTRACT" ]; then
   mkdir -p "$EXTRACT"
-  tar -xzf "$TARBALL" -C "$EXTRACT" --strip-components=1
+  tar -xJf "$TARBALL" -C "$EXTRACT" --strip-components=1
 fi
-# Strip to the runtime essentials: daemon, client tools, share/charsets.
-# -L dereferences symlinks (bintar ships mariadbd -> mysqld links).
+# 只保留运行必需：mysqld + 客户端工具 + share/（错误消息与字符集）。
 mkdir -p "$APP/mysql/bin" "$APP/mysql/share" "$APP/mysql/lib/plugin"
-cp -aL "$EXTRACT/bin/mariadbd" "$APP/mysql/bin/" 2>/dev/null || cp -aL "$EXTRACT/bin/mysqld" "$APP/mysql/bin/"
-for t in mariadb mysql mariadb-admin mysqladmin mariadb-dump mysqldump my_print_defaults resolveip; do
+cp -a "$EXTRACT/bin/mysqld" "$APP/mysql/bin/"
+for t in mysql mysqldump mysqladmin; do
   if [ -f "$EXTRACT/bin/$t" ]; then cp -aL "$EXTRACT/bin/$t" "$APP/mysql/bin/"; fi
 done
-# MariaDB bintar 把 install-db 放在 scripts/ 而不是 bin/（实测 11.4.8）
-for s in mariadb-install-db mysql_install_db; do
-  if [ ! -f "$APP/mysql/bin/$s" ] && [ -f "$EXTRACT/scripts/$s" ]; then
-    cp -aL "$EXTRACT/scripts/$s" "$APP/mysql/bin/"
-  elif [ -f "$EXTRACT/bin/$s" ]; then
-    cp -aL "$EXTRACT/bin/$s" "$APP/mysql/bin/"
-  fi
-done
+# 客户端工具依赖 libmysqlclient（minimal 包自带于 lib/ 下）
+mkdir -p "$APP/mysql/lib"
+cp -a "$EXTRACT/lib/"*.so* "$APP/mysql/lib/" 2>/dev/null || true
 cp -a "$EXTRACT/share/." "$APP/mysql/share/" 2>/dev/null || true
-# 保留完整 share/：mariadb-install-db 需要 fill_help_tables.sql 与
-# sys_schema，errmsg 多语言文件体积可接受
-# shared libs mariadbd needs (libaio comes from fnOS; copy plugin dir too)
-cp -a "$EXTRACT/lib/" "$APP/mysql/lib/" 2>/dev/null || true
-mkdir -p "$APP/mysql/lib/plugin"
-cp -a "$EXTRACT/lib/plugin/"* "$APP/mysql/lib/plugin/" 2>/dev/null || true
+# plugin 目录：caching_sha2 等内置插件为静态，无需额外 plugin 文件
 strip --strip-unneeded "$APP/mysql/bin/"* 2>/dev/null || true
 
 echo "== license files =="
 mkdir -p "$APP/licenses"
-cp -a "$EXTRACT/COPYING" "$APP/licenses/MariaDB-COPYING" 2>/dev/null || true
+cp -a "$EXTRACT/LICENSE" "$APP/licenses/MySQL-LICENSE" 2>/dev/null ||   cp -a "$EXTRACT/COPYING" "$APP/licenses/MySQL-COPYING" 2>/dev/null || true
+cp -a "$EXTRACT/README" "$APP/licenses/MySQL-README" 2>/dev/null || true
 
 echo "payload assembled at $APP"

@@ -141,35 +141,26 @@ func (a *App) versionInfo() backup.VersionInfo {
 }
 
 func (a *App) resolveBins() Binaries {
+	find := func(names ...string) string {
+		for _, n := range names {
+			c := filepath.Join(a.Paths.MySQLRuntime(), "bin", n)
+			if _, err := os.Stat(c); err == nil {
+				return c
+			}
+		}
+		return ""
+	}
 	b := Binaries{
 		Worldserver: filepath.Join(a.Paths.BinDir(), "worldserver"),
 		Authserver:  filepath.Join(a.Paths.BinDir(), "authserver"),
-		MysqlClient: filepath.Join(a.Paths.MySQLRuntime(), "bin", "mariadb"),
-		MysqlDump:   filepath.Join(a.Paths.MySQLRuntime(), "bin", "mariadb-dump"),
-		MysqlAdmin:  filepath.Join(a.Paths.MySQLRuntime(), "bin", "mariadb-admin"),
+		// MariaDB 与 MySQL 的同功能工具名不同，按存在性解析。
+		MariaDBD:   find("mariadbd", "mysqld"),
+		MysqlClient: find("mariadb", "mysql"),
+		MysqlDump:   find("mariadb-dump", "mysqldump"),
+		MysqlAdmin:  find("mariadb-admin", "mysqladmin"),
+		InstallDB:   find("mariadb-install-db", "mysql_install_db"),
 	}
-	// MariaDB bintar layout keeps the daemon as mariadbd (mysqld alias).
-	for _, name := range []string{"mariadbd", "mysqld"} {
-		c := filepath.Join(a.Paths.MySQLRuntime(), "bin", name)
-		if _, err := os.Stat(c); err == nil {
-			b.MariaDBD = c
-			break
-		}
-	}
-	for _, name := range []string{"mariadb-install-db", "mysql_install_db"} {
-		c := filepath.Join(a.Paths.MySQLRuntime(), "bin", name)
-		if _, err := os.Stat(c); err == nil {
-			b.InstallDB = c
-			break
-		}
-	}
-	// Fall back to bare names when the payload layout differs.
-	if b.MariaDBD == "" {
-		b.MariaDBD = "mariadbd"
-	}
-	if b.InstallDB == "" {
-		b.InstallDB = "mariadb-install-db"
-	}
+	// 无 install-db（MySQL 用 mysqld --initialize-insecure 建库）。
 	return b
 }
 

@@ -84,8 +84,16 @@ func BootstrapPrepare(p platform.Paths, log *logging.Logger, st StateRecorder,
 
 	if !datadirInitialized(p.MySQLData()) {
 		progress("installing datadir")
-		if err := runInstallDB(p, installDbBin); err != nil {
-			return nil, fmt.Errorf("mariadb-install-db: %w", err)
+		if installDbBin != "" {
+			// MariaDB: mariadb-install-db 脚本
+			if err := runInstallDB(p, installDbBin); err != nil {
+				return nil, fmt.Errorf("mariadb-install-db: %w", err)
+			}
+		} else {
+			// MySQL 8: mysqld --initialize-insecure（root@localhost 空密码）
+			if err := runInitialize(p, mysqldBin); err != nil {
+				return nil, fmt.Errorf("mysqld --initialize-insecure: %w", err)
+			}
 		}
 	}
 	return creds, nil
@@ -121,6 +129,15 @@ plugin_dir                 = %s
 	return os.WriteFile(myCnfPath(p), []byte(cnf), 0o600)
 }
 
+// isMariaDB reports the server flavor from the bundled daemon binary
+// name (the payload ships exactly one of mariadbd / mysqld).
+func isMariaDB(p platform.Paths) bool {
+	if _, err := os.Stat(filepath.Join(p.MySQLRuntime(), "bin", "mariadbd")); err == nil {
+		return true
+	}
+	return false
+}
+
 func datadirInitialized(dir string) bool {
 	for _, marker := range []string{"mysql", "performance_schema", "aria_log_control"} {
 		if _, err := os.Stat(filepath.Join(dir, marker)); err == nil {
@@ -128,6 +145,20 @@ func datadirInitialized(dir string) bool {
 		}
 	}
 	return false
+}
+
+// runInitialize uses MySQL 8's built-in datadir initializer.
+func runInitialize(p platform.Paths, mysqldBin string) error {
+	args := []string{
+		"--defaults-file=" + myCnfPath(p),
+		"--initialize-insecure",
+	}
+	cmd := command(mysqldBin, args)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%s: %s", err, strings.TrimSpace(string(out)))
+	}
+	return nil
 }
 
 func runInstallDB(p platform.Paths, installDbBin string) error {
@@ -181,7 +212,7 @@ func saveCreds(p platform.Paths, c *Credentials) error {
 // password on a fresh datadir, then create the databases and the
 // least-privilege app user. Safe to re-run.
 func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger) error {
-	if err := setRootPassword(creds, log); err != nil {
+	if err := setRootPassword(p, creds, log); err != nil {
 		return err
 	}
 	dsn := fmt.Sprintf("root:%s@tcp(127.0.0.1:%d)/?charset=utf8mb4&multiStatements=true", creds.Root, creds.Port)
@@ -237,7 +268,7 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 // that refuse (hardening: fewer remote root entries is better). The
 // Manager itself always connects over TCP 127.0.0.1, so that account
 // is guaranteed to exist with the final password.
-func setRootPassword(creds *Credentials, log *logging.Logger) error {
+func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) error {
 	dsn := fmt.Sprintf("root@tcp(127.0.0.1:%d)/?charset=utf8mb4&multiStatements=true", creds.Port)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -264,9 +295,17 @@ func setRootPassword(creds *Credentials, log *logging.Logger) error {
 		return err
 	}
 	for _, h := range hosts {
-		q := fmt.Sprintf(
-			"ALTER USER 'root'@'%s' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
-			h, creds.Root)
+		// MariaDB 与 MySQL 8 的密码语句方言不同（USING PASSWORD vs BY）
+		var q string
+		if isMariaDB(p) {
+			q = fmt.Sprintf(
+				"ALTER USER 'root'@'%s' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
+				h, creds.Root)
+		} else {
+			q = fmt.Sprintf(
+				"ALTER USER 'root'@'%s' IDENTIFIED WITH mysql_native_password BY '%s'",
+				h, creds.Root)
+		}
 		if _, err := db.Exec(q); err != nil {
 			log.Warn("ALTER USER root@%s failed (%v), dropping the account", h, err)
 			if _, derr := db.Exec(fmt.Sprintf("DROP USER 'root'@'%s'", h)); derr != nil {
