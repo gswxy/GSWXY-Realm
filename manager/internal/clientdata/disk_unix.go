@@ -2,7 +2,10 @@
 
 package clientdata
 
-import "syscall"
+import (
+	"fmt"
+	"syscall"
+)
 
 func checkDiskSpace(dir string, need int64) error {
 	var st syscall.Statfs_t
