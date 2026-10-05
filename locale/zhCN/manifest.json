@@ -1,0 +1,62 @@
+{
+  "name": "GSWXY Locale zhCN",
+  "version": "1.0.0",
+  "language": "zhCN",
+  "generated_at": "2026-10-05T15:24:40+08:00",
+  "source": "GSWXY 耳语魔兽（只读提取）",
+  "filter": "仅保留锁定上游 base SQL 中存在的主键；自定义 ID 一律排除",
+  "strategy": "写基础列（与客户端语言无关），不写 _locale 表；DBC 保持 enUS",
+  "tables": {
+    "creature_template": {
+      "kept": 27227,
+      "skipped_custom": 226,
+      "skipped_no_zh": 2719
+    },
+    "item_template": {
+      "kept": 37839,
+      "skipped_custom": 132507,
+      "skipped_no_zh": 8256
+    },
+    "quest_template": {
+      "kept": 9404,
+      "skipped_custom": 24,
+      "skipped_no_zh": 60
+    },
+    "gameobject_template": {
+      "kept": 577,
+      "skipped_custom": 2975,
+      "skipped_no_zh": 21003
+    },
+    "broadcast_text": {
+      "kept": 72302,
+      "skipped_custom": 1,
+      "skipped_no_zh": 737
+    },
+    "npc_text": {
+      "kept": 1,
+      "skipped_custom": 439,
+      "skipped_no_zh": 8350
+    },
+    "gossip_menu_option": {
+      "kept": 0,
+      "skipped_custom": 158,
+      "skipped_no_zh": 4537
+    },
+    "acore_string": {
+      "kept": 930,
+      "skipped_custom": 124,
+      "skipped_no_zh": 223
+    }
+  },
+  "totals": {
+    "kept": 148280,
+    "filtered_custom": 136454
+  },
+  "upstream": "见 versions/upstream.json",
+  "playerbots": {
+    "names": 100000,
+    "guilds": 400,
+    "arena_teams": 300,
+    "method": "程序化生成（承自 gen_pbots_zh.py 方案，固定种子可复现）"
+  }
+}
