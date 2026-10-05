@@ -12,9 +12,6 @@ trap 'rm -rf "$TMP"' EXIT
 
 echo "== archive inspect =="
 tar -tf "$FPK" > "$TMP/list" 2>/dev/null || tar -tf "$FPK" > "$TMP/list"
-# accept either a flat layout or an app/ top-level dir
-TOP=$(head -1 "$TMP/list" | cut -d/ -f1)
-if [ "$TOP" = "app" ] || [ "$TOP" = "." ]; then ROOTP=""; else ROOTP=""; fi
 tar -xf "$FPK" -C "$TMP"
 
 echo "== manifest =="

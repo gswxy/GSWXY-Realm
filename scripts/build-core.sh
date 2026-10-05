@@ -16,11 +16,13 @@ fi
 
 mkdir -p "$BUILD" "$STAGING"
 
+CCACHE_BIN="$(command -v ccache || true)"
+
 cmake -S "$SRC" -B "$BUILD" \
   -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_C_COMPILER_LAUNCHER=$(command -v ccache || echo) \
-  -DCMAKE_CXX_COMPILER_LAUNCHER=$(command -v ccache || echo) \
+  -DCMAKE_C_COMPILER_LAUNCHER="$CCACHE_BIN" \
+  -DCMAKE_CXX_COMPILER_LAUNCHER="$CCACHE_BIN" \
   -DCMAKE_INSTALL_PREFIX="$STAGING/server" \
   -DCONF_DIR=etc \
   -DTOOLS=0 \

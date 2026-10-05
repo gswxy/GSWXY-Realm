@@ -28,10 +28,10 @@ fi
 cd "$ROOT"
 "$FNPACK" build --directory "$ROOT/fnos"
 
-# fnpack output name: usually <dirname>.fpk in the parent of the project dir
-FPK="$ROOT/fnos.fpk"
+# fnpack 1.2.3 输出 <appname>.fpk 到工作目录（真机验证过）
+FPK="$ROOT/com.gswxy.realm.fpk"
 if [ ! -f "$FPK" ]; then
-  FPK=$(ls -t "$ROOT"/*.fpk 2>/dev/null | head -1 || true)
+  FPK=$(find "$ROOT" -maxdepth 1 -name "*.fpk" -type f | head -1 || true)
 fi
 if [ -z "${FPK:-}" ] || [ ! -f "$FPK" ]; then
   echo "ERROR: fnpack did not produce an .fpk" >&2
