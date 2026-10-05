@@ -21,7 +21,10 @@ tar -xf "$FPK" -C "$TMP"
 echo "== manifest =="
 M="$TMP/manifest"
 [ -f "$M" ] || M=$(find "$TMP" -maxdepth 2 -name manifest | head -1)
-[ -n "$M" ] && [ -f "$M" ] || { echo "manifest missing" >&2; exit 1; }
+if [ ! -f "$M" ]; then
+  echo "manifest missing" >&2
+  exit 1
+fi
 # fnpack 规范化 manifest 值（引号/空格），用归一化方式解析
 norm() { sed -E 's/[[:space:]]*=[[:space:]]*/=/' "$1" | sed -E 's/^([a-z_]+)="?([^"]*)"?"?/\1=\2/I'; }
 for field in appname version display_name platform source service_port desktop_uidir desktop_applaunchname; do
