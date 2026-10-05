@@ -1,0 +1,97 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "versions/upstream.json"
+      - "scripts/**"
+      - "manager/**"
+      - "config-schema/**"
+      - "locale/zhCN/**"
+      - "fnos/**"
+      - ".github/workflows/build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: 编译 Core + Playerbots 并打包 FPK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 读取版本锁
+        id: lock
+        run: |
+          echo "core=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['core']['commit'])")" >> "$GITHUB_OUTPUT"
+          echo "pb=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['playerbots']['commit'])")" >> "$GITHUB_OUTPUT"
+
+      - name: 拉取上游源码（锁定 SHA）
+        run: bash scripts/fetch-upstream.sh build/src
+
+      - name: 安装编译依赖
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            git build-essential cmake ninja-build ccache \
+            libboost1.83-dev libboost-system-dev libboost-filesystem-dev \
+            libboost-thread-dev libboost-program-options-dev libboost-iostreams-dev \
+            libboost-regex-dev libboost-date-time-dev libssl-dev \
+            libmariadb-dev libmariadb-dev-compat libreadline-dev zlib1g-dev libbz2-dev p7zip-full
+
+      - name: 缓存 ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ steps.lock.outputs.core }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ steps.lock.outputs.core }}-
+            ccache-
+
+      - name: 编译 Core + Playerbots
+        run: bash scripts/build-core.sh
+
+      - name: 构建 Manager
+        run: bash scripts/build-manager.sh
+
+      - name: 生成 Config Schema
+        run: |
+          python3 config-schema/generator/generate.py \
+            --src build/src --out config-schema/generated/config-schema.json --out-zh config-schema/generated/config-schema.zh.json --translations config-schema/translations/zhCN.json
+
+      - name: 收集运行时（含 MariaDB / WebUI / locale）
+        env:
+          GSRM_CACHE: /tmp/gsrm-cache
+        run: bash scripts/collect-runtime.sh
+
+      - name: 生成 build-info.json
+        env:
+          GSRM_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || '1.0.0-nightly' }}
+          GSRM_CHANNEL: nightly
+          GSRM_RUN_ID: ${{ github.run_id }}
+        run: bash scripts/gen-build-info.sh
+
+      - name: Smoke 测试
+        run: bash scripts/smoke-test.sh
+
+      - name: 构建 FPK
+        env:
+          GSRM_CACHE: /tmp/gsrm-cache
+        run: bash scripts/build-fpk.sh
+
+      - name: 验证 FPK
+        run: bash scripts/verify-package.sh dist/GSWXY-Realm-1.0.0-nightly-x86_64.fpk || bash scripts/verify-package.sh
+
+      - name: 上传 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GSWXY-Realm-fpk
+          path: |
+            dist/*.fpk
+            dist/*.sha256
+            fnos/app/build-info.json
+          retention-days: 14

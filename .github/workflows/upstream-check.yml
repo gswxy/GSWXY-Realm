@@ -1,0 +1,87 @@
+name: Upstream Check
+
+on:
+  schedule:
+    - cron: "0 21 * * *" # 每日 UTC 21:00（北京时间 05:00）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: 检查上游版本变化
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 查询上游最新 SHA
+        id: latest
+        run: |
+          CORE=$(curl -sf "https://api.github.com/repos/mod-playerbots/azerothcore-wotlk/branches/Playerbot" | python3 -c "import json,sys;print(json.load(sys.stdin)['commit']['sha'])")
+          PB=$(curl -sf "https://api.github.com/repos/mod-playerbots/mod-playerbots/branches/master" | python3 -c "import json,sys;print(json.load(sys.stdin)['commit']['sha'])")
+          echo "core=$CORE" >> "$GITHUB_OUTPUT"
+          echo "pb=$PB" >> "$GITHUB_OUTPUT"
+
+      - name: 对比版本锁
+        id: diff
+        run: |
+          CORE_LOCKED=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['core']['commit'])")
+          PB_LOCKED=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['playerbots']['commit'])")
+          CHANGED=""
+          [ "$CORE_LOCKED" != "${{ steps.latest.outputs.core }}" ] && CHANGED="core"
+          [ "$PB_LOCKED" != "${{ steps.latest.outputs.pb }}" ] && CHANGED="$CHANGED playerbots"
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+          echo "core_locked=$CORE_LOCKED" >> "$GITHUB_OUTPUT"
+          echo "pb_locked=$PB_LOCKED" >> "$GITHUB_OUTPUT"
+
+      - name: 无变化
+        if: steps.diff.outputs.changed == ''
+        run: echo "上游无变化，不执行任何操作。"
+
+      - name: 创建更新 Issue
+        if: steps.diff.outputs.changed != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changed = "${{ steps.diff.outputs.changed }}".trim();
+            const title = `上游更新候选：${changed}`;
+            // 去重：已有同标题开放 Issue 时不重复创建
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: "open", per_page: 100,
+            });
+            if (existing.data.some(i => i.title === title)) {
+              console.log("issue already open");
+              return;
+            }
+            const body = [
+              "上游出现新版本候选，**未经兼容构建验证，不得直接进入 Stable Release**。",
+              "",
+              "| 组件 | 锁定版本 | 最新版本 |",
+              "| --- | --- | --- |",
+              `| azerothcore-wotlk@Playerbot | ${{ steps.diff.outputs.core_locked }} | ${{ steps.latest.outputs.core }} |`,
+              `| mod-playerbots@master | ${{ steps.diff.outputs.pb_locked }} | ${{ steps.latest.outputs.pb }} |`,
+              "",
+              "### 处理方式",
+              "1. 用新 SHA 更新 `versions/upstream.json` 后触发 `Build` 工作流验证；",
+              "2. 兼容构建通过 + 真机冒烟通过后，人工触发 `Release`（stable）；",
+              "3. 不自动修改主线版本锁。",
+            ].join("\n");
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title, body, labels: ["upstream-update"],
+            });
+
+      - name: 输出 Summary
+        if: steps.diff.outputs.changed != ''
+        run: |
+          {
+            echo "## 上游更新候选"
+            echo ""
+            echo "| 组件 | 锁定 | 最新 |"
+            echo "| --- | --- | --- |"
+            echo "| Core | ${{ steps.diff.outputs.core_locked }} | ${{ steps.latest.outputs.core }} |"
+            echo "| Playerbots | ${{ steps.diff.outputs.pb_locked }} | ${{ steps.latest.outputs.pb }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

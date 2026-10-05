@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "manager/**"
+      - "config-schema/**"
+      - "scripts/**"
+      - "fnos/**"
+      - "locale/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  manager:
+    name: Manager 单元测试与构建
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: go vet
+        working-directory: manager
+        run: go vet ./...
+      - name: go test
+        working-directory: manager
+        run: go test ./... -v
+      - name: build (linux/amd64)
+        working-directory: manager
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+            go build -trimpath -ldflags="-s -w" -o bin/gswxy-manager ./cmd/gswxy-manager
+
+  frontend:
+    name: WebUI 静态检查
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: JS 语法检查
+        run: |
+          node --check manager/internal/api/static/app.js
+      - name: HTML 基础校验
+        run: |
+          python3 - <<'EOF'
+          from html.parser import HTMLParser
+          class P(HTMLParser):
+              def error(self, m): raise SystemExit(m)
+          P().feed(open("manager/internal/api/static/index.html", encoding="utf8").read())
+          print("html ok")
+          EOF
+
+  schema:
+    name: Config Schema 生成
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: mod-playerbots/azerothcore-wotlk
+          ref: f19a18799a35f7c24bdcdc9ea399c601f166259b
+          path: build/src
+      - name: 生成 schema
+        run: |
+          python3 config-schema/generator/generate.py \
+            --src build/src --out config-schema/generated/config-schema.json --out-zh config-schema/generated/config-schema.zh.json --translations config-schema/translations/zhCN.json
+      - name: schema 测试
+        run: python3 config-schema/generator/test_generator.py
+
+  locale:
+    name: Locale 数据检查
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: manifest 与 checksum 校验
+        run: python3 locale/extractor/validate_locale.py locale/zhCN
+
+  scripts:
+    name: Shell 脚本检查
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck scripts/*.sh fnos/cmd/main fnos/cmd/*
+      - name: bash -n 语法检查
+        run: |
+          for f in scripts/*.sh fnos/cmd/*; do bash -n "$f"; done
+
+  fpk:
+    name: FPK 结构静态验证
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: manifest/config/wizard 校验
+        run: |
+          python3 - <<'EOF'
+          import json, re, sys
+          m = open("fnos/manifest", encoding="utf8").read()
+          required = ["appname", "version", "display_name", "platform",
+                      "source", "service_port", "desktop_uidir",
+                      "desktop_applaunchname", "ctl_stop"]
+          for f in required:
+              assert re.search(rf'^{f}\s*=', m, re.M), f"manifest missing {f}"
+          assert 'appname="com.gswxy.realm"' in m
+          for p in ["fnos/config/privilege", "fnos/config/resource", "fnos/app/ui/config"]:
+              json.load(open(p, encoding="utf8"))
+          for p in ["fnos/wizard/install.json", "fnos/wizard/uninstall.json"]:
+              json.load(open(p, encoding="utf8"))
+          print("fpk static checks ok")
+          EOF
+      - name: 目录结构校验
+        run: |
+          test -x fnos/cmd/main
+          test -f fnos/ICON.PNG
+          test -f fnos/ICON_256.PNG
+          test -f fnos/app/ui/images/icon-64.png
+          test -f fnos/app/ui/images/icon-256.png

@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号（如 1.0.0）"
+        required: true
+        type: string
+      channel:
+        description: "发布通道"
+        required: true
+        type: choice
+        default: stable
+        options:
+          - stable
+          - nightly
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 发布 ${{ inputs.version }} (${{ inputs.channel }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 读取版本锁
+        id: lock
+        run: |
+          echo "core=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['core']['commit'])")" >> "$GITHUB_OUTPUT"
+          echo "pb=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['playerbots']['commit'])")" >> "$GITHUB_OUTPUT"
+
+      - name: 拉取上游源码（锁定 SHA）
+        run: bash scripts/fetch-upstream.sh build/src
+
+      - name: 安装编译依赖
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            git build-essential cmake ninja-build ccache \
+            libboost1.83-dev libboost-system-dev libboost-filesystem-dev \
+            libboost-thread-dev libboost-program-options-dev libboost-iostreams-dev \
+            libboost-regex-dev libboost-date-time-dev libssl-dev \
+            libmariadb-dev libmariadb-dev-compat libreadline-dev zlib1g-dev libbz2-dev p7zip-full
+
+      - name: 缓存 ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ steps.lock.outputs.core }}-release-${{ inputs.version }}
+          restore-keys: |
+            ccache-${{ steps.lock.outputs.core }}-
+            ccache-
+
+      - name: 编译 Core + Playerbots
+        run: bash scripts/build-core.sh
+
+      - name: 构建 Manager
+        run: bash scripts/build-manager.sh
+
+      - name: 生成 Config Schema
+        run: |
+          python3 config-schema/generator/generate.py \
+            --src build/src --out config-schema/generated/config-schema.json --out-zh config-schema/generated/config-schema.zh.json --translations config-schema/translations/zhCN.json
+
+      - name: 收集运行时
+        env:
+          GSRM_CACHE: /tmp/gsrm-cache
+        run: bash scripts/collect-runtime.sh
+
+      - name: 生成 build-info.json
+        env:
+          GSRM_VERSION: ${{ inputs.version }}
+          GSRM_CHANNEL: ${{ inputs.channel }}
+          GSRM_RUN_ID: ${{ github.run_id }}
+        run: bash scripts/gen-build-info.sh
+
+      - name: Smoke 测试
+        run: bash scripts/smoke-test.sh
+
+      - name: 构建 FPK
+        env:
+          GSRM_CACHE: /tmp/gsrm-cache
+        run: bash scripts/build-fpk.sh
+
+      - name: 验证 FPK
+        run: bash scripts/verify-package.sh
+
+      - name: 生成第三方许可证文件
+        run: bash scripts/gen-licenses.sh
+
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: GSWXY Realm ${{ inputs.version }}
+          draft: false
+          prerelease: ${{ inputs.channel == 'nightly' }}
+          body: |
+            ## GSWXY Realm ${{ inputs.version }}（${{ inputs.channel }}）
+
+            fnOS 原生 AzerothCore Playerbots 一体化服务器发行版。
+
+            ### 上游版本
+            - Core: ${{ steps.lock.outputs.core }}
+            - mod-playerbots: ${{ steps.lock.outputs.pb }}
+            - AC Client Data: 见 versions/upstream.json
+            - 数据库运行时: MariaDB（内置）
+
+            ### 安装
+            下载 `GSWXY-Realm-*.fpk`，在 fnOS 应用中心手动安装，打开应用按向导完成初始化。
+
+            **Powered by AzerothCore + mod-playerbots**
+          files: |
+            dist/*.fpk
+            dist/*.fpk.sha256
+            fnos/app/build-info.json
+            THIRD-PARTY-LICENSES.txt
