@@ -251,10 +251,13 @@ func (a *App) socketPath() string {
 	return filepath.Join(a.Paths.Var, "mysql.sock")
 }
 
-// serverEnv passes DB credentials to the servers through their generated
-// config files, not the environment (env vars can leak into logs).
+// serverEnv builds the environment for the game servers: bundled libs
+// first (dynamic-library strategy) and the payload data dir.
 func (a *App) serverEnv() []string {
-	return []string{"GSRM_DATA_DIR=" + a.Paths.DataDir()}
+	return []string{
+		"GSRM_DATA_DIR=" + a.Paths.DataDir(),
+		"LD_LIBRARY_PATH=" + filepath.Join(a.Paths.AppDest, "lib"),
+	}
 }
 
 // DB lazily opens the app-user connection.

@@ -1,0 +1,177 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 111800432457,
+      "run_id": 37321201434,
+      "workflow_name": "Build",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/gswxy/GSWXY-Realm/actions/runs/37321201434",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOU8QXUs8AAAAaB9M3SQ",
+      "head_sha": "1999822707f947b39b415d5e1e25a14d4cd56b97",
+      "url": "https://api.github.com/repos/gswxy/GSWXY-Realm/actions/jobs/111800432457",
+      "html_url": "https://github.com/gswxy/GSWXY-Realm/actions/runs/37321201434/job/111800432457",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T14:00:17Z",
+      "started_at": "2026-10-05T14:00:19Z",
+      "completed_at": "2026-10-05T15:20:49Z",
+      "name": "编译 Core + Playerbots 并打包 FPK",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T14:00:20Z",
+          "completed_at": "2026-10-05T14:00:21Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T14:00:21Z",
+          "completed_at": "2026-10-05T14:00:22Z"
+        },
+        {
+          "name": "读取版本锁",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T14:00:22Z",
+          "completed_at": "2026-10-05T14:00:22Z"
+        },
+        {
+          "name": "拉取上游源码（锁定 SHA）",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T14:00:22Z",
+          "completed_at": "2026-10-05T14:00:54Z"
+        },
+        {
+          "name": "安装编译依赖",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T14:00:54Z",
+          "completed_at": "2026-10-05T14:01:14Z"
+        },
+        {
+          "name": "缓存 ccache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T14:01:14Z",
+          "completed_at": "2026-10-05T14:01:14Z"
+        },
+        {
+          "name": "编译 Core + Playerbots",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T14:01:14Z",
+          "completed_at": "2026-10-05T15:18:30Z"
+        },
+        {
+          "name": "构建 Manager",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-05T15:18:30Z",
+          "completed_at": "2026-10-05T15:18:46Z"
+        },
+        {
+          "name": "生成 Config Schema",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T15:18:46Z",
+          "completed_at": "2026-10-05T15:18:46Z"
+        },
+        {
+          "name": "收集运行时（含 MariaDB / WebUI / locale）",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T15:18:46Z",
+          "completed_at": "2026-10-05T15:19:27Z"
+        },
+        {
+          "name": "生成 build-info.json",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T15:19:27Z",
+          "completed_at": "2026-10-05T15:19:27Z"
+        },
+        {
+          "name": "Smoke 测试",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-05T15:19:27Z",
+          "completed_at": "2026-10-05T15:19:27Z"
+        },
+        {
+          "name": "构建 FPK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T15:19:27Z",
+          "completed_at": "2026-10-05T15:20:22Z"
+        },
+        {
+          "name": "验证 FPK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-05T15:20:22Z",
+          "completed_at": "2026-10-05T15:20:33Z"
+        },
+        {
+          "name": "上传 Artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T15:20:33Z",
+          "completed_at": "2026-10-05T15:20:46Z"
+        },
+        {
+          "name": "Post 缓存 ccache",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-10-05T15:20:46Z",
+          "completed_at": "2026-10-05T15:20:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 30,
+          "started_at": "2026-10-05T15:20:48Z",
+          "completed_at": "2026-10-05T15:20:48Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31,
+          "started_at": "2026-10-05T15:20:48Z",
+          "completed_at": "2026-10-05T15:20:48Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/gswxy/GSWXY-Realm/check-runs/111800432457",
+      "labels": [
+        "ubuntu-24.04"
+      ],
+      "runner_id": 1000001880,
+      "runner_name": "GitHub Actions 1000001880",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

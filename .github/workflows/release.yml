@@ -22,7 +22,7 @@ permissions:
 jobs:
   release:
     name: 发布 ${{ inputs.version }} (${{ inputs.channel }})
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +40,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq \
-            git build-essential cmake ninja-build ccache \
-            libboost1.83-dev libboost-system-dev libboost-filesystem-dev \
-            libboost-thread-dev libboost-program-options-dev libboost-iostreams-dev \
-            libboost-regex-dev libboost-date-time-dev libssl-dev \
+            git build-essential cmake ninja-build ccache patchelf \
+            libboost-all-dev libssl-dev \
             libmysqlclient-dev libreadline-dev zlib1g-dev libbz2-dev p7zip-full
 
       - name: 缓存 ccache

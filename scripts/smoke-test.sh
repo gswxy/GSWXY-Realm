@@ -16,7 +16,8 @@ done
 echo "== gswxy-manager --version =="
 "$APP/bin/gswxy-manager" version
 
-echo "== dynamic libraries resolve =="
+echo "== dynamic libraries resolve (with bundled lib dir) =="
+export LD_LIBRARY_PATH="$APP/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 for b in worldserver authserver; do
   MISSING=$(ldd "$APP/bin/$b" 2>/dev/null | awk '/not found/{print $1}') || true
   if [ -n "${MISSING:-}" ]; then

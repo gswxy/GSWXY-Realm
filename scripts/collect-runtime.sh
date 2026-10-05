@@ -31,6 +31,28 @@ echo "== binaries =="
 cp -a "$STAGING/server/bin/." "$APP/bin/"
 strip --strip-unneeded "$APP/bin/worldserver" "$APP/bin/authserver" 2>/dev/null || true
 
+echo "== bundled shared libs ==="
+# 动态库策略：构建基线 glibc ≤ fnOS；非系统运行库随包携带 + RPATH。
+# 系统白名单（Debian 12 内置，不打包）：glibc/libstdc++/libgcc/zlib/
+# bz2/readline/ssl/crypto 等；其余（libmysqlclient、boost、…）收集。
+mkdir -p "$APP/lib"
+WHITELIST='libc.so.6|libm.so.6|libpthread|libdl.so.2|librt.so.1|libstdc++.so.6|libgcc_s.so.1|ld-linux|libz.so.1|libbz2.so|liblzma|libreadline.so|libtinfo|libncurses|libssl.so|libcrypto.so|libresolv|libnsl'
+COPIED=""
+for BIN in "$APP/bin/"*; do
+  [ -f "$BIN" ] || continue
+  while IFS= read -r line; do
+    lib=$(echo "$line" | awk '{print $1}')
+    path=$(echo "$line" | awk '{print $3}')
+    base=$(basename "$lib")
+    case "$base" in $WHITELIST) continue ;; esac
+    if [ "$path" != "not" ] && [ -f "$path" ] && [[ "$COPIED" != *"|$base|"* ]]; then
+      cp -aL "$path" "$APP/lib/" && COPIED="$COPIED|$base|"
+    fi
+  done < <(ldd "$BIN" 2>/dev/null)
+done
+patchelf --set-rpath '$ORIGIN/../lib' "$APP/bin/worldserver" "$APP/bin/authserver" 2>/dev/null || true
+echo "bundled: $(echo "$COPIED" | tr '|' ' ')"
+
 echo "== conf dists =="
 # worldserver/authserver dists + module dists
 find "$STAGING/server/etc" -name "*.conf.dist" -exec cp -a {} "$APP/etc/" \; 2>/dev/null || true
