@@ -33,11 +33,17 @@ jobs:
       - name: 拉取上游源码（锁定 SHA）
         run: bash scripts/fetch-upstream.sh build/src
 
+      - name: 安装 GCC 13（toolchain PPA）
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc-13 g++-13
+
       - name: 安装编译依赖
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq \
-            git build-essential gcc-12 g++-12 cmake ninja-build ccache patchelf \
+            git build-essential cmake ninja-build ccache patchelf \
             libboost-all-dev libssl-dev \
             libmysqlclient-dev libreadline-dev zlib1g-dev libbz2-dev p7zip-full
 
@@ -52,8 +58,8 @@ jobs:
 
       - name: 编译 Core + Playerbots
         env:
-          CC: gcc-12
-          CXX: g++-12
+          CC: gcc-13
+          CXX: g++-13
         run: bash scripts/build-core.sh
 
       - name: 构建 Manager
