@@ -17,10 +17,12 @@ tar -xf "$FPK" -C "$TMP"
 echo "== manifest =="
 M=$(find "$TMP" -maxdepth 2 -name manifest | head -1)
 [ -n "$M" ] || { echo "manifest missing" >&2; exit 1; }
+# fnpack 会把 manifest 规范化为 key = value / key="value" 等形式，兼容解析
+norm() { sed -E 's/[[:space:]]*=[[:space:]]*/=/' "$1" | sed -E 's/^([a-z_]+)="?([^"]*)"?"?/\1=\2/I'; }
 for field in appname version display_name platform source service_port desktop_uidir; do
-  grep -q "^${field}" "$M" || { echo "manifest field missing: $field" >&2; exit 1; }
+  grep -qiE "^${field}[[:space:]]*=" "$M" || { echo "manifest field missing: $field" >&2; exit 1; }
 done
-grep -q 'appname="com.gswxy.realm"' "$M" || { echo "wrong appname" >&2; exit 1; }
+norm "$M" | grep -qiE '^appname=com\.gswxy\.realm$' || { echo "wrong appname" >&2; exit 1; }
 
 echo "== structure =="
 BASE=$(dirname "$M")

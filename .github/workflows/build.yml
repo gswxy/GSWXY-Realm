@@ -84,7 +84,7 @@ jobs:
         run: bash scripts/build-fpk.sh
 
       - name: 验证 FPK
-        run: bash scripts/verify-package.sh dist/GSWXY-Realm-1.0.0-nightly-x86_64.fpk || bash scripts/verify-package.sh
+        run: bash scripts/verify-package.sh dist/GSWXY-Realm-*.fpk
 
       - name: 上传 Artifact
         uses: actions/upload-artifact@v4
