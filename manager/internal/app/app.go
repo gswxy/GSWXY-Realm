@@ -420,12 +420,11 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 		d.Setup.Error = ""
 		d.Setup.InProgress = true
 	})
-	setErr := func(err error) {
-		_ = a.State.Update(func(d *state.Data) { d.Setup.Error = err.Error() })
-	}
-
 	fail := func(err error) error {
-		setErr(err)
+		_ = a.State.Update(func(d *state.Data) {
+			d.Setup.Error = err.Error()
+			d.Setup.InProgress = false // 允许从失败点重新恢复
+		})
 		if progress != nil {
 			progress(step, "失败: "+err.Error())
 		}
