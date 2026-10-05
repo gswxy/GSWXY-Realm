@@ -1,0 +1,4554 @@
+{
+ "RealmID": {
+  "name": "Realm 编号",
+  "desc": "本服务器在 realmlist 中的编号，须与 auth 数据库一致。"
+ },
+ "WorldServerPort": {
+  "name": "World 端口",
+  "desc": "世界服务器 TCP 端口（默认 8085）。"
+ },
+ "BindIP": {
+  "name": "监听地址",
+  "desc": "0.0.0.0 表示监听所有网卡（局域网/公网可连）。"
+ },
+ "LoginDatabaseInfo": {
+  "name": "登录库连接",
+  "desc": "由 GSWXY Manager 自动生成，请勿手工修改。"
+ },
+ "WorldDatabaseInfo": {
+  "name": "世界库连接",
+  "desc": "由 GSWXY Manager 自动生成，请勿手工修改。"
+ },
+ "CharacterDatabaseInfo": {
+  "name": "角色库连接",
+  "desc": "由 GSWXY Manager 自动生成，请勿手工修改。"
+ },
+ "LoginDatabase.WorkerThreads": {
+  "pending": true
+ },
+ "WorldDatabase.WorkerThreads": {
+  "pending": true
+ },
+ "CharacterDatabase.WorkerThreads": {
+  "pending": true
+ },
+ "LoginDatabase.SynchThreads": {
+  "pending": true
+ },
+ "WorldDatabase.SynchThreads": {
+  "pending": true
+ },
+ "CharacterDatabase.SynchThreads": {
+  "pending": true
+ },
+ "MaxPingTime": {
+  "name": "最大心跳间隔",
+  "desc": "超时未心跳则断开连接（分钟）。"
+ },
+ "Database.Reconnect.Seconds": {
+  "pending": true
+ },
+ "Database.Reconnect.Attempts": {
+  "pending": true
+ },
+ "DataDir": {
+  "name": "数据目录",
+  "desc": "DBC/Maps/VMaps/MMaps 所在目录，由 Manager 管理。"
+ },
+ "LogsDir": {
+  "name": "日志目录",
+  "desc": "留空使用运行目录。"
+ },
+ "TempDir": {
+  "pending": true
+ },
+ "CMakeCommand": {
+  "pending": true
+ },
+ "BuildDirectory": {
+  "pending": true
+ },
+ "SourceDirectory": {
+  "pending": true
+ },
+ "MySQLExecutable": {
+  "pending": true
+ },
+ "PidFile": {
+  "name": "PID 文件",
+  "desc": "进程号文件路径。"
+ },
+ "Console.Enable": {
+  "name": "控制台",
+  "desc": "启用服务端控制台（GSWXY 控制台功能依赖此项）。"
+ },
+ "BeepAtStart": {
+  "pending": true
+ },
+ "FlashAtStart": {
+  "pending": true
+ },
+ "Updates.EnableDatabases": {
+  "pending": true
+ },
+ "Updates.AutoSetup": {
+  "pending": true
+ },
+ "Updates.Redundancy": {
+  "pending": true
+ },
+ "Updates.ArchivedRedundancy": {
+  "pending": true
+ },
+ "Updates.AllowRehash": {
+  "pending": true
+ },
+ "Updates.CleanDeadRefMaxCount": {
+  "pending": true
+ },
+ "Updates.ExceptionShutdownDelay": {
+  "pending": true
+ },
+ "Network.Threads": {
+  "name": "网络线程数",
+  "desc": "网络处理线程数量。"
+ },
+ "Network.OutKBuff": {
+  "pending": true
+ },
+ "Network.OutUBuff": {
+  "pending": true
+ },
+ "Network.TcpNodelay": {
+  "pending": true
+ },
+ "Network.EnableProxyProtocol": {
+  "pending": true
+ },
+ "Network.UseSocketActivation": {
+  "pending": true
+ },
+ "Ra.Enable": {
+  "name": "远程管理(RA)",
+  "desc": "远程访问控制台，默认仅本机。"
+ },
+ "Ra.IP": {
+  "name": "RA 绑定地址",
+  "desc": "远程控制台监听地址。"
+ },
+ "Ra.Port": {
+  "name": "RA 端口",
+  "desc": "远程控制台端口。"
+ },
+ "Ra.MinLevel": {
+  "pending": true
+ },
+ "SOAP.Enabled": {
+  "name": "SOAP 接口",
+  "desc": "启用 SOAP 管理 API（部分网页集成需要）。"
+ },
+ "SOAP.IP": {
+  "name": "SOAP 绑定地址",
+  "desc": "SOAP 监听地址，保持 127.0.0.1 更安全。"
+ },
+ "SOAP.Port": {
+  "name": "SOAP 端口",
+  "desc": "SOAP 监听端口（默认 7878）。"
+ },
+ "TOTPMasterSecret": {
+  "pending": true
+ },
+ "ThreadPool": {
+  "pending": true
+ },
+ "UseProcessors": {
+  "name": "CPU 亲和",
+  "desc": "服务端使用的处理器编号（authserver）。"
+ },
+ "ProcessPriority": {
+  "name": "进程优先级",
+  "desc": "0=普通 1=高。"
+ },
+ "Compression": {
+  "pending": true
+ },
+ "PacketLogFile": {
+  "pending": true
+ },
+ "LogDB.Opt.ClearInterval": {
+  "pending": true
+ },
+ "LogDB.Opt.ClearTime": {
+  "pending": true
+ },
+ "RecordUpdateTimeDiffInterval": {
+  "pending": true
+ },
+ "MinRecordUpdateTimeDiff": {
+  "pending": true
+ },
+ "IPLocationFile": {
+  "pending": true
+ },
+ "AllowLoggingIPAddressesInDatabase": {
+  "pending": true
+ },
+ "Allow.IP.Based.Action.Logging": {
+  "pending": true
+ },
+ "LogSpamReports": {
+  "pending": true
+ },
+ "ChatLog.Enable": {
+  "pending": true
+ },
+ "Appender.Console": {
+  "pending": true
+ },
+ "Appender.Server": {
+  "pending": true
+ },
+ "Appender.Playerbots": {
+  "pending": true
+ },
+ "Appender.Errors": {
+  "pending": true
+ },
+ "Logger.root": {
+  "pending": true
+ },
+ "Logger.diff": {
+  "pending": true
+ },
+ "Logger.mmaps": {
+  "pending": true
+ },
+ "Logger.scripts.hotswap": {
+  "pending": true
+ },
+ "Logger.server": {
+  "pending": true
+ },
+ "Logger.sql.sql": {
+  "pending": true
+ },
+ "Logger.sql.updates": {
+  "pending": true
+ },
+ "Logger.sql": {
+  "pending": true
+ },
+ "Logger.time.update": {
+  "pending": true
+ },
+ "Logger.module": {
+  "pending": true
+ },
+ "Logger.spells.scripts": {
+  "pending": true
+ },
+ "Logger.playerbots": {
+  "pending": true
+ },
+ "Log.Async.Enable": {
+  "pending": true
+ },
+ "Metric.Enable": {
+  "pending": true
+ },
+ "Metric.InfluxDB.Connection": {
+  "pending": true
+ },
+ "Metric.InfluxDB.v2": {
+  "pending": true
+ },
+ "Metric.InfluxDB.Org": {
+  "pending": true
+ },
+ "Metric.InfluxDB.Bucket": {
+  "pending": true
+ },
+ "Metric.InfluxDB.Token": {
+  "pending": true
+ },
+ "Metric.Interval": {
+  "pending": true
+ },
+ "Metric.OverallStatusInterval": {
+  "pending": true
+ },
+ "BirthdayTime": {
+  "pending": true
+ },
+ "PlayerLimit": {
+  "pending": true
+ },
+ "World.RealmAvailability": {
+  "pending": true
+ },
+ "GameType": {
+  "name": "游戏类型",
+  "desc": "0=普通 1=PvP 4=普通(标记) 6=RP 8=RPPvP。"
+ },
+ "RealmZone": {
+  "name": "Realm 时区区划",
+  "desc": "影响字符编码与部分规则，1=Development。"
+ },
+ "DBC.Locale": {
+  "pending": true
+ },
+ "Expansion": {
+  "name": "资料片等级",
+  "desc": "2=巫妖王之怒(3.3.5a 标准)。"
+ },
+ "ClientCacheVersion": {
+  "pending": true
+ },
+ "SocketTimeOutTime": {
+  "pending": true
+ },
+ "SocketTimeOutTimeActive": {
+  "pending": true
+ },
+ "MaxOverspeedPings": {
+  "pending": true
+ },
+ "DisconnectToleranceInterval": {
+  "pending": true
+ },
+ "EnableLoginAfterDC": {
+  "pending": true
+ },
+ "MinWorldUpdateTime": {
+  "pending": true
+ },
+ "UpdateUptimeInterval": {
+  "pending": true
+ },
+ "MaxCoreStuckTime": {
+  "pending": true
+ },
+ "SaveRespawnTimeImmediately": {
+  "pending": true
+ },
+ "Server.LoginInfo": {
+  "pending": true
+ },
+ "ShowKickInWorld": {
+  "pending": true
+ },
+ "ShowMuteInWorld": {
+  "pending": true
+ },
+ "ShowBanInWorld": {
+  "pending": true
+ },
+ "MaxWhoListReturns": {
+  "pending": true
+ },
+ "PreventAFKLogout": {
+  "pending": true
+ },
+ "PacketSpoof.BanMode": {
+  "pending": true
+ },
+ "PacketSpoof.BanDuration": {
+  "pending": true
+ },
+ "Warden.Enabled": {
+  "pending": true
+ },
+ "Warden.NumMemChecks": {
+  "pending": true
+ },
+ "Warden.NumLuaChecks": {
+  "pending": true
+ },
+ "Warden.NumOtherChecks": {
+  "pending": true
+ },
+ "Warden.ClientResponseDelay": {
+  "pending": true
+ },
+ "Warden.ClientCheckHoldOff": {
+  "pending": true
+ },
+ "Warden.ClientCheckFailAction": {
+  "pending": true
+ },
+ "Warden.BanDuration": {
+  "pending": true
+ },
+ "AutoBroadcast.On": {
+  "pending": true
+ },
+ "AutoBroadcast.Center": {
+  "pending": true
+ },
+ "AutoBroadcast.Timer": {
+  "pending": true
+ },
+ "AutoBroadcast.MinDisableLevel": {
+  "pending": true
+ },
+ "Visibility.GroupMode": {
+  "pending": true
+ },
+ "Visibility.Distance.Continents": {
+  "pending": true
+ },
+ "Visibility.Distance.Instances": {
+  "pending": true
+ },
+ "Visibility.Distance.BGArenas": {
+  "pending": true
+ },
+ "Visibility.ObjectSparkles": {
+  "pending": true
+ },
+ "Visibility.ObjectQuestMarkers": {
+  "pending": true
+ },
+ "MapUpdateInterval": {
+  "pending": true
+ },
+ "MapUpdate.Threads": {
+  "pending": true
+ },
+ "MoveMaps.Enable": {
+  "pending": true
+ },
+ "vmap.enableLOS": {
+  "pending": true
+ },
+ "vmap.enableHeight": {
+  "pending": true
+ },
+ "vmap.petLOS": {
+  "pending": true
+ },
+ "vmap.BlizzlikePvPLOS": {
+  "pending": true
+ },
+ "vmap.BlizzlikeLOSInOpenWorld": {
+  "pending": true
+ },
+ "vmap.enableIndoorCheck": {
+  "pending": true
+ },
+ "DetectPosCollision": {
+  "pending": true
+ },
+ "CheckGameObjectLoS": {
+  "pending": true
+ },
+ "PreloadAllNonInstancedMapGrids": {
+  "pending": true
+ },
+ "DontCacheRandomMovementPaths": {
+  "pending": true
+ },
+ "ActivateWeather": {
+  "pending": true
+ },
+ "ChangeWeatherInterval": {
+  "pending": true
+ },
+ "AllowTickets": {
+  "pending": true
+ },
+ "LevelReq.Ticket": {
+  "pending": true
+ },
+ "DeletedCharacterTicketTrace": {
+  "pending": true
+ },
+ "AllowPlayerCommands": {
+  "pending": true
+ },
+ "Command.LookupMaxResults": {
+  "pending": true
+ },
+ "Die.Command.Mode": {
+  "pending": true
+ },
+ "GM.LoginState": {
+  "pending": true
+ },
+ "GM.Visible": {
+  "pending": true
+ },
+ "GM.Chat": {
+  "pending": true
+ },
+ "GM.WhisperingTo": {
+  "pending": true
+ },
+ "GM.InGMList.Level": {
+  "pending": true
+ },
+ "GM.InWhoList.Level": {
+  "pending": true
+ },
+ "GM.StartLevel": {
+  "pending": true
+ },
+ "GM.AllowInvite": {
+  "pending": true
+ },
+ "GM.AllowFriend": {
+  "pending": true
+ },
+ "GM.LowerSecurity": {
+  "pending": true
+ },
+ "GM.TicketSystem.ChanceOfGMSurvey": {
+  "pending": true
+ },
+ "DisableWaterBreath": {
+  "pending": true
+ },
+ "AllFlightPaths": {
+  "pending": true
+ },
+ "TaxiFlightSpeed": {
+  "pending": true
+ },
+ "InstantFlightPaths": {
+  "pending": true
+ },
+ "AlwaysMaxSkillForLevel": {
+  "pending": true
+ },
+ "AlwaysMaxWeaponSkill": {
+  "pending": true
+ },
+ "PlayerStart.AllReputation": {
+  "pending": true
+ },
+ "PlayerStart.CustomSpells": {
+  "pending": true
+ },
+ "PlayerStart.MapsExplored": {
+  "pending": true
+ },
+ "Trial.LevelCap": {
+  "pending": true
+ },
+ "Trial.MoneyCap": {
+  "pending": true
+ },
+ "Trial.TradeSkillCap": {
+  "pending": true
+ },
+ "Trial.Restriction.Chat": {
+  "pending": true
+ },
+ "Trial.Restriction.Mail": {
+  "pending": true
+ },
+ "Trial.Restriction.Trade": {
+  "pending": true
+ },
+ "Trial.Restriction.Auction": {
+  "pending": true
+ },
+ "Trial.Restriction.Party": {
+  "pending": true
+ },
+ "Trial.Restriction.Guild": {
+  "pending": true
+ },
+ "Trial.Restriction.Queue": {
+  "pending": true
+ },
+ "PlayerSaveInterval": {
+  "pending": true
+ },
+ "PlayerSave.Stats.MinLevel": {
+  "pending": true
+ },
+ "PlayerSave.Stats.SaveOnlyOnLogout": {
+  "pending": true
+ },
+ "PlayerSave.AdditionalSaves": {
+  "pending": true
+ },
+ "CleanCharacterDB": {
+  "pending": true
+ },
+ "PersistentCharacterCleanFlags": {
+  "pending": true
+ },
+ "ValidateSkillLearnedBySpells": {
+  "pending": true
+ },
+ "CharDelete.Method": {
+  "pending": true
+ },
+ "CharDelete.MinLevel": {
+  "pending": true
+ },
+ "CharDelete.KeepDays": {
+  "pending": true
+ },
+ "MinPlayerName": {
+  "pending": true
+ },
+ "MinPetName": {
+  "pending": true
+ },
+ "DeclinedNames": {
+  "pending": true
+ },
+ "StrictNames.Reserved": {
+  "pending": true
+ },
+ "StrictNames.Profanity": {
+  "pending": true
+ },
+ "StrictPlayerNames": {
+  "pending": true
+ },
+ "StrictPetNames": {
+  "pending": true
+ },
+ "CharacterCreating.Disabled": {
+  "pending": true
+ },
+ "CharacterCreating.Disabled.RaceMask": {
+  "pending": true
+ },
+ "CharacterCreating.Disabled.ClassMask": {
+  "pending": true
+ },
+ "CharactersPerAccount": {
+  "pending": true
+ },
+ "CharactersPerRealm": {
+  "pending": true
+ },
+ "HeroicCharactersPerRealm": {
+  "pending": true
+ },
+ "CharacterCreating.MinLevelForHeroicCharacter": {
+  "pending": true
+ },
+ "StartPlayerLevel": {
+  "name": "初始等级",
+  "desc": "新角色创建时的等级。"
+ },
+ "StartHeroicPlayerLevel": {
+  "pending": true
+ },
+ "SkipCinematics": {
+  "pending": true
+ },
+ "StartPlayerMoney": {
+  "name": "初始金币",
+  "desc": "新角色初始金钱（单位：铜）。"
+ },
+ "StartHeroicPlayerMoney": {
+  "pending": true
+ },
+ "PlayerStart.String": {
+  "pending": true
+ },
+ "EnablePlayerSettings": {
+  "pending": true
+ },
+ "MaxPlayerLevel": {
+  "name": "等级上限",
+  "desc": "玩家可达到的最高等级。"
+ },
+ "MinDualSpecLevel": {
+  "pending": true
+ },
+ "WaterBreath.Timer": {
+  "pending": true
+ },
+ "EnableLowLevelRegenBoost": {
+  "pending": true
+ },
+ "Rate.MoveSpeed.Player": {
+  "pending": true
+ },
+ "Rate.MoveSpeed.NPC": {
+  "pending": true
+ },
+ "Rate.Damage.Fall": {
+  "pending": true
+ },
+ "Rate.Talent": {
+  "pending": true
+ },
+ "Rate.Talent.Pet": {
+  "pending": true
+ },
+ "Rate.Health": {
+  "pending": true
+ },
+ "Rate.Mana": {
+  "pending": true
+ },
+ "Rate.Rage.Income": {
+  "pending": true
+ },
+ "Rate.Rage.Loss": {
+  "pending": true
+ },
+ "Rate.RunicPower.Income": {
+  "pending": true
+ },
+ "Rate.RunicPower.Loss": {
+  "pending": true
+ },
+ "Rate.Focus": {
+  "pending": true
+ },
+ "Rate.Energy": {
+  "pending": true
+ },
+ "Rate.Rest.InGame": {
+  "pending": true
+ },
+ "Rate.Rest.Offline.InTavernOrCity": {
+  "pending": true
+ },
+ "Rate.Rest.Offline.InWilderness": {
+  "pending": true
+ },
+ "Rate.Rest.MaxBonus": {
+  "pending": true
+ },
+ "Rate.MissChanceMultiplier.TargetCreature": {
+  "pending": true
+ },
+ "Rate.MissChanceMultiplier.TargetPlayer": {
+  "pending": true
+ },
+ "Rate.MissChanceMultiplier.OnlyAffectsPlayer": {
+  "pending": true
+ },
+ "LevelReq.Trade": {
+  "pending": true
+ },
+ "NoResetTalentsCost": {
+  "pending": true
+ },
+ "ToggleXP.Cost": {
+  "pending": true
+ },
+ "SpellQueue.Enabled": {
+  "pending": true
+ },
+ "SpellQueue.Window": {
+  "pending": true
+ },
+ "Achievement.RealmFirstKillWindow": {
+  "pending": true
+ },
+ "Achievement.RealmFirstRaceLimitOnePerCharacter": {
+  "pending": true
+ },
+ "MaxPrimaryTradeSkill": {
+  "pending": true
+ },
+ "SkillChance.Prospecting": {
+  "pending": true
+ },
+ "SkillChance.Milling": {
+  "pending": true
+ },
+ "Rate.Skill.Discovery": {
+  "pending": true
+ },
+ "SkillGain.Crafting": {
+  "pending": true
+ },
+ "SkillGain.Defense": {
+  "pending": true
+ },
+ "SkillGain.Gathering": {
+  "pending": true
+ },
+ "SkillGain.Weapon": {
+  "pending": true
+ },
+ "SkillChance.Orange": {
+  "pending": true
+ },
+ "SkillChance.Yellow": {
+  "pending": true
+ },
+ "SkillChance.Green": {
+  "pending": true
+ },
+ "SkillChance.Grey": {
+  "pending": true
+ },
+ "SkillChance.MiningSteps": {
+  "pending": true
+ },
+ "SkillChance.SkinningSteps": {
+  "pending": true
+ },
+ "OffhandCheckAtSpellUnlearn": {
+  "pending": true
+ },
+ "Stats.Limits.Enable": {
+  "pending": true
+ },
+ "Stats.Limits.Dodge": {
+  "pending": true
+ },
+ "Stats.Limits.Parry": {
+  "pending": true
+ },
+ "Stats.Limits.Block": {
+  "pending": true
+ },
+ "Stats.Limits.Crit": {
+  "pending": true
+ },
+ "Rate.Reputation.Gain": {
+  "name": "声望倍率",
+  "desc": "获取声望的倍率。"
+ },
+ "Rate.Reputation.LowLevel.Kill": {
+  "pending": true
+ },
+ "Rate.Reputation.LowLevel.Quest": {
+  "pending": true
+ },
+ "Rate.Reputation.RecruitAFriendBonus": {
+  "pending": true
+ },
+ "Rate.Reputation.Gain.WSG": {
+  "pending": true
+ },
+ "Rate.Reputation.Gain.AB": {
+  "pending": true
+ },
+ "Rate.Reputation.Gain.AV": {
+  "pending": true
+ },
+ "MaxGroupXPDistance": {
+  "pending": true
+ },
+ "Rate.XP.Kill": {
+  "name": "杀怪经验倍率",
+  "desc": "击杀怪物获得的经验倍率。"
+ },
+ "Rate.XP.Quest": {
+  "name": "任务经验倍率",
+  "desc": "完成任务获得的经验倍率。"
+ },
+ "Rate.XP.Quest.DF": {
+  "pending": true
+ },
+ "Rate.XP.Explore": {
+  "name": "探索经验倍率",
+  "desc": "探索地图获得的经验倍率。"
+ },
+ "Rate.XP.Pet": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillAV": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillWSG": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillAB": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillEOTS": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillSOTA": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundKillIC": {
+  "pending": true
+ },
+ "Rate.XP.BattlegroundBonus": {
+  "pending": true
+ },
+ "Rate.Pet.LevelXP": {
+  "pending": true
+ },
+ "MaxHonorPoints": {
+  "name": "荣誉上限",
+  "desc": "荣誉点数上限。"
+ },
+ "MaxHonorPointsMoneyPerPoint": {
+  "pending": true
+ },
+ "StartHonorPoints": {
+  "name": "初始荣誉",
+  "desc": "新角色初始荣誉点数。"
+ },
+ "HonorPointsAfterDuel": {
+  "pending": true
+ },
+ "Rate.Honor": {
+  "name": "荣誉倍率",
+  "desc": "获取荣誉的倍率。"
+ },
+ "MaxArenaPoints": {
+  "name": "竞技场上限",
+  "desc": "竞技场点数上限。"
+ },
+ "StartArenaPoints": {
+  "pending": true
+ },
+ "Arena.LegacyArenaPoints": {
+  "pending": true
+ },
+ "Rate.ArenaPoints": {
+  "pending": true
+ },
+ "Rate.ArenaPoints2v2": {
+  "pending": true
+ },
+ "Rate.ArenaPoints3v3": {
+  "pending": true
+ },
+ "PvPToken.Enable": {
+  "pending": true
+ },
+ "PvPToken.MapAllowType": {
+  "pending": true
+ },
+ "PvPToken.ItemID": {
+  "pending": true
+ },
+ "PvPToken.ItemCount": {
+  "pending": true
+ },
+ "DurabilityLoss.InPvP": {
+  "pending": true
+ },
+ "DurabilityLoss.OnDeath": {
+  "pending": true
+ },
+ "DurabilityLoss.OnSpiritResurrect": {
+  "pending": true
+ },
+ "DurabilityLossChance.Damage": {
+  "pending": true
+ },
+ "DurabilityLossChance.Absorb": {
+  "pending": true
+ },
+ "DurabilityLossChance.Parry": {
+  "pending": true
+ },
+ "DurabilityLossChance.Block": {
+  "pending": true
+ },
+ "Death.SicknessLevel": {
+  "pending": true
+ },
+ "Death.CorpseReclaimDelay.PvP": {
+  "pending": true
+ },
+ "Death.CorpseReclaimDelay.PvE": {
+  "pending": true
+ },
+ "Death.Bones.World": {
+  "pending": true
+ },
+ "Death.Bones.BattlegroundOrArena": {
+  "pending": true
+ },
+ "Pet.RankMod.Health": {
+  "pending": true
+ },
+ "ItemDelete.Method": {
+  "pending": true
+ },
+ "ItemDelete.Vendor": {
+  "pending": true
+ },
+ "ItemDelete.Quality": {
+  "pending": true
+ },
+ "ItemDelete.ItemLevel": {
+  "pending": true
+ },
+ "ItemDelete.KeepDays": {
+  "pending": true
+ },
+ "DBC.EnforceItemAttributes": {
+  "pending": true
+ },
+ "Rate.Drop.Item.Poor": {
+  "name": "灰色物品掉率",
+  "desc": "普通(灰色)物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Normal": {
+  "name": "白色物品掉率",
+  "desc": "白色物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Uncommon": {
+  "name": "绿色物品掉率",
+  "desc": "优秀(绿色)物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Rare": {
+  "name": "蓝色物品掉率",
+  "desc": "稀有(蓝色)物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Epic": {
+  "name": "紫色物品掉率",
+  "desc": "史诗(紫色)物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Legendary": {
+  "name": "橙色物品掉率",
+  "desc": "传说(橙色)物品掉落倍率。"
+ },
+ "Rate.Drop.Item.Artifact": {
+  "pending": true
+ },
+ "Rate.Drop.Item.Referenced": {
+  "pending": true
+ },
+ "Rate.Drop.Money": {
+  "pending": true
+ },
+ "Rate.Drop.Item.ReferencedAmount": {
+  "pending": true
+ },
+ "Rate.Drop.Item.GroupAmount": {
+  "pending": true
+ },
+ "LootNeedBeforeGreedILvlRestriction": {
+  "pending": true
+ },
+ "Item.SetItemTradeable": {
+  "pending": true
+ },
+ "Quests.EnableQuestTracker": {
+  "pending": true
+ },
+ "QuestPOI.Enabled": {
+  "pending": true
+ },
+ "Quests.LowLevelHideDiff": {
+  "pending": true
+ },
+ "Quests.HighLevelHideDiff": {
+  "pending": true
+ },
+ "Quests.IgnoreRaid": {
+  "pending": true
+ },
+ "Quests.IgnoreAutoAccept": {
+  "pending": true
+ },
+ "Quests.IgnoreAutoComplete": {
+  "pending": true
+ },
+ "Rate.RewardQuestMoney": {
+  "pending": true
+ },
+ "Rate.RewardBonusMoney": {
+  "pending": true
+ },
+ "MonsterSight": {
+  "pending": true
+ },
+ "Rate.Creature.Aggro": {
+  "name": "仇恨范围倍率",
+  "desc": "怪物仇恨(侦测)范围倍率。"
+ },
+ "CreatureFamilyFleeAssistanceRadius": {
+  "pending": true
+ },
+ "CreatureLeashRadius": {
+  "pending": true
+ },
+ "CreatureFamilyAssistanceRadius": {
+  "pending": true
+ },
+ "CreatureFamilyAssistanceDelay": {
+  "pending": true
+ },
+ "CreatureFamilyAssistancePeriod": {
+  "pending": true
+ },
+ "CreatureFamilyFleeDelay": {
+  "pending": true
+ },
+ "WorldBossLevelDiff": {
+  "pending": true
+ },
+ "Corpse.Decay.NORMAL": {
+  "pending": true
+ },
+ "Corpse.Decay.RARE": {
+  "pending": true
+ },
+ "Corpse.Decay.ELITE": {
+  "pending": true
+ },
+ "Corpse.Decay.RAREELITE": {
+  "pending": true
+ },
+ "Corpse.Decay.WORLDBOSS": {
+  "pending": true
+ },
+ "Rate.Corpse.Decay.Looted": {
+  "pending": true
+ },
+ "Rate.Creature.Normal.Damage": {
+  "name": "普通怪伤害倍率",
+  "desc": "普通怪物伤害倍率。"
+ },
+ "Rate.Creature.Elite.Elite.Damage": {
+  "name": "精英怪伤害倍率",
+  "desc": "精英怪物伤害倍率。"
+ },
+ "Rate.Creature.Elite.RARE.Damage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.RAREELITE.Damage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.WORLDBOSS.Damage": {
+  "pending": true
+ },
+ "Rate.Creature.Normal.SpellDamage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.Elite.SpellDamage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.RARE.SpellDamage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.RAREELITE.SpellDamage": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.WORLDBOSS.SpellDamage": {
+  "pending": true
+ },
+ "Rate.Creature.Normal.HP": {
+  "name": "普通怪血量倍率",
+  "desc": "普通怪物生命值倍率。"
+ },
+ "Rate.Creature.Elite.Elite.HP": {
+  "name": "精英怪血量倍率",
+  "desc": "精英怪物生命值倍率。"
+ },
+ "Rate.Creature.Elite.RARE.HP": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.RAREELITE.HP": {
+  "pending": true
+ },
+ "Rate.Creature.Elite.WORLDBOSS.HP": {
+  "pending": true
+ },
+ "ListenRange.Say": {
+  "pending": true
+ },
+ "ListenRange.TextEmote": {
+  "pending": true
+ },
+ "ListenRange.Yell": {
+  "pending": true
+ },
+ "Creature.RepositionAgainstNpcs": {
+  "pending": true
+ },
+ "Creature.MovingStopTimeForPlayer": {
+  "pending": true
+ },
+ "WaypointMovementStopTimeForPlayer": {
+  "pending": true
+ },
+ "NpcRegenHPIfTargetIsUnreachable": {
+  "pending": true
+ },
+ "Creature.Instance.TeleportToUnreachableTarget": {
+  "pending": true
+ },
+ "Creatures.CustomIDs": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Poor": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Normal": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Uncommon": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Rare": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Epic": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Legendary": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Artifact": {
+  "pending": true
+ },
+ "Rate.SellValue.Item.Heirloom": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Poor": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Normal": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Uncommon": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Rare": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Epic": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Legendary": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Artifact": {
+  "pending": true
+ },
+ "Rate.BuyValue.Item.Heirloom": {
+  "pending": true
+ },
+ "Rate.RepairCost": {
+  "pending": true
+ },
+ "LeaveGroupOnLogout.Enabled": {
+  "pending": true
+ },
+ "Group.Raid.LevelRestriction": {
+  "pending": true
+ },
+ "Group.RandomRollMaximum": {
+  "pending": true
+ },
+ "Instance.GMSummonPlayer": {
+  "pending": true
+ },
+ "Instance.IgnoreLevel": {
+  "pending": true
+ },
+ "Instance.IgnoreRaid": {
+  "pending": true
+ },
+ "Instance.ResetTimeHour": {
+  "pending": true
+ },
+ "Instance.ResetTimeRelativeTimestamp": {
+  "pending": true
+ },
+ "Rate.InstanceResetTime": {
+  "pending": true
+ },
+ "Instance.UnloadDelay": {
+  "pending": true
+ },
+ "AccountInstancesPerHour": {
+  "pending": true
+ },
+ "Instance.SharedNormalHeroicId": {
+  "pending": true
+ },
+ "DungeonAccessRequirements.PrintMode": {
+  "pending": true
+ },
+ "DungeonAccessRequirements.PortalAvgIlevelCheck": {
+  "pending": true
+ },
+ "DungeonAccessRequirements.OptionalStringID": {
+  "pending": true
+ },
+ "CAIS.Enable": {
+  "pending": true
+ },
+ "JoinBGAndLFG.Enable": {
+  "pending": true
+ },
+ "LFG.MailItemOnFullInventory": {
+  "pending": true
+ },
+ "DungeonFinder.OptionsMask": {
+  "pending": true
+ },
+ "LFG.Location.All": {
+  "pending": true
+ },
+ "LFG.MaxKickCount": {
+  "pending": true
+ },
+ "LFG.KickPreventionTimer": {
+  "pending": true
+ },
+ "DungeonAccessRequirements.LFGLevelDBCOverride": {
+  "pending": true
+ },
+ "DungeonFinder.CastDeserter": {
+  "pending": true
+ },
+ "DungeonFinder.AllowCompleted": {
+  "pending": true
+ },
+ "DungeonFinder.DungeonSelectionCooldown": {
+  "pending": true
+ },
+ "MinCharterName": {
+  "pending": true
+ },
+ "StrictCharterNames": {
+  "pending": true
+ },
+ "Guild.EventLogRecordsCount": {
+  "pending": true
+ },
+ "Guild.ResetHour": {
+  "pending": true
+ },
+ "Guild.BankEventLogRecordsCount": {
+  "pending": true
+ },
+ "MinPetitionSigns": {
+  "pending": true
+ },
+ "Guild.CharterCost": {
+  "pending": true
+ },
+ "Guild.AllowMultipleGuildMaster": {
+  "pending": true
+ },
+ "Guild.BankInitialTabs": {
+  "pending": true
+ },
+ "Guild.BankTabCost0": {
+  "pending": true
+ },
+ "Guild.BankTabCost1": {
+  "pending": true
+ },
+ "Guild.BankTabCost2": {
+  "pending": true
+ },
+ "Guild.BankTabCost3": {
+  "pending": true
+ },
+ "Guild.BankTabCost4": {
+  "pending": true
+ },
+ "Guild.BankTabCost5": {
+  "pending": true
+ },
+ "Guild.MemberLimit": {
+  "pending": true
+ },
+ "FFAPvPTimer": {
+  "pending": true
+ },
+ "OutdoorPvPCaptureRate": {
+  "pending": true
+ },
+ "Wintergrasp.Enable": {
+  "pending": true
+ },
+ "Wintergrasp.PlayerMax": {
+  "pending": true
+ },
+ "Wintergrasp.PlayerMin": {
+  "pending": true
+ },
+ "Wintergrasp.PlayerMinLvl": {
+  "pending": true
+ },
+ "Wintergrasp.BattleTimer": {
+  "pending": true
+ },
+ "Wintergrasp.NoBattleTimer": {
+  "pending": true
+ },
+ "Wintergrasp.CrashRestartTimer": {
+  "pending": true
+ },
+ "Wintergrasp.SkipBattleSessionCount": {
+  "pending": true
+ },
+ "Wintergrasp.KickVoAPlayers": {
+  "pending": true
+ },
+ "Wintergrasp.EssenceBothFactions": {
+  "pending": true
+ },
+ "Wintergrasp.DeferShutdownTimer": {
+  "pending": true
+ },
+ "Battleground.PrepTime": {
+  "pending": true
+ },
+ "Battleground.CastDeserter": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.Enable": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.Limit.MinLevel": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.Limit.MinPlayers": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.SpamProtection.Delay": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.PlayerOnly": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.Timed": {
+  "pending": true
+ },
+ "Battleground.QueueAnnouncer.Timer": {
+  "pending": true
+ },
+ "Battleground.PrematureFinishTimer": {
+  "pending": true
+ },
+ "Battleground.PremadeGroupWaitForMatch": {
+  "pending": true
+ },
+ "Battleground.GiveXPForKills": {
+  "pending": true
+ },
+ "Battleground.Random.ResetHour": {
+  "pending": true
+ },
+ "Battleground.StoreStatistics.Enable": {
+  "pending": true
+ },
+ "Battleground.TrackDeserters.Enable": {
+  "pending": true
+ },
+ "Battleground.InvitationType": {
+  "pending": true
+ },
+ "Battleground.ReportAFK.Timer": {
+  "pending": true
+ },
+ "Battleground.ReportAFK": {
+  "pending": true
+ },
+ "Battleground.DisableQuestShareInBG": {
+  "pending": true
+ },
+ "Battleground.DisableReadyCheckInBG": {
+  "pending": true
+ },
+ "Battleground.RewardWinnerHonorFirst": {
+  "pending": true
+ },
+ "Battleground.RewardWinnerArenaFirst": {
+  "pending": true
+ },
+ "Battleground.RewardWinnerHonorLast": {
+  "pending": true
+ },
+ "Battleground.RewardWinnerArenaLast": {
+  "pending": true
+ },
+ "Battleground.RewardLoserHonorFirst": {
+  "pending": true
+ },
+ "Battleground.RewardLoserHonorLast": {
+  "pending": true
+ },
+ "Battleground.PlayerRespawn": {
+  "pending": true
+ },
+ "Battleground.RestorationBuffRespawn": {
+  "pending": true
+ },
+ "Battleground.BerserkingBuffRespawn": {
+  "pending": true
+ },
+ "Battleground.SpeedBuffRespawn": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.AV": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.WS": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.AB": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.EY": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.SA": {
+  "pending": true
+ },
+ "Battleground.Override.LowLevels.MinPlayers.IC": {
+  "pending": true
+ },
+ "Battleground.Warsong.Flags": {
+  "pending": true
+ },
+ "Battleground.Arathi.CapturePoints": {
+  "pending": true
+ },
+ "Battleground.Alterac.Reinforcements": {
+  "pending": true
+ },
+ "Battleground.Alterac.ReputationOnBossDeath": {
+  "pending": true
+ },
+ "Battleground.EyeOfTheStorm.CapturePoints": {
+  "pending": true
+ },
+ "Arena.PrepTime": {
+  "pending": true
+ },
+ "Arena.MaxRatingDifference": {
+  "pending": true
+ },
+ "Arena.RatingDiscardTimer": {
+  "pending": true
+ },
+ "Arena.PreviousOpponentsDiscardTimer": {
+  "pending": true
+ },
+ "Arena.AutoDistributePoints": {
+  "pending": true
+ },
+ "Arena.AutoDistributeInterval": {
+  "pending": true
+ },
+ "Arena.GamesRequired": {
+  "pending": true
+ },
+ "Arena.QueueAnnouncer.Enable": {
+  "pending": true
+ },
+ "Arena.QueueAnnouncer.PlayerOnly": {
+  "pending": true
+ },
+ "Arena.QueueAnnouncer.Detail": {
+  "pending": true
+ },
+ "Arena.ArenaStartRating": {
+  "pending": true
+ },
+ "Arena.LegacyArenaStartRating": {
+  "pending": true
+ },
+ "Arena.ArenaStartPersonalRating": {
+  "pending": true
+ },
+ "Arena.ArenaStartMatchmakerRating": {
+  "pending": true
+ },
+ "Arena.ArenaWinRatingModifier1": {
+  "pending": true
+ },
+ "Arena.ArenaWinRatingModifier2": {
+  "pending": true
+ },
+ "Arena.ArenaLoseRatingModifier": {
+  "pending": true
+ },
+ "Arena.ArenaMatchmakerRatingModifier": {
+  "pending": true
+ },
+ "ArenaTeam.CharterCost.2v2": {
+  "pending": true
+ },
+ "ArenaTeam.CharterCost.3v3": {
+  "pending": true
+ },
+ "ArenaTeam.CharterCost.5v5": {
+  "pending": true
+ },
+ "MaxAllowedMMRDrop": {
+  "pending": true
+ },
+ "MailDeliveryDelay": {
+  "name": "邮件延迟",
+  "desc": "邮件送达延迟（秒）。"
+ },
+ "Mail.PushInboxOnDelivery": {
+  "pending": true
+ },
+ "LevelReq.Mail": {
+  "pending": true
+ },
+ "IsContinentTransport.Enabled": {
+  "pending": true
+ },
+ "IsPreloadedContinentTransport.Enabled": {
+  "pending": true
+ },
+ "StrictChannelNames": {
+  "pending": true
+ },
+ "AddonChannel": {
+  "pending": true
+ },
+ "ChatFakeMessagePreventing": {
+  "pending": true
+ },
+ "ChatStrictLinkChecking.Severity": {
+  "pending": true
+ },
+ "ChatStrictLinkChecking.Kick": {
+  "pending": true
+ },
+ "ChatFlood.MessageCount": {
+  "pending": true
+ },
+ "ChatFlood.MessageDelay": {
+  "pending": true
+ },
+ "ChatFlood.AddonMessageCount": {
+  "pending": true
+ },
+ "ChatFlood.AddonMessageDelay": {
+  "pending": true
+ },
+ "ChatFlood.MuteTime": {
+  "pending": true
+ },
+ "Chat.MuteFirstLogin": {
+  "pending": true
+ },
+ "Chat.MuteTimeFirstLogin": {
+  "pending": true
+ },
+ "Channel.RestrictedLfg": {
+  "pending": true
+ },
+ "Channel.SilentlyGMJoin": {
+  "pending": true
+ },
+ "ChatLevelReq.Channel": {
+  "pending": true
+ },
+ "ChatLevelReq.Whisper": {
+  "pending": true
+ },
+ "ChatLevelReq.Say": {
+  "pending": true
+ },
+ "PartyLevelReq": {
+  "pending": true
+ },
+ "PreserveCustomChannels": {
+  "pending": true
+ },
+ "PreserveCustomChannelDuration": {
+  "pending": true
+ },
+ "ChatFilter.Whisper": {
+  "pending": true
+ },
+ "ChatFilter.Say": {
+  "pending": true
+ },
+ "ChatFilter.Yell": {
+  "pending": true
+ },
+ "ChatFilter.Emote": {
+  "pending": true
+ },
+ "AllowTwoSide.Accounts": {
+  "name": "跨阵营账号",
+  "desc": "同一账号可建联盟与部落角色。"
+ },
+ "AllowTwoSide.Interaction.Calendar": {
+  "pending": true
+ },
+ "AllowTwoSide.Interaction.Chat": {
+  "name": "跨阵营聊天",
+  "desc": "允许联盟与部落互相聊天。"
+ },
+ "AllowTwoSide.Interaction.Channel": {
+  "name": "跨阵营频道",
+  "desc": "允许跨阵营使用自定义频道。"
+ },
+ "AllowTwoSide.Interaction.Group": {
+  "name": "跨阵营组队",
+  "desc": "允许跨阵营组队。"
+ },
+ "AllowTwoSide.Interaction.Guild": {
+  "name": "跨阵营公会",
+  "desc": "允许跨阵营加入同一公会。"
+ },
+ "AllowTwoSide.Interaction.Arena": {
+  "pending": true
+ },
+ "AllowTwoSide.Interaction.Auction": {
+  "name": "跨阵营拍卖行",
+  "desc": "允许跨阵营使用拍卖行。"
+ },
+ "TalentsInspecting": {
+  "pending": true
+ },
+ "ChangeFaction.MaxMoney": {
+  "pending": true
+ },
+ "RecruitAFriend.MaxLevel": {
+  "pending": true
+ },
+ "RecruitAFriend.MaxDifference": {
+  "pending": true
+ },
+ "MaxRecruitAFriendBonusDistance": {
+  "pending": true
+ },
+ "Calendar.DeleteOldEventsHour": {
+  "pending": true
+ },
+ "Event.Announce": {
+  "pending": true
+ },
+ "Sunsreach.CounterMax": {
+  "pending": true
+ },
+ "ScourgeInvasion.CounterFirst": {
+  "pending": true
+ },
+ "ScourgeInvasion.CounterSecond": {
+  "pending": true
+ },
+ "ScourgeInvasion.CounterThird": {
+  "pending": true
+ },
+ "AuctionHouse.WorkerThreads": {
+  "pending": true
+ },
+ "LevelReq.Auction": {
+  "pending": true
+ },
+ "Rate.Auction.Time": {
+  "pending": true
+ },
+ "Rate.Auction.Deposit": {
+  "pending": true
+ },
+ "Rate.Auction.Cut": {
+  "pending": true
+ },
+ "PlayerDump.DisallowPaths": {
+  "pending": true
+ },
+ "PlayerDump.DisallowOverwrite": {
+  "pending": true
+ },
+ "ICC.Buff.Alliance": {
+  "pending": true
+ },
+ "ICC.Buff.Horde": {
+  "pending": true
+ },
+ "WipeGunshipBlizzlike.Enable": {
+  "pending": true
+ },
+ "Minigob.Manabonk.Enable": {
+  "pending": true
+ },
+ "Calculate.Creature.Zone.Area.Data": {
+  "pending": true
+ },
+ "Calculate.Gameoject.Zone.Area.Data": {
+  "pending": true
+ },
+ "DailyRBGArenaPoints.MinLevel": {
+  "pending": true
+ },
+ "MunchingBlizzlike.Enabled": {
+  "pending": true
+ },
+ "Daze.Enabled": {
+  "pending": true
+ },
+ "InfiniteAmmo.Enabled": {
+  "pending": true
+ },
+ "Debug.Battleground": {
+  "pending": true
+ },
+ "Debug.Arena": {
+  "pending": true
+ },
+ "Debug.LFG": {
+  "pending": true
+ },
+ "Respawn.DynamicRateCreature": {
+  "pending": true
+ },
+ "Respawn.DynamicMinimumCreature": {
+  "pending": true
+ },
+ "Respawn.DynamicRateGameObject": {
+  "pending": true
+ },
+ "Respawn.DynamicMinimumGameObject": {
+  "pending": true
+ },
+ "Respawn.DynamicEscortNPC": {
+  "pending": true
+ },
+ "Respawn.ForceCompatibilityMode": {
+  "pending": true
+ },
+ "Cluster.Enabled": {
+  "pending": true
+ },
+ "Cluster.AvailableMaps": {
+  "pending": true
+ },
+ "Cluster.IsCrossrealm": {
+  "pending": true
+ },
+ "RealmServerPort": {
+  "name": "登录端口",
+  "desc": "AuthServer 监听端口（默认 3724）。"
+ },
+ "EnableProxyProtocol": {
+  "pending": true
+ },
+ "RealmsStateUpdateDelay": {
+  "pending": true
+ },
+ "WrongPass.MaxCount": {
+  "name": "密码错误上限",
+  "desc": "触发封禁的最大密码错误次数。"
+ },
+ "WrongPass.BanTime": {
+  "name": "错误封禁时长",
+  "desc": "密码错误触发的封禁时长。"
+ },
+ "WrongPass.BanType": {
+  "name": "错误封禁类型",
+  "desc": "0=不封禁 1=封IP 2=封账号。"
+ },
+ "WrongPass.Logging": {
+  "pending": true
+ },
+ "BanExpiryCheckInterval": {
+  "pending": true
+ },
+ "StrictVersionCheck": {
+  "pending": true
+ },
+ "Appender.Auth": {
+  "pending": true
+ },
+ "AiPlayerbot.Enabled": {
+  "name": "启用机器人",
+  "desc": "Playerbots 模块总开关。"
+ },
+ "AiPlayerbot.RandomBotAutologin": {
+  "name": "开机自动上线",
+  "desc": "服务器启动后机器人自动登录上线。"
+ },
+ "AiPlayerbot.MinRandomBots": {
+  "name": "随机机器人下限",
+  "desc": "随机机器人账号/角色池最小数量。"
+ },
+ "AiPlayerbot.MaxRandomBots": {
+  "name": "随机机器人上限",
+  "desc": "随机机器人账号/角色池最大数量。"
+ },
+ "AiPlayerbot.RandomBotAccountCount": {
+  "name": "机器人账号数",
+  "desc": "自动创建的机器人账号数量。"
+ },
+ "AiPlayerbot.AddClassAccountPoolSize": {
+  "name": "职业机器人池",
+  "desc": "AddClass 快捷职业机器人账号池大小。"
+ },
+ "AiPlayerbot.RandomBotAccountPrefix": {
+  "name": "机器人账号前缀",
+  "desc": "机器人账号名前缀。"
+ },
+ "AiPlayerbot.DeleteRandomBotAccounts": {
+  "name": "重建机器人账号",
+  "desc": "启动时删除并重建随机机器人账号（会清空机器人进度）。"
+ },
+ "AiPlayerbot.DisabledWithoutRealPlayer": {
+  "pending": true
+ },
+ "AiPlayerbot.DisabledWithoutRealPlayerLoginDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxAddedBots": {
+  "name": "最大召唤机器人",
+  "desc": "单个玩家最多可召唤的机器人数量。"
+ },
+ "AiPlayerbot.AddClassCommand": {
+  "pending": true
+ },
+ "AiPlayerbot.GroupInvitationPermission": {
+  "name": "邀请权限",
+  "desc": "机器人接受陌生人组队邀请的权限等级。"
+ },
+ "AiPlayerbot.KeepAltsInGroup": {
+  "name": "小号留队",
+  "desc": "玩家小号机器人保持组队状态。"
+ },
+ "AiPlayerbot.BotAutologin": {
+  "name": "机器人自动登录",
+  "desc": "玩家自己的机器人角色自动登录。"
+ },
+ "AiPlayerbot.AllowAccountBots": {
+  "name": "允许账号机器人",
+  "desc": "允许把同账号角色作为机器人召唤。"
+ },
+ "AiPlayerbot.AllowGuildBots": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowTrustedAccountBots": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotGuildNearby": {
+  "name": "就近公会",
+  "desc": "机器人优先加入附近/相关的公会。"
+ },
+ "AiPlayerbot.RandomBotGuildCount": {
+  "name": "机器人公会数",
+  "desc": "机器人自动创建的公会数量。"
+ },
+ "AiPlayerbot.RandomBotGuildSizeMax": {
+  "pending": true
+ },
+ "AiPlayerbot.DeleteRandomBotGuilds": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotInvitePlayer": {
+  "pending": true
+ },
+ "AiPlayerbot.InviteChat": {
+  "pending": true
+ },
+ "AiPlayerbot.SummonWhenGroup": {
+  "name": "组队召唤",
+  "desc": "组队时把机器人召唤到玩家身边。"
+ },
+ "AiPlayerbot.SelfBotLevel": {
+  "name": "自身机器人等级",
+  "desc": "玩家自己召唤机器人（self bot）的等级规则。"
+ },
+ "AiPlayerbot.AutoInitOnly": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetInstanceIdForAltBots": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoInitEquipLevelLimitRatio": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowLearnTrainerSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowSummonInCombat": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowSummonWhenMasterIsDead": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowSummonWhenBotIsDead": {
+  "pending": true
+ },
+ "AiPlayerbot.ReviveBotWhenSummoned": {
+  "pending": true
+ },
+ "AiPlayerbot.BotRepairWhenSummon": {
+  "pending": true
+ },
+ "AiPlayerbot.UseGroundMountAtMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.UseFastGroundMountAtMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.UseFlyMountAtMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.UseFastFlyMountAtMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotShowHelmet": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotShowCloak": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoEquipUpgradeLoot": {
+  "pending": true
+ },
+ "AiPlayerbot.EquipUpgradeThreshold": {
+  "pending": true
+ },
+ "AiPlayerbot.TwoRoundsGearInit": {
+  "pending": true
+ },
+ "AiPlayerbot.FreeMethodLoot": {
+  "pending": true
+ },
+ "AiPlayerbot.LootNeedRollLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.LootGreedRollLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.LootRollRecipe": {
+  "pending": true
+ },
+ "AiPlayerbot.LootRollDisenchant": {
+  "pending": true
+ },
+ "AiPlayerbot.DisallowedGameObjects": {
+  "pending": true
+ },
+ "AiPlayerbot.IterationsPerTick": {
+  "pending": true
+ },
+ "AiPlayerbot.GlobalCooldown": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxWaitForMove": {
+  "pending": true
+ },
+ "AiPlayerbot.DisableMoveSplinePath": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxMovementSearchTime": {
+  "pending": true
+ },
+ "AiPlayerbot.ExpireActionTime": {
+  "pending": true
+ },
+ "AiPlayerbot.DispelAuraDuration": {
+  "pending": true
+ },
+ "AiPlayerbot.ReactDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.DynamicReactDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.PassiveDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.RepeatDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.ErrorDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.SitDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.ReturnDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.LootDelay": {
+  "pending": true
+ },
+ "AiPlayerbot.FarDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.SightDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.SpellDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.ShootDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.HealDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.LootDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.FleeDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.AggroDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.TooCloseDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.MeleeDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.FollowDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.WhisperDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.ContactDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.AoeRadius": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.GrindDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.ReactDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.CriticalHealth": {
+  "pending": true
+ },
+ "AiPlayerbot.LowHealth": {
+  "pending": true
+ },
+ "AiPlayerbot.MediumHealth": {
+  "pending": true
+ },
+ "AiPlayerbot.AlmostFullHealth": {
+  "pending": true
+ },
+ "AiPlayerbot.LowMana": {
+  "pending": true
+ },
+ "AiPlayerbot.MediumMana": {
+  "pending": true
+ },
+ "AiPlayerbot.HighMana": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoPickReward": {
+  "pending": true
+ },
+ "AiPlayerbot.SyncQuestWithPlayer": {
+  "pending": true
+ },
+ "AiPlayerbot.SyncQuestForPlayer": {
+  "pending": true
+ },
+ "AiPlayerbot.DropObsoleteQuests": {
+  "pending": true
+ },
+ "AiPlayerbot.ApplyInstanceStrategies": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoAvoidAoe": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxAoeAvoidRadius": {
+  "pending": true
+ },
+ "AiPlayerbot.AoeAvoidSpellWhitelist": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoSaveMana": {
+  "pending": true
+ },
+ "AiPlayerbot.SaveManaThreshold": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGreaterBlessings": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoPartyBuffs": {
+  "pending": true
+ },
+ "AiPlayerbot.TellWhenMissingBuffReagents": {
+  "pending": true
+ },
+ "AiPlayerbot.MissingBuffReagentMessageCooldown": {
+  "pending": true
+ },
+ "AiPlayerbot.ForceRebuffOnReadyCheck": {
+  "pending": true
+ },
+ "AiPlayerbot.ForceRebuffMarginSecs": {
+  "pending": true
+ },
+ "AiPlayerbot.FleeingEnabled": {
+  "pending": true
+ },
+ "AiPlayerbot.MaintenanceCommand": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceAmmo": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceFood": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceReagents": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceConsumables": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenancePotions": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceBags": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceMounts": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceSkills": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceClassSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceAvailableSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceSpecialSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceTalentTree": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceGlyphs": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceGemsEnchants": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenancePet": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenancePetTalents": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceReputation": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceAttunementQuests": {
+  "pending": true
+ },
+ "AiPlayerbot.AltMaintenanceKeyring": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGearCommand": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGearCommandAltBots": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGearBisCommand": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGearQualityLimit": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoGearScoreLimit": {
+  "pending": true
+ },
+ "AiPlayerbot.BotCheats": {
+  "pending": true
+ },
+ "AiPlayerbot.AttunementQuests": {
+  "pending": true
+ },
+ "AiPlayerbot.BotTaxiDelayMinMs": {
+  "pending": true
+ },
+ "AiPlayerbot.BotTaxiDelayMaxMs": {
+  "pending": true
+ },
+ "AiPlayerbot.BotTaxiGapMs": {
+  "pending": true
+ },
+ "AiPlayerbot.BotTaxiGapJitterMs": {
+  "pending": true
+ },
+ "AiPlayerbot.ClassMatchingProfessionChance": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableFishingWithMaster": {
+  "pending": true
+ },
+ "AiPlayerbot.FishingDistanceFromMaster": {
+  "pending": true
+ },
+ "AiPlayerbot.FishingDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.EndFishingWithMaster": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotRandomPassword": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotMaxLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.SyncLevelWithPlayers": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotConcentrateInPlayerZone": {
+  "pending": true
+ },
+ "AiPlayerbot.PreQuests": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotJoinLfg": {
+  "name": "自动排本",
+  "desc": "机器人自动加入随机副本队列。"
+ },
+ "AiPlayerbot.EnablePeriodicOnlineOffline": {
+  "pending": true
+ },
+ "AiPlayerbot.PeriodicOnlineOfflineRatio": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAllianceRatio": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotHordeRatio": {
+  "pending": true
+ },
+ "AiPlayerbot.DisableDeathKnightLogin": {
+  "name": "禁用DK上线",
+  "desc": "禁止随机死亡骑士机器人上线。"
+ },
+ "AiPlayerbot.LimitTalentsExpansion": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableRandomBotTrading": {
+  "pending": true
+ },
+ "AiPlayerbot.TradeActionExcludedPrefixes": {
+  "pending": true
+ },
+ "AiPlayerbot.BotSendMailEnabled": {
+  "pending": true
+ },
+ "AiPlayerbot.DisableRandomLevels": {
+  "pending": true
+ },
+ "AiPlayerbot.RandombotStartingLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotMinLevelChance": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotMaxLevelChance": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotFixedLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.DowngradeMaxLevelBot": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotXPRate": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Enabled": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.CheckFrequency": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.CheckFlaggedFrequency": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.FlaggedProcessLimit": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.IgnoreGuildBotsWithRealPlayers": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.IgnoreArenaTeamBots": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.IgnoreFriendListed": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.ExcludeNames": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.NumRanges": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Dynamic.UseDynamicDistribution": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Dynamic.RealPlayerWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Dynamic.SyncFactions": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range1.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range1.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range1.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range2.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range2.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range2.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range3.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range3.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range3.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range4.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range4.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range4.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range5.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range5.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range5.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range6.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range6.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range6.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range7.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range7.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range7.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range8.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range8.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range8.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range9.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range9.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Alliance.Range9.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range1.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range1.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range1.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range2.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range2.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range2.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range3.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range3.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range3.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range4.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range4.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range4.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range5.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range5.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range5.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range6.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range6.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range6.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range7.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range7.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range7.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range8.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range8.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range8.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range9.Lower": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range9.Upper": {
+  "pending": true
+ },
+ "AiPlayerbot.LevelBrackets.Horde.Range9.Pct": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.Enabled": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.MaxLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.ResetToLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.SkipFromLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.SkipToLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.ResetChance": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.ScaledChance": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.RestrictTimePlayed": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.MinTimePlayed": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.PlayedTimeCheckFrequency": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.IgnoreGuildBotsWithRealPlayers": {
+  "pending": true
+ },
+ "AiPlayerbot.ResetBotLevel.ExcludeNames": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoUpgradeEquip": {
+  "name": "自动升级装备",
+  "desc": "机器人自动用更高级装备替换旧装备。"
+ },
+ "AiPlayerbot.EquipAndSpecPersistence": {
+  "pending": true
+ },
+ "AiPlayerbot.EquipAndSpecPersistenceLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomGearQualityLimit": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomGearScoreLimit": {
+  "pending": true
+ },
+ "AiPlayerbot.PreferClassArmorType": {
+  "pending": true
+ },
+ "AiPlayerbot.PreferredSpecWeapons": {
+  "pending": true
+ },
+ "AiPlayerbot.MinEnchantingBotLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.LimitEnchantExpansion": {
+  "pending": true
+ },
+ "AiPlayerbot.LimitGearExpansion": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomGearLoweringChance": {
+  "pending": true
+ },
+ "AiPlayerbot.UnobtainableItems": {
+  "pending": true
+ },
+ "AiPlayerbot.GearScoreCheck": {
+  "pending": true
+ },
+ "AiPlayerbot.HunterWolfPet": {
+  "pending": true
+ },
+ "AiPlayerbot.DefaultPetStance": {
+  "pending": true
+ },
+ "AiPlayerbot.PetChatCommandDebug": {
+  "pending": true
+ },
+ "AiPlayerbot.ExcludedHunterPetFamilies": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAlone": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneDurationSeconds": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneForceWhenInRadius": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneForceWhenInZone": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneForceWhenInMap": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneForceWhenIsFriend": {
+  "pending": true
+ },
+ "AiPlayerbot.BotActiveAloneForceWhenInGuild": {
+  "pending": true
+ },
+ "AiPlayerbot.botActiveAloneSmartScale": {
+  "pending": true
+ },
+ "AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor": {
+  "pending": true
+ },
+ "AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling": {
+  "pending": true
+ },
+ "AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotQuestIds": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotGroupNearby": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoDoQuests": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotQuestItems": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoLearnQuestSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoLearnTrainerSpells": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoPickTalents": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotSpellIds": {
+  "pending": true
+ },
+ "AiPlayerbot.OpenGoSpell": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotCombatStrategies": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotNonCombatStrategies": {
+  "pending": true
+ },
+ "AiPlayerbot.CombatStrategies": {
+  "pending": true
+ },
+ "AiPlayerbot.NonCombatStrategies": {
+  "pending": true
+ },
+ "AiPlayerbot.HealerDPSMapRestriction": {
+  "pending": true
+ },
+ "AiPlayerbot.RestrictedHealerDPSMaps": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableNewRpgStrategy": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.WanderRandom": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.WanderNpc": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.GoGrind": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.GoCamp": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.DoQuest": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.TravelFlight": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.Rest": {
+  "pending": true
+ },
+ "AiPlayerbot.RpgStatusProbWeight.OutdoorPvp": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.1": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.12": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.14": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.85": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.141": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.215": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3430": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3524": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.17": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.38": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.40": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.130": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.148": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3433": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3525": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.10": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.11": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.44": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.267": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.331": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.400": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.406": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.8": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.15": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.16": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.33": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.45": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.47": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.51": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.357": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.405": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.440": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.4": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.28": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.46": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.139": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.361": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.490": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.618": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.1377": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3483": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3518": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3519": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3520": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3521": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3522": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3523": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.4080": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.65": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.66": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.67": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.210": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.394": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.495": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.2817": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3537": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.3711": {
+  "pending": true
+ },
+ "AiPlayerbot.ZoneBracket.4197": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotMaps": {
+  "pending": true
+ },
+ "AiPlayerbot.ProbTeleToBankers": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableWeightTeleToCityBankers": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToStormwindWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToIronforgeWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToDarnassusWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToExodarWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToOrgrimmarWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToUndercityWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToThunderBluffWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToSilvermoonCityWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToShattrathCityWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.TeleToDalaranWeight": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotTeleportDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotTeleLowerLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotTeleHigherLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.AutoTeleportForLevel": {
+  "name": "自动跨图升级",
+  "desc": "机器人升级后自动传送到合适地图。"
+ },
+ "AiPlayerbot.RandomBotJoinBG": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBG": {
+  "name": "自动打战场",
+  "desc": "机器人自动报名战场。"
+ },
+ "AiPlayerbot.RandomBotAutoJoinWSBrackets": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinABBrackets": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinAVBrackets": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinEYBrackets": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinICBrackets": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGWSCount": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGABCount": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGAVCount": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGEYCount": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGICCount": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinArenaBracket": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotArenaTeam2v2Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotArenaTeam3v3Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotArenaTeam5v5Count": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotArenaTeamMaxRating": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotArenaTeamMinRating": {
+  "pending": true
+ },
+ "AiPlayerbot.DeleteRandomBotArenaTeams": {
+  "pending": true
+ },
+ "AiPlayerbot.PvpProhibitedZoneIds": {
+  "pending": true
+ },
+ "AiPlayerbot.PvpProhibitedAreaIds": {
+  "pending": true
+ },
+ "AiPlayerbot.FastReactInBG": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotUpdateInterval": {
+  "name": "机器人更新间隔",
+  "desc": "机器人 AI 更新周期（秒）。"
+ },
+ "AiPlayerbot.RandomBotCountChangeMinInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotCountChangeMaxInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotInWorldTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotInWorldTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotRandomizeTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotRandomizeTime": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotsPerInterval": {
+  "name": "每周期上下线数",
+  "desc": "每个调度周期上/下线的机器人数量。"
+ },
+ "AiPlayerbot.RandomBotPrintStatsInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotReviveTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotReviveTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotTeleportInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotTeleportInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.PermanentlyInWorldTime": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.1.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.1.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.1.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.2.65": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.2.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.2.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.2.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.0.40": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.3.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.3.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.3.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.0.16": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.0.20": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.1.16": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.1.20": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.2.16": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeHunterPetLink.2.20": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.4.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.4.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.4.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.5.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.5.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.5.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.6.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.6.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.6.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.6.6.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.7.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.7.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.7.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.8.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.8.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.6.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.8.6.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.0.70": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.1.70": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.9.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.9.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.9.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.0": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.0.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.0.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.1": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.1.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.1.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.2": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.2.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.2.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.3": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.3.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.3.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.4": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.4.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.4.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.5": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.5.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.5.80": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecName.11.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecGlyph.11.6": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.6.60": {
+  "pending": true
+ },
+ "AiPlayerbot.PremadeSpecLink.11.6.80": {
+  "pending": true
+ },
+ "AiPlayerbot.WorldBuffMatrix": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.1.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.1.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.2.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.2.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.3.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.3.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.4.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.4.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.5.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.5.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.6.6": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.6.6": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.7.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.7.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.8.6": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.8.6": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.9.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.9.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.0": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.1": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.2": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.3": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.4": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.5": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecProb.11.6": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomClassSpecIndex.11.6": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableICCBuffs": {
+  "pending": true
+ },
+ "PlayerbotsDatabaseInfo": {
+  "name": "机器人库连接",
+  "desc": "由 GSWXY Manager 自动生成，请勿手工修改。"
+ },
+ "PlayerbotsDatabase.WorkerThreads": {
+  "pending": true
+ },
+ "PlayerbotsDatabase.SynchThreads": {
+  "pending": true
+ },
+ "Playerbots.Updates.EnableDatabases": {
+  "pending": true
+ },
+ "AiPlayerbot.CommandServerPort": {
+  "pending": true
+ },
+ "AiPlayerbot.SpellDump": {
+  "pending": true
+ },
+ "AiPlayerbot.LogInGroupOnly": {
+  "name": "仅组队上线",
+  "desc": "机器人只在被组队时上线。"
+ },
+ "AiPlayerbot.LogValuesPerTick": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomChangeMultiplier": {
+  "pending": true
+ },
+ "AiPlayerbot.TellWhenAvoidAoe": {
+  "pending": true
+ },
+ "AiPlayerbot.PerfMonEnabled": {
+  "pending": true
+ },
+ "AiPlayerbot.CommandPrefix": {
+  "pending": true
+ },
+ "AiPlayerbot.CommandSeparator": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableAutoTradeOnItemMention": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotTalk": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotEmote": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotSuggestDungeons": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableGreet": {
+  "pending": true
+ },
+ "AiPlayerbot.ToxicLinksRepliesChance": {
+  "pending": true
+ },
+ "AiPlayerbot.ThunderfuryRepliesChance": {
+  "pending": true
+ },
+ "AIPlayerbot.GuildFeedback": {
+  "pending": true
+ },
+ "AiPlayerbot.GuildRepliesRate": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotSayWithoutMaster": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableBroadcasts": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToGuildGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToWorldGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToGeneralGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToTradeGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToLFGGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToLocalDefenseGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToWorldDefenseGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastToGuildRecruitmentGlobalChance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemPoor": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemNormal": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemUncommon": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemRare": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemEpic": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemLegendary": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLootingItemArtifact": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestAccepted": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestUpdateObjectiveCompleted": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestUpdateObjectiveProgress": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestUpdateFailedTimer": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestUpdateComplete": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceQuestTurnedIn": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillNormal": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillElite": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillRareelite": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillWorldboss": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillRare": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillUnknown": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillPet": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceKillPlayer": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLevelupGeneric": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLevelupTenX": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceLevelupMaxLevel": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestInstance": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestQuest": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestGrindMaterials": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestGrindReputation": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestSell": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestSomething": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestSomethingToxic": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestToxicLinks": {
+  "pending": true
+ },
+ "AiPlayerbot.ToxicLinksPrefix": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceSuggestThunderfury": {
+  "pending": true
+ },
+ "AiPlayerbot.BroadcastChanceGuildManagement": {
+  "pending": true
+ },
+ "AiPlayerbot.AllowedLogFiles": {
+  "pending": true
+ },
+ "AiPlayerbot.EnableGuildTasks": {
+  "pending": true
+ },
+ "AiPlayerbot.RandomBotRpgChance": {
+  "pending": true
+ },
+ "AiPlayerbot.RandombotsWalkingRPG": {
+  "pending": true
+ },
+ "AiPlayerbot.RandombotsWalkingRPG.InDoors": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotsPriceChangeInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotsPriceChangeInterval": {
+  "pending": true
+ },
+ "AiPlayerbot.MinRandomBotChangeStrategyTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxRandomBotChangeStrategyTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MinGuildTaskChangeTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxGuildTaskChangeTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MinGuildTaskAdvertisementTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxGuildTaskAdvertisementTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MinGuildTaskRewardTime": {
+  "pending": true
+ },
+ "AiPlayerbot.MaxGuildTaskRewardTime": {
+  "pending": true
+ },
+ "AiPlayerbot.GuildTaskAdvertCleanupTime": {
+  "pending": true
+ },
+ "AiPlayerbot.GuildTaskKillTaskDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.TargetPosRecalcDistance": {
+  "pending": true
+ },
+ "AiPlayerbot.SummonAtInnkeepersEnabled": {
+  "pending": true
+ }
+}
