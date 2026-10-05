@@ -300,7 +300,9 @@ func (a *App) Preflight() []PreflightCheck {
 
 	// architecture
 	if a.Paths.OnFnOS || runtimeIsLinux() {
-		add("系统架构 x86_64", runtimeArch() == "x86_64", runtimeArch(), "GSWXY Realm 仅支持 x86_64")
+		arch := runtimeArch()
+		add("系统架构 x86_64", arch == "amd64" || arch == "x86_64",
+			arch, "GSWXY Realm 仅支持 x86_64")
 	}
 
 	// payload integrity
