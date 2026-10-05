@@ -33,14 +33,15 @@
     "verified_by": "GSWXY NAS full download, 2026-10-05"
   },
   "database_runtime": {
-    "flavor": "mariadb",
-    "version": "11.4.8",
-    "url": "https://archive.mariadb.org/mariadb-11.4.8/bintar-linux-systemd-x86_64/mariadb-11.4.8-linux-systemd-x86_64.tar.gz",
-    "license": "GPL-2.0-only",
+    "flavor": "mysql",
+    "version": "8.0.46",
+    "url": "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-8.0.46-linux-glibc2.17-x86_64-minimal.tar.xz",
+    "license": "GPL-2.0-only WITH Universal-FOSS-exception-1.0",
     "bundled": true,
     "listen": "127.0.0.1",
     "port": 0,
-    "port_note": "Manager 分配 127.0.0.1 随机高位端口或 Unix Socket；不暴露 LAN"
+    "port_note": "Manager 分配 127.0.0.1 随机高位端口；不暴露 LAN",
+    "note": "mod-playerbots 核心拒绝 MariaDB（版本字符串字典序比较 11.4.8-MariaDB < 8.0），官方支持 MySQL 8.0+；MySQL Archive 永久可下载，可复现构建"
   },
   "platform": {
     "os": "fnOS",
