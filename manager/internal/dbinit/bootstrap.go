@@ -282,6 +282,12 @@ type SQLFile struct {
 	Path     string
 	Database string
 	Label    string
+	// CheckUpdates: the file is an upstream dated update; skip it when
+	// the target database's `updates` table already records it (AC
+	// convention: ARCHIVED entries are already merged into the base
+	// snapshot), and record newly applied ones so the worldserver
+	// auto-updater does not re-apply them.
+	CheckUpdates bool
 }
 
 // BuildPipeline assembles the ordered SQL import plan:
@@ -299,9 +305,16 @@ func BuildPipeline(p platform.Paths) []SQLFile {
 	add(filepath.Join(base, "base", "db_auth"), "acore_auth", "core/base")
 	add(filepath.Join(base, "base", "db_characters"), "acore_characters", "core/base")
 	add(filepath.Join(base, "base", "db_world"), "acore_world", "core/base")
-	add(filepath.Join(base, "updates", "db_auth"), "acore_auth", "core/updates")
-	add(filepath.Join(base, "updates", "db_characters"), "acore_characters", "core/updates")
-	add(filepath.Join(base, "updates", "db_world"), "acore_world", "core/updates")
+	addU := func(dir, db string) {
+		if fs, err := walkSQL(dir); err == nil {
+			for _, f := range fs {
+				files = append(files, SQLFile{Path: f, Database: db, Label: "core/updates", CheckUpdates: true})
+			}
+		}
+	}
+	addU(filepath.Join(base, "updates", "db_auth"), "acore_auth")
+	addU(filepath.Join(base, "updates", "db_characters"), "acore_characters")
+	addU(filepath.Join(base, "updates", "db_world"), "acore_world")
 
 	mod := filepath.Join(p.AppDest, "modules", "mod-playerbots", "data", "sql")
 	add(filepath.Join(mod, "playerbots"), "acore_playerbots", "playerbots")

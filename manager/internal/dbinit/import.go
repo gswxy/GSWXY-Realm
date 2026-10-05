@@ -3,6 +3,7 @@
 package dbinit
 
 import (
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -20,6 +21,24 @@ import (
 type PatchApplier interface {
 	IsApplied(label string) bool
 	MarkApplied(label string, checksum string) error
+	// IsUpdateApplied reports whether <db>.updates already contains name.
+	IsUpdateApplied(db, name string) bool
+	// RecordUpdate inserts name into <db>.updates after manual import.
+	RecordUpdate(db, name, sha1hex string) error
+}
+
+// sha1File computes the SHA-1 of a file (the hash AC records in updates).
+func sha1File(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	h := sha1.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
+	}
+	return strings.ToUpper(hex.EncodeToString(h.Sum(nil))), nil
 }
 
 // ChecksumFile computes the SHA-256 of a file.
@@ -96,6 +115,15 @@ func ImportAll(p platform.Paths, mysqlBin, rootPass string, files []SQLFile,
 			}
 			continue
 		}
+		base := filepath.Base(f.Path)
+		if f.CheckUpdates && applier.IsUpdateApplied(f.Database, base) {
+			// 已并入基础快照（ARCHIVED）——跳过并记录，保证幂等续跑。
+			_ = applier.MarkApplied(label, "archived")
+			if progress != nil {
+				progress(i, total, label+" (已并入基础库，跳过)")
+			}
+			continue
+		}
 		if progress != nil {
 			progress(i, total, label)
 		}
@@ -106,6 +134,11 @@ func ImportAll(p platform.Paths, mysqlBin, rootPass string, files []SQLFile,
 		}
 		if err := ImportFile(p, mysqlBin, rootPass, f.Database, f.Path, log); err != nil {
 			return fmt.Errorf("import %s: %w", f.Path, err)
+		}
+		if f.CheckUpdates {
+			// 记录到 updates 表，避免 worldserver 自动更新器重复应用。
+			sum1, _ := sha1File(f.Path)
+			_ = applier.RecordUpdate(f.Database, base, sum1)
 		}
 		if err := applier.MarkApplied(label, sum); err != nil {
 			return err

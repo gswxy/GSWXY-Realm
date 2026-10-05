@@ -5,7 +5,6 @@ package app
 
 import (
 	"database/sql"
-	"sync/atomic"
 	"fmt"
 	"net"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -34,13 +34,13 @@ import (
 
 // Binaries resolves bundled executable paths.
 type Binaries struct {
-	Worldserver  string
-	Authserver   string
-	MariaDBD     string
-	InstallDB    string
-	MysqlClient  string
-	MysqlDump    string
-	MysqlAdmin   string
+	Worldserver string
+	Authserver  string
+	MariaDBD    string
+	InstallDB   string
+	MysqlClient string
+	MysqlDump   string
+	MysqlAdmin  string
 }
 
 // App is the root orchestrator.
@@ -64,6 +64,9 @@ type App struct {
 	db   *sql.DB
 
 	startMu sync.Mutex
+
+	updatesMu    sync.Mutex
+	updatesCache map[string]map[string]bool
 
 	// setupRunning marks a live setup goroutine in THIS process; the
 	// persisted InProgress flag alone cannot distinguish "running" from
@@ -408,6 +411,56 @@ func (a *App) MarkApplied(label, sum string) error {
 	return a.State.Update(func(d *state.Data) {
 		d.Patches[label] = state.PatchRecord{AppliedAt: time.Now().Format(time.RFC3339), Checksum: sum}
 	})
+}
+
+// IsUpdateApplied queries the target database's `updates` tracking
+// table (AC convention) with a per-DB cache.
+func (a *App) IsUpdateApplied(db, name string) bool {
+	a.updatesMu.Lock()
+	defer a.updatesMu.Unlock()
+	if a.updatesCache == nil {
+		a.updatesCache = map[string]map[string]bool{}
+	}
+	set, ok := a.updatesCache[db]
+	if !ok {
+		set = map[string]bool{}
+		conn, err := a.DB()
+		if err == nil {
+			rows, err := conn.Query("SELECT name FROM `" + db + "`.`updates`")
+			if err == nil {
+				for rows.Next() {
+					var n string
+					if rows.Scan(&n) == nil {
+						set[n] = true
+					}
+				}
+				rows.Close()
+			}
+		}
+		a.updatesCache[db] = set
+	}
+	return set[name]
+}
+
+// RecordUpdate inserts an applied update into <db>.updates.
+func (a *App) RecordUpdate(db, name, sha1hex string) error {
+	conn, err := a.DB()
+	if err != nil {
+		return err
+	}
+	_, err = conn.Exec(
+		"INSERT INTO `"+db+"`.`updates` (name, hash, state) VALUES (?, ?, 'RELEASED') "+
+			"ON DUPLICATE KEY UPDATE hash = VALUES(hash)", name, sha1hex)
+	if err == nil {
+		a.updatesMu.Lock()
+		if a.updatesCache != nil {
+			if set := a.updatesCache[db]; set != nil {
+				set[name] = true
+			}
+		}
+		a.updatesMu.Unlock()
+	}
+	return err
 }
 
 // ensureDBRunning starts mariadbd (and waits for it) if it is not
