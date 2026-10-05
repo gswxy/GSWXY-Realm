@@ -20,10 +20,17 @@
     "repository": "https://github.com/wowgaming/client-data",
     "asset": "Data.zip",
     "url": "https://github.com/wowgaming/client-data/releases/download/v20.0/Data.zip",
-    "size_bytes": 1196191335,
-    "sha256": "PENDING_VERIFIED_DOWNLOAD",
+    "size_bytes": 1196168257,
+    "sha256": "a3d4df635ae6c2c8f08052c32a79e0f806955150ad36b014a823dd08a32a4610",
     "published_at": "2026-07-19T11:28:09Z",
-    "requires": ["dbc", "maps", "vmaps", "mmaps", "Cameras"]
+    "requires": [
+      "dbc",
+      "maps",
+      "vmaps",
+      "mmaps",
+      "Cameras"
+    ],
+    "verified_by": "GSWXY NAS full download, 2026-10-05"
   },
   "database_runtime": {
     "flavor": "mariadb",
