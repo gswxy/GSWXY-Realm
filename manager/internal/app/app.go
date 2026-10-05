@@ -466,17 +466,21 @@ func (a *App) RecordUpdate(db, name, sha1hex string) error {
 // ensureDBRunning starts mariadbd (and waits for it) if it is not
 // running — resumed setup runs must not assume a warm database.
 func (a *App) ensureDBRunning() error {
-	if a.Sup.Running("mysqld") {
-		return nil
+	creds, err := dbinit.LoadCreds(a.Paths)
+	if err != nil || creds == nil {
+		return fmt.Errorf("数据库凭据缺失")
 	}
-	if _, err := dbinit.LoadCreds(a.Paths); err != nil {
+	if !a.Sup.Running("mysqld") {
+		a.registerMysqld()
+		if err := a.Sup.Start("mysqld"); err != nil {
+			return err
+		}
+	}
+	if err := waitTCP("127.0.0.1", a.State.Get().Database.Port, 90*time.Second); err != nil {
 		return err
 	}
-	a.registerMysqld()
-	if err := a.Sup.Start("mysqld"); err != nil {
-		return err
-	}
-	return waitTCP("127.0.0.1", a.State.Get().Database.Port, 90*time.Second)
+	// 幂等兜底：库/跟踪表/应用用户可能被外部破坏（例如误跑 DROP 脚本）。
+	return dbinit.ProvisionAccounts(a.Paths, creds, a.Log)
 }
 
 // RunSetup executes the first-run pipeline step by step. Re-runnable:
