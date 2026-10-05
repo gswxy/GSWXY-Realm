@@ -44,3 +44,5 @@ fnos/app/config-schema.json
 .joblog*
 .runid.txt
 .jobid.txt
+.buildlog.txt
+.jobs.json
