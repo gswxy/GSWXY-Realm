@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GSWXY Realm</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">🌐</div>
+      <div>
+        <div class="brand-name">GSWXY Realm</div>
+        <div class="brand-sub">Playerbots Edition</div>
+      </div>
+    </div>
+    <nav id="nav">
+      <a href="#/overview" class="active">🖥️ 概览</a>
+      <a href="#/server">⚙️ 服务器</a>
+      <a href="#/playerbot">🤖 Playerbot</a>
+      <a href="#/accounts">👤 账号</a>
+      <a href="#/config">🎚️ 配置</a>
+      <a href="#/data">📦 数据</a>
+      <a href="#/logs">📜 日志</a>
+      <a href="#/backup">💾 备份</a>
+      <a href="#/version">ℹ️ 版本</a>
+    </nav>
+    <div class="sidebar-foot">
+      <a href="#/login" id="login-link">登录</a>
+      <span>Powered by AzerothCore + mod-playerbots</span>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- 登录 / 首次设置 -->
+    <section id="page-login" class="page">
+      <div class="card narrow">
+        <h2 id="login-title">登录管理</h2>
+        <p class="muted" id="login-desc">首次使用请先设置管理员密码（至少 8 位）。</p>
+        <label>管理员密码 <input type="password" id="login-password" autocomplete="current-password"></label>
+        <label id="login-password2-wrap">确认密码 <input type="password" id="login-password2" autocomplete="new-password"></label>
+        <button class="primary" id="login-btn">进入</button>
+        <div class="error" id="login-error"></div>
+      </div>
+    </section>
+
+    <!-- 概览 -->
+    <section id="page-overview" class="page">
+      <div class="header-row"><h1>概览</h1>
+        <div class="btns">
+          <button class="primary" data-act="start">▶ 启动全部</button>
+          <button class="danger" data-act="stop">■ 安全停止</button>
+        </div>
+      </div>
+      <div class="grid3">
+        <div class="stat card"><div class="stat-label">WorldServer</div><div class="stat-value" id="ov-world">—</div></div>
+        <div class="stat card"><div class="stat-label">AuthServer</div><div class="stat-value" id="ov-auth">—</div></div>
+        <div class="stat card"><div class="stat-label">数据库</div><div class="stat-value" id="ov-db">—</div></div>
+      </div>
+      <div class="grid3">
+        <div class="stat card"><div class="stat-label">真实玩家</div><div class="stat-value" id="ov-real">—</div></div>
+        <div class="stat card"><div class="stat-label">在线机器人</div><div class="stat-value" id="ov-bots">—</div></div>
+        <div class="stat card"><div class="stat-label">在线总角色</div><div class="stat-value" id="ov-total">—</div></div>
+      </div>
+      <div class="card">
+        <h3>初始化状态</h3>
+        <div id="ov-setup"></div>
+        <div class="btns" id="ov-setup-actions"></div>
+      </div>
+      <div class="card">
+        <h3>版本信息</h3>
+        <div id="ov-versions" class="kv"></div>
+      </div>
+    </section>
+
+    <!-- 服务器 -->
+    <section id="page-server" class="page">
+      <h1>服务器</h1>
+      <div class="card">
+        <h3>自检（运行前检查）</h3>
+        <table class="tbl" id="pf-table"><thead><tr><th>项目</th><th>状态</th><th>详情</th><th>修复建议</th></tr></thead><tbody></tbody></table>
+        <button class="primary" data-act="start">全部通过后，启动服务器</button>
+      </div>
+      <div class="card">
+        <h3>进程</h3>
+        <table class="tbl" id="proc-table"><thead><tr><th>进程</th><th>状态</th><th>PID</th><th>操作</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <h3>Realm</h3>
+        <div class="row">
+          <input type="text" id="realm-name" placeholder="服务器名称">
+          <button id="realm-save" class="primary">保存</button>
+        </div>
+        <p class="muted">客户端 realmlist：set realmlist &lt;NAS的IP地址&gt;</p>
+      </div>
+    </section>
+
+    <!-- Playerbot -->
+    <section id="page-playerbot" class="page">
+      <h1>Playerbot</h1>
+      <div class="grid3" id="pb-stats"></div>
+      <div class="card">
+        <h3>配置模板</h3>
+        <p class="muted">模板本质是对真实 Playerbot 配置的批量修改，应用前请查看变更。</p>
+        <div id="pb-profiles"></div>
+      </div>
+      <div class="card">
+        <h3>分布</h3>
+        <div id="pb-dists"></div>
+      </div>
+    </section>
+
+    <!-- 账号 -->
+    <section id="page-accounts" class="page">
+      <div class="header-row"><h1>账号</h1>
+        <button class="primary" id="acc-new">+ 创建账号</button>
+      </div>
+      <div class="row">
+        <input type="text" id="acc-search" placeholder="搜索账号名">
+        <button id="acc-search-btn">搜索</button>
+      </div>
+      <table class="tbl" id="acc-table">
+        <thead><tr><th>ID</th><th>账号</th><th>GM</th><th>状态</th><th>最后登录</th><th>操作</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- 配置 -->
+    <section id="page-config" class="page">
+      <h1>配置</h1>
+      <div class="tabs" id="cfg-tabs">
+        <button data-conf="worldserver.conf" class="active">WorldServer</button>
+        <button data-conf="authserver.conf">AuthServer</button>
+        <button data-conf="playerbots.conf">Playerbot</button>
+        <button data-mode="raw">原始编辑器</button>
+      </div>
+      <div class="row">
+        <input type="text" id="cfg-search" placeholder="搜索配置项 / 中文说明">
+        <select id="cfg-section"><option value="">全部分组</option></select>
+      </div>
+      <div id="cfg-list"></div>
+
+      <div id="cfg-raw" style="display:none">
+        <div class="card">
+          <h3>用户配置（原始编辑）</h3>
+          <p class="muted">此文件会覆盖上游默认值；运行时最终配置由本文件 + 上游 .conf.dist 生成。</p>
+          <textarea id="cfg-raw-editor" rows="22" spellcheck="false"></textarea>
+          <div class="btns">
+            <button class="primary" id="cfg-raw-save">保存并重新生成</button>
+            <button id="cfg-raw-reset">恢复默认（清空用户配置）</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>运行时最终配置（生成，只读）</h3>
+          <pre id="cfg-raw-run" class="pre"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据 -->
+    <section id="page-data" class="page">
+      <h1>数据</h1>
+      <div class="card">
+        <h3>AC 客户端数据</h3>
+        <div id="data-status" class="kv"></div>
+        <div class="btns">
+          <button class="primary" id="data-download">⬇ 从官方源下载</button>
+          <button id="data-cancel" disabled>取消下载</button>
+        </div>
+        <div class="progress-wrap"><div id="data-progress"></div></div>
+        <div class="muted" id="data-progress-text"></div>
+        <details>
+          <summary>手动导入 Data.zip（下载代理均不可用时）</summary>
+          <input type="file" id="data-file">
+          <button id="data-import">上传并校验</button>
+        </details>
+      </div>
+    </section>
+
+    <!-- 日志 -->
+    <section id="page-logs" class="page">
+      <div class="header-row"><h1>日志</h1>
+        <div class="btns">
+          <select id="log-name"></select>
+          <input type="text" id="log-filter" placeholder="过滤（如 ERROR / WARNING）">
+          <button id="log-refresh">刷新</button>
+        </div>
+      </div>
+      <pre id="log-view" class="pre log"></pre>
+    </section>
+
+    <!-- 备份 -->
+    <section id="page-backup" class="page">
+      <div class="header-row"><h1>备份与恢复</h1>
+        <button class="primary" id="bk-create">立即备份</button>
+      </div>
+      <p class="muted">备份包含 auth / characters 数据库、world 关键表、用户配置与状态；不包含可重新下载的客户端数据。恢复前会自动生成当前状态备份。</p>
+      <table class="tbl" id="bk-table">
+        <thead><tr><th>文件</th><th>大小</th><th>操作</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- 版本 -->
+    <section id="page-version" class="page">
+      <h1>版本</h1>
+      <div class="card"><div id="ver-view" class="kv"></div></div>
+      <div class="card">
+        <p class="muted">GSWXY Realm 由 GitHub Actions 从锁定的上游版本自动构建，可在仓库 Releases 页面获取新版本 FPK。</p>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
