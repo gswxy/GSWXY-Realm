@@ -117,10 +117,17 @@ func ImportAll(p platform.Paths, mysqlBin, rootPass string, files []SQLFile,
 	return nil
 }
 
+// defaultsFile writes a per-invocation client credentials file (0600,
+// avoids argv leaks) pinning the connection to the bundled server via
+// TCP 127.0.0.1:<random port>; without it the client tries the system
+// socket path /run/mysqld/mysqld.sock.
 func defaultsFile(p platform.Paths, rootPass string) string {
-	// Write per-invocation credentials file with 0600 (avoids argv leaks).
+	port := 0
+	if creds, err := LoadCreds(p); err == nil && creds != nil {
+		port = creds.Port
+	}
 	path := filepath.Join(p.Tmp, "mysql-import-auth.cnf")
-	content := "[client]\nuser=root\npassword=" + rootPass + "\n"
+	content := fmt.Sprintf("[client]\nhost=127.0.0.1\nport=%d\nuser=root\npassword=%s\n", port, rootPass)
 	_ = os.WriteFile(path, []byte(content), 0o600)
 	return path
 }

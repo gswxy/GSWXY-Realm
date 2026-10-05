@@ -152,9 +152,21 @@ func dumpDatabase(dumpBin, pass, db, out string, tables []string) error {
 	return nil
 }
 
+// defaultsFile writes a 0600 client credentials file pinned to the
+// bundled instance (TCP 127.0.0.1 + random port). The port comes from
+// the stored credentials via the hook the app package installs.
+// exported hook; set by the app package at startup
+var CredsHook func() (user, pass string, port int)
+
 func defaultsFile(dumpBin, pass string) string {
 	path := "/tmp/.gswxy-mysqldump-auth"
-	_ = os.WriteFile(path, []byte("[client]\nuser=root\npassword="+pass+"\n"), 0o600)
+	content := "[client]\nuser=root\npassword=" + pass + "\n"
+	if CredsHook != nil {
+		if u, pw, port := CredsHook(); port > 0 {
+			content = fmt.Sprintf("[client]\nhost=127.0.0.1\nport=%d\nuser=%s\npassword=%s\n", port, u, pw)
+		}
+	}
+	_ = os.WriteFile(path, []byte(content), 0o600)
 	return path
 }
 

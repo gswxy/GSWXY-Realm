@@ -98,6 +98,14 @@ func New(p platform.Paths) (*App, error) {
 		Rec:     recommend.New(),
 	}
 	a.BK = &backup.Manager{Paths: p, Log: log, Version: a.versionInfo()}
+	// Backup 工具链通过该钩子拿到内置数据库的 TCP 端口与凭据。
+	backup.CredsHook = func() (user, pass string, port int) {
+		c, err := dbinit.LoadCreds(p)
+		if err != nil || c == nil {
+			return "", "", 0
+		}
+		return "root", c.Root, c.Port
+	}
 	a.Bins = a.resolveBins()
 	a.registerProcs()
 	return a, nil
