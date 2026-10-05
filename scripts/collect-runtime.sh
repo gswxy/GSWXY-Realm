@@ -44,12 +44,13 @@ for BIN in "$APP/bin/"*; do
     lib=$(echo "$line" | awk '{print $1}')
     path=$(echo "$line" | awk '{print $3}')
     base=$(basename "$lib")
-    case "$base" in $WHITELIST) continue ;; esac
+    if echo "$base" | grep -qE "^($WHITELIST)"; then continue; fi
     if [ "$path" != "not" ] && [ -f "$path" ] && [[ "$COPIED" != *"|$base|"* ]]; then
       cp -aL "$path" "$APP/lib/" && COPIED="$COPIED|$base|"
     fi
   done < <(ldd "$BIN" 2>/dev/null)
 done
+# shellcheck disable=SC2016  # $ORIGIN 必须保持字面量
 patchelf --set-rpath '$ORIGIN/../lib' "$APP/bin/worldserver" "$APP/bin/authserver" 2>/dev/null || true
 echo "bundled: $(echo "$COPIED" | tr '|' ' ')"
 
