@@ -221,11 +221,14 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 
 // setRootPassword authenticates as root on a fresh datadir (empty
 // password thanks to --auth-root-authentication-method=normal) and
-// applies the generated root password to EVERY root@host account
-// (install-db creates several: localhost, 127.0.0.1, ::1, hostname —
-// host-specific matches would otherwise shadow the new password).
+// secures EVERY root@host account. MariaDB 10.4+ ships combined-plugin
+// accounts (unix_socket OR password) where bare ALTER USER fails with
+// ER_CANNOT_USER 1396 — set the plugin explicitly, and drop accounts
+// that refuse (hardening: fewer remote root entries is better). The
+// Manager itself always connects over TCP 127.0.0.1, so that account
+// is guaranteed to exist with the final password.
 func setRootPassword(creds *Credentials, log *logging.Logger) error {
-	dsn := fmt.Sprintf("root@tcp(127.0.0.1:%d)/?charset=utf8mb4", creds.Port)
+	dsn := fmt.Sprintf("root@tcp(127.0.0.1:%d)/?charset=utf8mb4&multiStatements=true", creds.Port)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return err
@@ -251,12 +254,26 @@ func setRootPassword(creds *Credentials, log *logging.Logger) error {
 		return err
 	}
 	for _, h := range hosts {
-		q := fmt.Sprintf("ALTER USER 'root'@'%s' IDENTIFIED BY '%s'", h, creds.Root)
+		q := fmt.Sprintf(
+			"ALTER USER 'root'@'%s' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
+			h, creds.Root)
 		if _, err := db.Exec(q); err != nil {
-			return fmt.Errorf("set root password for %s: %w", h, err)
+			log.Warn("ALTER USER root@%s failed (%v), dropping the account", h, err)
+			if _, derr := db.Exec(fmt.Sprintf("DROP USER 'root'@'%s'", h)); derr != nil {
+				return fmt.Errorf("secure root@%s: %w", h, derr)
+			}
 		}
 	}
-	log.Info("root password configured for %d root accounts", len(hosts))
+	// Guarantee the TCP account the Manager itself uses.
+	if _, err := db.Exec(fmt.Sprintf(
+		"CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
+		creds.Root)); err != nil {
+		return fmt.Errorf("ensure root@127.0.0.1: %w", err)
+	}
+	if _, err := db.Exec("FLUSH PRIVILEGES"); err != nil {
+		return err
+	}
+	log.Info("root password configured (%d root accounts processed)", len(hosts))
 	return nil
 }
 
