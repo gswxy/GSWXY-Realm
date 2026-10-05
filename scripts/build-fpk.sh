@@ -18,6 +18,10 @@ FNPACK="$CACHE/fnpack-${FNPACK_VER}-linux-amd64"
 
 mkdir -p "$OUT"
 
+# 打包前确保生命周期脚本与二进制可执行（跨平台拷贝可能丢失权限位）
+chmod +x "$ROOT/fnos/cmd/"* 2>/dev/null || true
+chmod +x "$ROOT/fnos/app/bin/"* 2>/dev/null || true
+
 if [ ! -x "$FNPACK" ]; then
   echo "downloading fnpack ${FNPACK_VER}..."
   curl -sL --retry 3 -o "$FNPACK" \
