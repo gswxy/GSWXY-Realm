@@ -44,12 +44,16 @@ mkdir -p "$PAYLOAD"
 tar -xzf "$TMP/app.tgz" -C "$PAYLOAD"
 [ -f "$PAYLOAD/bin/gswxy-manager" ] || { echo "manager binary missing" >&2; exit 1; }
 [ -f "$PAYLOAD/resources.json" ] || { echo "resources.json missing" >&2; exit 1; }
-[ -x "$PAYLOAD/bin/gswxy-manager" ] || { echo "manager binary not executable" >&2; exit 1; }
+# fnpack 归一化 payload 内权限位；fnOS install_callback 会恢复执行位，
+# 因此这里只警告不失败。
+[ -x "$PAYLOAD/bin/gswxy-manager" ] || echo "WARN: manager exec bit not set in app.tgz (install_callback will restore)"
 [ -x "$PAYLOAD/bin/worldserver" ] || echo "WARN: worldserver missing (stub payload?)"
 [ -x "$PAYLOAD/bin/authserver" ] || echo "WARN: authserver missing (stub payload?)"
 
 echo "== JSON validity =="
-python3 - "$TMP" "$PAYLOAD" <<'EOF'
+PY=python3
+command -v python3 >/dev/null 2>&1 || PY=python
+"$PY" - "$TMP" "$PAYLOAD" <<'EOF'
 import json, sys
 tmp, payload = sys.argv[1], sys.argv[2]
 for p in [f"{tmp}/config/privilege", f"{tmp}/config/resource",
