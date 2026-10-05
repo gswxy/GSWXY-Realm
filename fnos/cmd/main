@@ -1,0 +1,82 @@
+#!/bin/bash
+# GSWXY Realm — fnOS lifecycle entry (cmd/main).
+# start/stop/status delegate to the GSWXY Manager single binary.
+set -u
+
+APPDIR="$(cd "$(dirname "$0")/.." && pwd)"      # /var/apps/<app>
+TARGET="$(readlink -f "$APPDIR/target" 2>/dev/null || echo "$APPDIR/target")"
+BIN="$TARGET/bin/gswxy-manager"
+PIDFILE="${TRIM_PKGVAR:-$APPDIR/var}/manager.pid"
+LOGFILE="${TRIM_PKGVAR:-$APPDIR/var}/logs/fnos-main.log"
+
+mkdir -p "$(dirname "$LOGFILE")" "$(dirname "$PIDFILE")"
+
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [cmd/main] $*" >>"$LOGFILE"; }
+
+is_running() {
+  if [ -f "$PIDFILE" ]; then
+    local pid
+    pid="$(cat "$PIDFILE" 2>/dev/null)"
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+      return 0
+    fi
+  fi
+  # also ask the manager binary itself (handles foreign pid files)
+  if [ -x "$BIN" ]; then
+    "$BIN" status >/dev/null 2>&1
+    return $?
+  fi
+  return 1
+}
+
+case "${1:-}" in
+  start)
+    if is_running; then
+      log "already running"
+      exit 0
+    fi
+    if [ ! -x "$BIN" ]; then
+      log "ERROR: manager binary missing: $BIN"
+      echo "manager binary missing" >>"${TRIM_TEMP_LOGFILE:-/dev/null}"
+      exit 1
+    fi
+    log "starting GSWXY Manager..."
+    "$BIN" start >>"$LOGFILE" 2>&1
+    # wait briefly for readiness
+    for _ in $(seq 1 20); do
+      if is_running; then
+        log "started"
+        exit 0
+      fi
+      sleep 0.5
+    done
+    log "ERROR: manager failed to start"
+    echo "GSWXY Manager 启动失败，请查看 var/logs/gswxy-manager.log" >>"${TRIM_TEMP_LOGFILE:-/dev/null}"
+    exit 1
+    ;;
+  stop)
+    if ! is_running; then
+      log "not running"
+      exit 0
+    fi
+    log "stopping GSWXY Manager (graceful)..."
+    "$BIN" stop >>"$LOGFILE" 2>&1
+    for _ in $(seq 1 60); do
+      if ! is_running; then
+        log "stopped"
+        exit 0
+      fi
+      sleep 1
+    done
+    log "WARN: stop timed out"
+    exit 1
+    ;;
+  status)
+    is_running
+    exit $?
+    ;;
+  *)
+    log "usage: cmd/main {start|stop|status}"
+    exit 1
+    ;;
+esac

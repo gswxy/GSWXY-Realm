@@ -1,0 +1,40 @@
+[
+  {
+    "stepTitle": "GSWXY Realm 初始设置",
+    "items": [
+      {
+        "type": "tips",
+        "text": "安装完成后，打开 GSWXY Realm 应用完成初始化（数据库、中文数据、客户端数据下载均可自动完成）。"
+      },
+      {
+        "type": "text",
+        "name": "realm_name",
+        "label": "游戏服务器名称",
+        "default": "GSWXY Realm",
+        "validate": {
+          "required": true,
+          "max": 32
+        }
+      },
+      {
+        "type": "password",
+        "name": "admin_password",
+        "label": "管理界面密码（至少 8 位）",
+        "validate": {
+          "required": true,
+          "min": 8
+        }
+      },
+      {
+        "type": "text",
+        "name": "min_bots",
+        "label": "初始在线机器人数量（10-500）",
+        "default": "50",
+        "validate": {
+          "required": true,
+          "pattern": "^[0-9]+$"
+        }
+      }
+    ]
+  }
+]

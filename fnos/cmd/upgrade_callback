@@ -1,0 +1,24 @@
+#!/bin/bash
+# upgrade_callback: after the payload is replaced.
+# Runtime files may have changed; persistent user data in var/ is untouched.
+set -u
+APPNAME="${TRIM_APPNAME:-com.gswxy.realm}"
+VAR="${TRIM_PKGVAR:-/var/apps/$APPNAME/var}"
+RUN_USER="${TRIM_RUN_USERNAME:-gswxyrealm}"
+TARGET="${TRIM_APPDEST:-/var/apps/$APPNAME/target}"
+
+mkdir -p "$VAR"/{mysql,client-data,downloads/manual,backups,logs,state,config/run/modules}
+if [ "$(id -u)" = "0" ]; then
+  chown -R "$RUN_USER" "$VAR" 2>/dev/null || true
+fi
+chmod +x "$TARGET/bin/"* 2>/dev/null || true
+chmod +x "$TARGET/mysql/bin/"* 2>/dev/null || true
+
+# Regenerate run configs against the new payload's .conf.dist defaults.
+if [ -x "$TARGET/bin/gswxy-manager" ]; then
+  GSRM_REGEN=1 "$TARGET/bin/gswxy-manager" run --regen-only >>"$VAR/logs/upgrade.log" 2>&1 || true
+fi
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [upgrade_callback] upgrade to ${TRIM_APPVER:-unknown} complete" \
+  >>"$VAR/logs/upgrade.log" 2>/dev/null || true
+exit 0

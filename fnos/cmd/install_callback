@@ -1,0 +1,44 @@
+#!/bin/bash
+# install_callback runs after payload extraction (as root on fnOS).
+# - prepares persistent dirs under var/
+# - fixes ownership for the package user
+# - consumes install wizard values (wizard_*) into the bootstrap file
+set -u
+
+APPNAME="${TRIM_APPNAME:-com.gswxy.realm}"
+VAR="${TRIM_PKGVAR:-/var/apps/$APPNAME/var}"
+RUN_USER="${TRIM_RUN_USERNAME:-gswxyrealm}"
+
+mkdir -p "$VAR"/{mysql,client-data,downloads/manual,backups,logs,state,config/run/modules}
+
+# Bootstrap file: first-run admin password from the fnOS install wizard.
+# The Manager consumes it once, then it is removed.
+BOOT="$VAR/state/bootstrap.json"
+if [ -n "${wizard_admin_password:-}" ] && [ ! -f "$BOOT" ]; then
+  cat >"$BOOT" <<EOF
+{
+  "admin_password": "$(printf '%s' "$wizard_admin_password" | sed 's/\\/\\\\/g; s/"/\\"/g')",
+  "realm_name": "$(printf '%s' "${wizard_realm_name:-GSWXY Realm}" | sed 's/\\/\\\\/g; s/"/\\"/g')",
+  "min_bots": "$(printf '%s' "${wizard_min_bots:-50}" | tr -dc '0-9')"
+}
+EOF
+  chmod 600 "$BOOT"
+fi
+
+# Ownership: the app runs as the package user.
+if [ "$(id -u)" = "0" ]; then
+  chown -R "$RUN_USER" "$VAR" 2>/dev/null || true
+  chmod 750 "$VAR" 2>/dev/null || true
+fi
+
+# Executable bits for bundled binaries.
+TARGET="${TRIM_APPDEST:-/var/apps/$APPNAME/target}"
+if [ -d "$TARGET/bin" ]; then
+  chmod +x "$TARGET/bin/"* 2>/dev/null || true
+fi
+if [ -d "$TARGET/mysql/bin" ]; then
+  chmod +x "$TARGET/mysql/bin/"* 2>/dev/null || true
+fi
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [install_callback] done" >>"${TRIM_TEMP_LOGFILE:-/dev/null}"
+exit 0

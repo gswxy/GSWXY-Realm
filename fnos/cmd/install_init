@@ -1,0 +1,5 @@
+#!/bin/bash
+# install_init runs before payload extraction (fast, must not fail).
+echo "$(date '+%Y-%m-%d %H:%M:%S') [install_init] GSWXY Realm ${TRIM_APPVER:-} begin" \
+  >>"${TRIM_TEMP_LOGFILE:-/dev/null}"
+exit 0

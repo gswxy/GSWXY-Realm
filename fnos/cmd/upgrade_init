@@ -1,0 +1,12 @@
+#!/bin/bash
+# upgrade_init: before the payload is replaced. fnOS stops the app first.
+set -u
+APPNAME="${TRIM_APPNAME:-com.gswxy.realm}"
+VAR="${TRIM_PKGVAR:-/var/apps/$APPNAME/var}"
+# Safety net: ensure services are down before files are replaced.
+if [ -x "/var/apps/$APPNAME/cmd/main" ]; then
+  /var/apps/"$APPNAME"/cmd/main stop >/dev/null 2>&1 || true
+fi
+echo "$(date '+%Y-%m-%d %H:%M:%S') [upgrade_init] pre-upgrade checkpoint" \
+  >>"$VAR/logs/upgrade.log" 2>/dev/null || true
+exit 0

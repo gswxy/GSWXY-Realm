@@ -1,0 +1,14 @@
+#!/bin/bash
+# uninstall_init: runs BEFORE removal. fnOS keeps var/ and shares/ by
+# default, so user data survives uninstall — unless the user explicitly
+# chose deletion in the uninstall wizard.
+set -u
+APPNAME="${TRIM_APPNAME:-com.gswxy.realm}"
+VAR="${TRIM_PKGVAR:-/var/apps/$APPNAME/var}"
+# Stop everything first.
+if [ -x "/var/apps/$APPNAME/cmd/main" ]; then
+  /var/apps/"$APPNAME"/cmd/main stop >/dev/null 2>&1 || true
+fi
+echo "$(date '+%Y-%m-%d %H:%M:%S') [uninstall_init] stopped (data retention: ${wizard_keep_data:-keep})" \
+  >>"$VAR/logs/uninstall.log" 2>/dev/null || true
+exit 0

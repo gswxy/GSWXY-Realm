@@ -1,0 +1,15 @@
+#!/bin/bash
+# uninstall_callback: fnOS has already preserved var/ and shares/.
+# If the user explicitly chose "删除所有数据" in the uninstall wizard
+# (wizard_keep_data = "delete"), remove the server data now.
+set -u
+APPNAME="${TRIM_APPNAME:-com.gswxy.realm}"
+VAR="${TRIM_PKGVAR:-/var/apps/$APPNAME/var}"
+
+if [ "${wizard_keep_data:-keep}" = "delete" ]; then
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [uninstall_callback] user chose full data deletion" \
+    >>"$VAR/logs/uninstall.log" 2>/dev/null || true
+  # Only ever delete our own data root, nothing outside VAR.
+  rm -rf "$VAR/mysql" "$VAR/client-data" "$VAR/backups" "$VAR/config" "$VAR/state"
+fi
+exit 0

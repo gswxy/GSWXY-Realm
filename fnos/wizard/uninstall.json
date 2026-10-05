@@ -1,0 +1,27 @@
+[
+  {
+    "stepTitle": "卸载 GSWXY Realm",
+    "items": [
+      {
+        "type": "tips",
+        "text": "为保护你的服务器，卸载默认保留全部数据（数据库、配置、备份）。只有明确选择删除时才会清除。"
+      },
+      {
+        "type": "radio",
+        "name": "keep_data",
+        "label": "服务器数据处理",
+        "default": "keep",
+        "items": [
+          {
+            "value": "keep",
+            "label": "保留数据（推荐）"
+          },
+          {
+            "value": "delete",
+            "label": "同时删除所有服务器数据"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "com.gswxy.realm.url": {
+    "title": "GSWXY Realm",
+    "icon": "images/icon-{0}.png",
+    "type": "iframe",
+    "protocol": "http",
+    "port": "18700",
+    "url": "/",
+    "allUsers": false
+  }
+}
