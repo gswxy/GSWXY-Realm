@@ -5,6 +5,7 @@ package app
 
 import (
 	"database/sql"
+	"sync/atomic"
 	"fmt"
 	"net"
 	"os"
@@ -63,6 +64,11 @@ type App struct {
 	db   *sql.DB
 
 	startMu sync.Mutex
+
+	// setupRunning marks a live setup goroutine in THIS process; the
+	// persisted InProgress flag alone cannot distinguish "running" from
+	// "abandoned by a crash", which must stay resumable.
+	setupRunning atomic.Bool
 }
 
 // New builds the App from resolved paths.
@@ -408,9 +414,11 @@ func (a *App) MarkApplied(label, sum string) error {
 // it resumes from the first incomplete step and clears stale errors.
 func (a *App) RunSetup(progress func(step, detail string)) error {
 	st := a.State.Get()
-	if st.Setup.InProgress {
+	if st.Setup.InProgress && a.setupRunning.Load() {
 		return fmt.Errorf("初始化已在进行中")
 	}
+	// InProgress 但本进程没有正在跑的 setup goroutine —— 崩溃/强停残留，
+	// 直接从第一个未完成步骤恢复。
 	step := st.PendingStep()
 	if step == state.StepDone {
 		return nil
@@ -420,6 +428,8 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 		d.Setup.Error = ""
 		d.Setup.InProgress = true
 	})
+	a.setupRunning.Store(true)
+	defer a.setupRunning.Store(false)
 	fail := func(err error) error {
 		_ = a.State.Update(func(d *state.Data) {
 			d.Setup.Error = err.Error()
