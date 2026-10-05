@@ -109,12 +109,12 @@ if [ ! -d "$EXTRACT" ]; then
   tar -xzf "$TARBALL" -C "$EXTRACT" --strip-components=1
 fi
 # Strip to the runtime essentials: daemon, client tools, share/charsets.
-mkdir -p "$APP/mysql"
-cp -a "$EXTRACT/bin/mariadbd" "$APP/mysql/bin/" 2>/dev/null || cp -a "$EXTRACT/bin/mysqld" "$APP/mysql/bin/"
-for t in mariadb mysql mariadb-admin mysqladmin mariadb-dump mysqldump mariadb-install-db mysql_install_db; do
-  if [ -f "$EXTRACT/bin/$t" ]; then cp -a "$EXTRACT/bin/$t" "$APP/mysql/bin/"; fi
+# -L dereferences symlinks (bintar ships mariadbd -> mysqld links).
+mkdir -p "$APP/mysql/bin" "$APP/mysql/share" "$APP/mysql/lib/plugin"
+cp -aL "$EXTRACT/bin/mariadbd" "$APP/mysql/bin/" 2>/dev/null || cp -aL "$EXTRACT/bin/mysqld" "$APP/mysql/bin/"
+for t in mariadb mysql mariadb-admin mysqladmin mariadb-dump mysqldump mariadb-install-db mysql_install_db my_print_defaults resolveip; do
+  if [ -f "$EXTRACT/bin/$t" ]; then cp -aL "$EXTRACT/bin/$t" "$APP/mysql/bin/"; fi
 done
-mkdir -p "$APP/mysql/share" "$APP/mysql/lib"
 cp -a "$EXTRACT/share/." "$APP/mysql/share/" 2>/dev/null || true
 # only language + charsets needed
 find "$APP/mysql/share" -maxdepth 1 -mindepth 1 ! -name 'charsets' ! -name 'english' -exec rm -rf {} + 2>/dev/null || true
