@@ -35,3 +35,10 @@ tools-local/
 # 系统
 .DS_Store
 Thumbs.db
+
+# 真机测试产物（由 collect-runtime 生成）
+fnos/app/bin/
+fnos/app/resources.json
+fnos/app/config-schema.json
+*.token*
+.joblog*
