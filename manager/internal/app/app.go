@@ -100,6 +100,13 @@ func New(p platform.Paths) (*App, error) {
 		CD:    clientdata.NewManager(p, log),
 		Ver:   version.Load(p.BuildInfo()),
 	}
+	a.CD.OnInstalled = func(version string) {
+		_ = st.Update(func(d *state.Data) {
+			d.ClientData.Version = version
+			d.ClientData.Installed = true
+			d.ClientData.VerifiedAt = time.Now().Format(time.RFC3339)
+		})
+	}
 	a.CM = &confman.Manager{
 		UserDir: p.UserConfig(),
 		RunDir:  p.RunConfig(),
