@@ -271,10 +271,11 @@ func ModuleConfs(distDir string) []string {
 	return out
 }
 
-// GenerateModule writes a module's generated run conf (same three-layer
-// merge as the main confs) into the modules subdir of the run dir.
+// GenerateModule writes a module's generated conf next to its .dist
+// (AC loads 'etc/modules/<name>.conf' relative to the binary's CWD —
+// the standard stock-install layout).
 func (m *Manager) GenerateModule(name string, dist *Schema) error {
-	if err := os.MkdirAll(filepath.Join(m.RunDir, "modules"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(m.DistDir, "modules"), 0o755); err != nil {
 		return err
 	}
 	eff, err := m.Resolve(name, dist)
@@ -295,6 +296,6 @@ func (m *Manager) GenerateModule(name string, dist *Schema) error {
 		}
 		fmt.Fprintf(&b, "%s = %s\n", e.Key, quoteValue(e.Value))
 	}
-	path := filepath.Join(m.RunDir, "modules", name)
+	path := filepath.Join(m.DistDir, "modules", name)
 	return os.WriteFile(path, []byte(b.String()), 0o644)
 }

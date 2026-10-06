@@ -43,14 +43,14 @@ find "$SRC/modules/mod-playerbots/conf" -name "*.conf.dist" \
 echo "== data dir placeholders =="
 for d in dbc maps vmaps mmaps Cameras; do mkdir -p "$APP/data/$d"; done
 
-echo "== sql =="
-mkdir -p "$APP/sql/base" "$APP/sql/updates"
-cp -a "$SRC/data/sql/base/db_auth"    "$APP/sql/base/"
-cp -a "$SRC/data/sql/base/db_characters" "$APP/sql/base/"
-cp -a "$SRC/data/sql/base/db_world"   "$APP/sql/base/"
-cp -a "$SRC/data/sql/updates/db_auth"      "$APP/sql/updates/" 2>/dev/null || true
-cp -a "$SRC/data/sql/updates/db_characters" "$APP/sql/updates/" 2>/dev/null || true
-cp -a "$SRC/data/sql/updates/db_world"      "$APP/sql/updates/" 2>/dev/null || true
+echo "== sql (AC 布局：data/sql，供 worldserver 自动更新器使用) =="
+mkdir -p "$APP/data/sql/base" "$APP/data/sql/updates"
+cp -a "$SRC/data/sql/base/db_auth"    "$APP/data/sql/base/"
+cp -a "$SRC/data/sql/base/db_characters" "$APP/data/sql/base/"
+cp -a "$SRC/data/sql/base/db_world"   "$APP/data/sql/base/"
+cp -a "$SRC/data/sql/updates/db_auth"      "$APP/data/sql/updates/" 2>/dev/null || true
+cp -a "$SRC/data/sql/updates/db_characters" "$APP/data/sql/updates/" 2>/dev/null || true
+cp -a "$SRC/data/sql/updates/db_world"      "$APP/data/sql/updates/" 2>/dev/null || true
 
 echo "== module sql =="
 mkdir -p "$APP/modules/mod-playerbots/data/sql"

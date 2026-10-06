@@ -81,13 +81,25 @@ func (a *App) regenerateFull() error {
 	if err := a.injectCredentials(); err != nil {
 		return err
 	}
-	// Point DataDir at the payload data dir (symlinks to client-data).
-	worldPath := a.CM.RunPath("worldserver.conf")
-	raw, err := os.ReadFile(worldPath)
-	if err == nil {
-		re := regexp.MustCompile(`(?m)^DataDir\s*=\s*(.*)$`)
-		raw = re.ReplaceAll(raw, []byte("DataDir = \""+a.Paths.DataDir()+"\""))
-		_ = os.WriteFile(worldPath, raw, 0o600)
+	// DataDir 指向 payload data 目录（client-data 符号链接所在）；
+	// SourceDirectory 指向 payload 根（AC 的更新器在其 data/sql/updates
+	// 下查找 dated updates——空值会让 std::filesystem 抛异常）。
+	inject := map[string]string{
+		"DataDir":         a.Paths.DataDir(),
+		"SourceDirectory": a.Paths.AppDest,
+		"LogsDir":         a.Paths.Logs(),
+	}
+	for _, conf := range []string{"worldserver.conf", "authserver.conf"} {
+		path := a.CM.RunPath(conf)
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		for key, val := range inject {
+			re := regexp.MustCompile(`(?m)^` + key + `\s*=\s*(.*)$`)
+			raw = re.ReplaceAll(raw, []byte(key+" = \""+val+"\""))
+		}
+		_ = os.WriteFile(path, raw, 0o600)
 	}
 	a.EnsureDataLinks()
 	return nil

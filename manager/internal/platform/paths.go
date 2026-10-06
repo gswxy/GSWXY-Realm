@@ -111,7 +111,7 @@ func (p Paths) RunConfig() string    { return filepath.Join(p.Var, "config", "ru
 func (p Paths) UserConfig() string   { return filepath.Join(p.Var, "config") }
 func (p Paths) BinDir() string       { return filepath.Join(p.AppDest, "bin") }
 func (p Paths) MySQLRuntime() string { return filepath.Join(p.AppDest, "mysql") }
-func (p Paths) SQLDir() string       { return filepath.Join(p.AppDest, "sql") }
+func (p Paths) SQLDir() string       { return filepath.Join(p.AppDest, "data", "sql") }
 func (p Paths) LocaleDir() string    { return filepath.Join(p.AppDest, "locale") }
 func (p Paths) EtcDist() string      { return filepath.Join(p.AppDest, "etc") }
 func (p Paths) DataDir() string      { return filepath.Join(p.AppDest, "data") }
