@@ -727,14 +727,15 @@ func (a *App) regenerateConfigs() error {
 			return fmt.Errorf("生成 %s: %w", conf, err)
 		}
 	}
-	// 模块配置：target/etc/modules/*.conf.dist → var/config/run/modules/
+	// 模块配置：target/etc/modules/*.conf.dist → 同目录生成 <name>.conf
+	// （AC 以 CWD 相对路径 etc/modules/<name>.conf 加载）
 	for _, distFile := range confman.ModuleConfs(a.Paths.EtcDist()) {
 		dist, err := confman.ParseDist(filepath.Join(a.Paths.EtcDist(), "modules", distFile))
 		if err != nil {
 			return fmt.Errorf("解析模块 %s: %w", distFile, err)
 		}
 		name := strings.TrimSuffix(distFile, ".dist")
-		if err := a.CM.Generate(name, dist); err != nil {
+		if err := a.CM.GenerateModule(name, dist); err != nil {
 			return fmt.Errorf("生成模块 %s: %w", name, err)
 		}
 	}
