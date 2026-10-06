@@ -100,8 +100,7 @@ func (m *Manager) ChangePassword(username, password string) error {
 		return err
 	}
 	res, err := m.DB.Exec(
-		`UPDATE acore_auth.account SET salt=?, verifier=?, sessionkey='',
-		    v=0, s=0 WHERE username = ?`,
+		`UPDATE acore_auth.account SET salt=?, verifier=? WHERE username = ?`,
 		salt, verifier, strings.ToUpper(username))
 	if err != nil {
 		return err
