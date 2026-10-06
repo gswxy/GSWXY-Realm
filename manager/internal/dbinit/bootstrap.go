@@ -154,6 +154,7 @@ func runInitialize(p platform.Paths, mysqldBin string) error {
 		"--initialize-insecure",
 	}
 	cmd := command(mysqldBin, args)
+	cmd.Env = ClientEnv(p)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%s: %s", err, strings.TrimSpace(string(out)))
@@ -170,6 +171,7 @@ func runInstallDB(p platform.Paths, installDbBin string) error {
 		"--skip-test-db",
 	}
 	cmd := command(installDbBin, args)
+	cmd.Env = ClientEnv(p)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%s: %s", err, strings.TrimSpace(string(out)))

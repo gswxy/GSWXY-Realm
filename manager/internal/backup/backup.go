@@ -19,23 +19,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gswxy/gswxy-realm/manager/internal/dbinit"
 	"github.com/gswxy/gswxy-realm/manager/internal/logging"
 	"github.com/gswxy/gswxy-realm/manager/internal/platform"
 )
 
 // Manifest records provenance of one backup archive.
 type Manifest struct {
-	Format          string   `json:"format"` // gswxy-backup/1
-	CreatedAt       string   `json:"created_at"`
-	GSWXYVersion    string   `json:"gswxy_version"`
-	CoreCommit      string   `json:"core_commit"`
-	PlayerbotsCommit string  `json:"playerbots_commit"`
-	DBVersion       string   `json:"db_version,omitempty"`
-	DataVersion     string   `json:"data_version,omitempty"`
-	LocaleVersion   string   `json:"locale_version,omitempty"`
-	Databases       []string `json:"databases"`
-	WorldTables     []string `json:"world_tables,omitempty"`
-	Files           []string `json:"files"`
+	Format           string   `json:"format"` // gswxy-backup/1
+	CreatedAt        string   `json:"created_at"`
+	GSWXYVersion     string   `json:"gswxy_version"`
+	CoreCommit       string   `json:"core_commit"`
+	PlayerbotsCommit string   `json:"playerbots_commit"`
+	DBVersion        string   `json:"db_version,omitempty"`
+	DataVersion      string   `json:"data_version,omitempty"`
+	LocaleVersion    string   `json:"locale_version,omitempty"`
+	Databases        []string `json:"databases"`
+	WorldTables      []string `json:"world_tables,omitempty"`
+	Files            []string `json:"files"`
 }
 
 // World tables carried in backups (the ones locale import + common admin
@@ -49,10 +50,10 @@ var WorldTables = []string{
 
 // Manager creates and restores archives.
 type Manager struct {
-	Paths    platform.Paths
-	Log      *logging.Logger
-	DB       *sql.DB
-	Version  VersionInfo
+	Paths   platform.Paths
+	Log     *logging.Logger
+	DB      *sql.DB
+	Version VersionInfo
 }
 
 // VersionInfo feeds the backup manifest.
@@ -77,15 +78,15 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 	defer os.RemoveAll(tmp)
 
 	manifest := Manifest{
-		Format:          "gswxy-backup/1",
-		CreatedAt:       time.Now().Format(time.RFC3339),
-		GSWXYVersion:    m.Version.GSWXY,
-		CoreCommit:      m.Version.CoreCommit,
+		Format:           "gswxy-backup/1",
+		CreatedAt:        time.Now().Format(time.RFC3339),
+		GSWXYVersion:     m.Version.GSWXY,
+		CoreCommit:       m.Version.CoreCommit,
 		PlayerbotsCommit: m.Version.PlayerbotsCommit,
-		DataVersion:     m.Version.DataVersion,
-		LocaleVersion:   m.Version.LocaleVersion,
-		Databases:       []string{"acore_auth", "acore_characters"},
-		WorldTables:     WorldTables,
+		DataVersion:      m.Version.DataVersion,
+		LocaleVersion:    m.Version.LocaleVersion,
+		Databases:        []string{"acore_auth", "acore_characters"},
+		WorldTables:      WorldTables,
 	}
 
 	// 1. database dumps (consistent per-database).
@@ -94,13 +95,13 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 		{"acore_characters", "characters.sql"},
 	} {
 		out := filepath.Join(tmp, d.file)
-		if err := dumpDatabase(dumpBin, rootPass, d.db, out, nil); err != nil {
+		if err := dumpDatabase(m.Paths, dumpBin, rootPass, d.db, out, nil); err != nil {
 			return "", fmt.Errorf("dump %s: %w", d.db, err)
 		}
 	}
 	// world: only the tracked tables.
 	worldOut := filepath.Join(tmp, "world.sql")
-	if err := dumpDatabase(dumpBin, rootPass, "acore_world", worldOut, WorldTables); err != nil {
+	if err := dumpDatabase(m.Paths, dumpBin, rootPass, "acore_world", worldOut, WorldTables); err != nil {
 		return "", fmt.Errorf("dump world tables: %w", err)
 	}
 
@@ -125,7 +126,7 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 	return path, nil
 }
 
-func dumpDatabase(dumpBin, pass, db, out string, tables []string) error {
+func dumpDatabase(paths platform.Paths, dumpBin, pass, db, out string, tables []string) error {
 	args := []string{
 		"--defaults-extra-file=" + defaultsFile(dumpBin, pass),
 		"--default-character-set=utf8mb4",
@@ -145,7 +146,7 @@ func dumpDatabase(dumpBin, pass, db, out string, tables []string) error {
 	defer f.Close()
 	cmd := exec.Command(dumpBin, args...)
 	cmd.Stdout = f
-	cmd.Env = []string{"PATH=/usr/local/bin:/usr/bin:/bin", "LANG=C.UTF-8"}
+	cmd.Env = dbinit.ClientEnv(paths)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -321,7 +322,7 @@ func (m *Manager) Restore(archive, mysqlBin, dumpBin, rootPass string) error {
 			return err
 		}
 		cmd.Stdin = in
-		cmd.Env = []string{"PATH=/usr/local/bin:/usr/bin:/bin"}
+		cmd.Env = dbinit.ClientEnv(m.Paths)
 		if out, err := cmd.CombinedOutput(); err != nil {
 			in.Close()
 			return fmt.Errorf("恢复 %s: %v: %s", pair[1], err, tail(string(out)))

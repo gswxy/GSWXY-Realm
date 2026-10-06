@@ -14,7 +14,7 @@ GSWXY Realm 是一个 fnOS 应用（`.fpk` 安装包），安装完成后你会�
 - **机器人玩家（Playerbot）**：升级、副本、战场、公会全程陪你玩
 - 全中文世界（NPC/物品/任务/广播文本/机器人名字，均来自 GSWXY zhCN 数据包）
 - 中文 Web 管理界面：概览 / 服务器 / Playerbot / 账号 / 配置 / 数据 / 日志 / 备份 / 版本
-- 内置数据库运行环境（MariaDB，仅监听本机，零配置）
+- 内置数据库运行环境（MySQL Community 8.0，仅监听本机，零配置）
 
 `Powered by AzerothCore + mod-playerbots`
 
@@ -118,7 +118,7 @@ bash scripts/verify-package.sh                # 包结构验证
 
 - GSWXY Realm 自有代码：AGPL-3.0（见 [LICENSE](LICENSE)）
 - AzerothCore / mod-playerbots：AGPL-3.0
-- MariaDB（内置运行时）：GPL-2.0
+- MySQL Community Server（内置运行时）：GPL-2.0 with FOSS exception
 - 第三方组件清单：见发布资产 `THIRD-PARTY-LICENSES.txt`
 
 本仓库不包含、不分发任何暴雪客户端原始资产；客户端数据（DBC/Maps/...）由用户端从

@@ -4,8 +4,9 @@ This distribution includes software and data from the following projects:
 
 - **AzerothCore** (mod-playerbots/azerothcore-wotlk, Playerbot branch) — AGPL-3.0
 - **mod-playerbots** (mod-playerbots/mod-playerbots, master branch) — AGPL-3.0
-- **MariaDB Server** (bundled, stripped runtime) — GPL-2.0 (see MariaDB-COPYING
-  in release archives; reproduced in THIRD-PARTY-LICENSES.txt)
+- **MySQL Community Server** (bundled, stripped minimal runtime) — GPL-2.0
+  with Universal FOSS Exception (see MySQL-LICENSE in release archives;
+  reproduced in THIRD-PARTY-LICENSES.txt)
 - **Go libraries** (build-time): go-sql-driver/mysql (BSD-3-Clause),
   SPL), golang.org/x/crypto (BSD-3-Clause)
 

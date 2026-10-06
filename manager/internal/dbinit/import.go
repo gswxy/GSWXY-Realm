@@ -99,7 +99,7 @@ func ImportFile(p platform.Paths, mysqlBin, rootPass, dbName, path string,
 	defer closeIn()
 	cmd.Stdin = stdin
 	// Never inherit the Manager's environment wholesale.
-	cmd.Env = minimalEnv()
+	cmd.Env = ClientEnv(p)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		// Locale/DML import must leave the database untouched.
@@ -202,14 +202,6 @@ func stripDatabaseStatements(sql string) string {
 		out = append(out, l)
 	}
 	return strings.Join(out, "\n")
-}
-
-func minimalEnv() []string {
-	return []string{
-		"PATH=/usr/local/bin:/usr/bin:/bin",
-		"LANG=C.UTF-8",
-		"LC_ALL=C.UTF-8",
-	}
 }
 
 func tailLines(s string, n int) string {
