@@ -116,10 +116,11 @@ for t in mysql mysqldump mysqladmin; do
   if [ -f "$EXTRACT/bin/$t" ]; then cp -aL "$EXTRACT/bin/$t" "$APP/mysql/bin/"; fi
 done
 # 客户端工具依赖 libmysqlclient（minimal 包自带于 lib/ 下）；
-# mysqld 的私有依赖（libprotobuf-lite 等）在 lib/private/（Oracle 约定）
+# mysqld 的私有依赖在 lib/private/，Oracle 自带 RPATH=$ORIGIN/../lib/private
+# —— 必须保留原布局，不与 lib/ 合并。
 mkdir -p "$APP/mysql/lib"
 cp -a "$EXTRACT/lib/"*.so* "$APP/mysql/lib/" 2>/dev/null || true
-cp -a "$EXTRACT/lib/private/." "$APP/mysql/lib/" 2>/dev/null || true
+cp -a "$EXTRACT/lib/private" "$APP/mysql/lib/private" 2>/dev/null || true
 cp -a "$EXTRACT/share/." "$APP/mysql/share/" 2>/dev/null || true
 # plugin 目录：caching_sha2 等内置插件为静态，无需额外 plugin 文件
 strip --strip-unneeded "$APP/mysql/bin/"* 2>/dev/null || true
