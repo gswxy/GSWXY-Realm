@@ -342,6 +342,10 @@ func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) 
 	if _, err := db.Exec(ensure); err != nil {
 		return fmt.Errorf("ensure root@127.0.0.1: %w", err)
 	}
+	if _, err := db.Exec(
+		"GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION"); err != nil {
+		return fmt.Errorf("grant root@127.0.0.1: %w", err)
+	}
 	if _, err := db.Exec("FLUSH PRIVILEGES"); err != nil {
 		return err
 	}
