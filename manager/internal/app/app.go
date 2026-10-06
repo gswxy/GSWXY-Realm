@@ -715,7 +715,8 @@ func (a *App) RunSetup(progress func(step, detail string)) error {
 	}
 }
 
-// regenerateConfigs writes the run configs from the three layers.
+// regenerateConfigs writes the run configs from the three layers,
+// including module confs (AC loads them from <run dir>/modules/).
 func (a *App) regenerateConfigs() error {
 	for _, conf := range confman.ConfFiles {
 		dist, err := confman.ParseDist(a.distFor(conf))
@@ -724,6 +725,17 @@ func (a *App) regenerateConfigs() error {
 		}
 		if err := a.CM.Generate(conf, dist); err != nil {
 			return fmt.Errorf("生成 %s: %w", conf, err)
+		}
+	}
+	// 模块配置：target/etc/modules/*.conf.dist → var/config/run/modules/
+	for _, distFile := range confman.ModuleConfs(a.Paths.EtcDist()) {
+		dist, err := confman.ParseDist(filepath.Join(a.Paths.EtcDist(), "modules", distFile))
+		if err != nil {
+			return fmt.Errorf("解析模块 %s: %w", distFile, err)
+		}
+		name := strings.TrimSuffix(distFile, ".dist")
+		if err := a.CM.Generate(name, dist); err != nil {
+			return fmt.Errorf("生成模块 %s: %w", name, err)
 		}
 	}
 	return nil

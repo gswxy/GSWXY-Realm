@@ -270,3 +270,31 @@ func ModuleConfs(distDir string) []string {
 	sort.Strings(out)
 	return out
 }
+
+// GenerateModule writes a module's generated run conf (same three-layer
+// merge as the main confs) into the modules subdir of the run dir.
+func (m *Manager) GenerateModule(name string, dist *Schema) error {
+	if err := os.MkdirAll(filepath.Join(m.RunDir, "modules"), 0o755); err != nil {
+		return err
+	}
+	eff, err := m.Resolve(name, dist)
+	if err != nil {
+		return err
+	}
+	var b strings.Builder
+	b.WriteString("[//]: # (由 GSWXY Manager 生成 —— 模块运行配置)\n")
+	for _, e := range eff {
+		cmt := ""
+		if ce, ok := dist.Get(e.Key); ok {
+			cmt = ce.Comment
+		}
+		if cmt != "" {
+			for _, l := range strings.Split(cmt, "\n") {
+				b.WriteString("# " + l + "\n")
+			}
+		}
+		fmt.Fprintf(&b, "%s = %s\n", e.Key, quoteValue(e.Value))
+	}
+	path := filepath.Join(m.RunDir, "modules", name)
+	return os.WriteFile(path, []byte(b.String()), 0o644)
+}
