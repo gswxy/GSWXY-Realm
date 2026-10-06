@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/gswxy/gswxy-realm/manager/internal/confman"
 	"github.com/gswxy/gswxy-realm/manager/internal/dbinit"
 )
 
@@ -54,11 +55,19 @@ func (a *App) injectCredentials() error {
 	if err != nil || creds == nil {
 		return fmt.Errorf("数据库凭据缺失")
 	}
-	for conf := range map[string]bool{"worldserver.conf": true, "authserver.conf": true} {
-		path := a.CM.RunPath(conf)
+	// 主配置（run 目录）+ 模块配置（etc/modules/*.conf）都要注入。
+	confs := []string{"worldserver.conf", "authserver.conf"}
+	for _, m := range confman.ModuleConfs(a.Paths.EtcDist()) {
+		confs = append(confs, strings.TrimSuffix(m, ".dist"))
+	}
+	for _, conf := range confs {
+		path := filepath.Join(a.CM.DistDir, "modules", conf)
+		if _, statErr := os.Stat(path); statErr != nil {
+			path = a.CM.RunPath(conf)
+		}
 		raw, err := os.ReadFile(path)
 		if err != nil {
-			continue // module confs have no DB info
+			continue
 		}
 		lines := strings.Split(string(raw), "\n")
 		for i, line := range lines {
