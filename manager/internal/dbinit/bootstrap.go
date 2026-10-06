@@ -129,6 +129,9 @@ plugin_dir                 = %s
 	return os.WriteFile(myCnfPath(p), []byte(cnf), 0o600)
 }
 
+// SocketPath is the unix socket of the bundled instance (my.cnf sets it).
+func SocketPath(p platform.Paths) string { return filepath.Join(p.Var, "mysql.sock") }
+
 // isMariaDB reports the server flavor from the bundled daemon binary
 // name (the payload ships exactly one of mariadbd / mysqld).
 func isMariaDB(p platform.Paths) bool {
@@ -271,7 +274,9 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 // Manager itself always connects over TCP 127.0.0.1, so that account
 // is guaranteed to exist with the final password.
 func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) error {
-	dsn := fmt.Sprintf("root@tcp(127.0.0.1:%d)/?charset=utf8mb4&multiStatements=true", creds.Port)
+	// 引导连接必须走 Unix Socket：MySQL 的 initialize 只建 root@localhost，
+	// 且 skip_name_resolve 下 TCP 127.0.0.1 不会匹配 localhost 账号。
+	dsn := "root@unix(" + SocketPath(p) + ")/?charset=utf8mb4&multiStatements=true"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return err
@@ -315,10 +320,19 @@ func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) 
 			}
 		}
 	}
-	// Guarantee the TCP account the Manager itself uses.
-	if _, err := db.Exec(fmt.Sprintf(
-		"CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
-		creds.Root)); err != nil {
+	// Guarantee the TCP account the Manager itself uses (skip_name_resolve
+	// makes 127.0.0.1 distinct from localhost).
+	var ensure string
+	if isMariaDB(p) {
+		ensure = fmt.Sprintf(
+			"CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING PASSWORD('%s')",
+			creds.Root)
+	} else {
+		ensure = fmt.Sprintf(
+			"CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '%s'",
+			creds.Root)
+	}
+	if _, err := db.Exec(ensure); err != nil {
 		return fmt.Errorf("ensure root@127.0.0.1: %w", err)
 	}
 	if _, err := db.Exec("FLUSH PRIVILEGES"); err != nil {
