@@ -136,7 +136,7 @@ echo "== bundled shared libs ==="
 # bz2/readline/ssl/crypto 等；其余（libmysqlclient、boost、protobuf、…）收集。
 # 游戏二进制 → app/lib；mysql 工具 → mysql/lib（各自 $ORIGIN/../lib）。
 mkdir -p "$APP/lib" "$APP/mysql/lib"
-WHITELIST='libc.so.6|libm.so.6|libpthread|libdl.so.2|librt.so.1|libstdc++.so.6|libgcc_s.so.1|ld-linux|libz.so.1|libbz2.so|liblzma|libreadline.so|libtinfo|libncurses|libssl.so|libcrypto.so|libresolv|libnsl'
+WHITELIST='libc.so.6|libm.so.6|libpthread|libdl.so.2|librt.so.1|libstdc++.so.6|libgcc_s.so.1|ld-linux|libz.so.1|libbz2.so|liblzma|libreadline.so|libssl.so|libcrypto.so|libresolv|libnsl'
 COPIED=""
 bundle_libs() {
   local srcdir="$1" dstdir="$2"

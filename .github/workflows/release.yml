@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq \
-            git build-essential cmake ninja-build ccache patchelf \
+            git build-essential cmake ninja-build ccache patchelf libncurses5 libtinfo5 \
             libboost-all-dev libssl-dev \
             libmysqlclient-dev libreadline-dev zlib1g-dev libbz2-dev p7zip-full
 
