@@ -37,8 +37,12 @@ N=$(find "$APP/sql/base" -name '*.sql' | wc -l)
 [ "$N" -gt 0 ] || fail "no base SQL found"
 
 echo "== mysql runtime =="
-[ -x "$APP/mysql/bin/mariadbd" ] || [ -x "$APP/mysql/bin/mysqld" ] || fail "mariadbd missing"
+[ -x "$APP/mysql/bin/mysqld" ] || [ -x "$APP/mysql/bin/mariadbd" ] || fail "mysqld missing"
 [ -d "$APP/mysql/share/charsets" ] || fail "mysql share/charsets missing"
+MISSING=$(LD_LIBRARY_PATH="$APP/mysql/lib:$APP/lib" ldd "$APP/mysql/bin/mysqld" 2>/dev/null | awk '/not found/{print $1}') || true
+if [ -n "${MISSING:-}" ]; then
+  fail "mysqld has unresolved libs: $MISSING"
+fi
 
 echo "== resources.json =="
 python3 -c "import json,sys; r=json.load(open('$APP/resources.json')); assert r['url'].startswith('https://')"
