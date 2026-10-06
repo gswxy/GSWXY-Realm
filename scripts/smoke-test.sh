@@ -32,8 +32,8 @@ done
 ls "$APP/etc/modules/"*.conf.dist >/dev/null 2>&1 || fail "module conf dists missing"
 
 echo "== sql present =="
-[ -f "$APP/sql/base/db_auth/acore_auth.sql" ] || true   # layout-tolerant
-N=$(find "$APP/sql/base" -name '*.sql' | wc -l)
+[ -f "$APP/data/sql/base/db_auth/acore_auth.sql" ] || true   # layout-tolerant
+N=$(find "$APP/data/sql/base" -name '*.sql' | wc -l)
 [ "$N" -gt 0 ] || fail "no base SQL found"
 
 echo "== mysql runtime =="
