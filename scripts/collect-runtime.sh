@@ -31,6 +31,8 @@ mkdir -p "$APP/bin" "$APP/web" "$APP/etc" "$APP/data" "$APP/sql" "$APP/locale" "
 echo "== binaries =="
 cp -a "$STAGING/server/bin/." "$APP/bin/"
 strip --strip-unneeded "$APP/bin/worldserver" "$APP/bin/authserver" 2>/dev/null || true
+# AC 以 CWD 相对路径 etc/modules/*.conf 加载模块配置（CWD=bin）
+ln -sfn ../etc "$APP/bin/etc" 2>/dev/null || true
 
 echo "== conf dists =="
 # worldserver/authserver dists + module dists

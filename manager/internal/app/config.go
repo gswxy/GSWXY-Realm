@@ -84,10 +84,13 @@ func (a *App) regenerateFull() error {
 	// DataDir 指向 payload data 目录（client-data 符号链接所在）；
 	// SourceDirectory 指向 payload 根（AC 的更新器在其 data/sql/updates
 	// 下查找 dated updates——空值会让 std::filesystem 抛异常）。
+	// MySQLExecutable 不能为空：updates 启用时 AC 的 DBUpdater 会对该值
+	// 做 is_regular_file（空路径抛 std::filesystem 异常直接崩溃）。
 	inject := map[string]string{
 		"DataDir":         a.Paths.DataDir(),
 		"SourceDirectory": a.Paths.AppDest,
 		"LogsDir":         a.Paths.Logs(),
+		"MySQLExecutable": a.Bins.MysqlClient,
 	}
 	for _, conf := range []string{"worldserver.conf", "authserver.conf"} {
 		path := a.CM.RunPath(conf)
