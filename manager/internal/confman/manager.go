@@ -128,9 +128,15 @@ func (m *Manager) Generate(conf string, dist *Schema) error {
 	}
 	var b strings.Builder
 	b.WriteString("[//]: # (由 GSWXY Manager 生成 —— 请勿直接编辑本文件；编辑上层用户配置或使用 WebUI)\n")
-	b.WriteString("[worldserver]\n")
-	if conf == "authserver.conf" {
+	// 段标签必须与 dist 一致：authserver 用 [authserver]，playerbots 的
+	// dist 没有 ini 段（键在根上），worldserver 用 [worldserver]。
+	switch {
+	case conf == "authserver.conf":
 		b.WriteString("[authserver]\n")
+	case conf == "playerbots.conf":
+		// 无段标签
+	default:
+		b.WriteString("[worldserver]\n")
 	}
 	for _, sec := range order {
 		entries := bySec[sec]
