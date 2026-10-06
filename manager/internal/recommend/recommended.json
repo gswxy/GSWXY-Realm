@@ -135,6 +135,7 @@
     "AiPlayerbot.SpawnTimer": "60",
     "AiPlayerbot.RandomBotsPerTick": "60",
     "AiPlayerbot.BotsPerTick": "10",
-    "AiPlayerbot.PerformanceAllowMoreBots": "0"
+    "AiPlayerbot.PerformanceAllowMoreBots": "0",
+    "AiPlayerbot.DeleteRandomBotAccounts": "0"
   }
 }
