@@ -283,11 +283,11 @@ func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) 
 	cfg.Net = "unix"
 	cfg.Addr = SocketPath(p)
 	cfg.Params = map[string]string{"charset": "utf8mb4"}
-	dsn := cfg.FormatDSN()
-	db, err := sql.Open("mysql", dsn)
+	conn, err := mysqldriver.NewConnector(cfg)
 	if err != nil {
 		return err
 	}
+	db := sql.OpenDB(conn)
 	defer db.Close()
 	if err := db.Ping(); err != nil {
 		// Root already password-protected: nothing to do.
