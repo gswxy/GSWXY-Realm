@@ -32,37 +32,6 @@ echo "== binaries =="
 cp -a "$STAGING/server/bin/." "$APP/bin/"
 strip --strip-unneeded "$APP/bin/worldserver" "$APP/bin/authserver" 2>/dev/null || true
 
-echo "== bundled shared libs ==="
-# 动态库策略：构建基线 glibc ≤ fnOS；非系统运行库随包携带 + RPATH。
-# 系统白名单（Debian 12 内置，不打包）：glibc/libstdc++/libgcc/zlib/
-# bz2/readline/ssl/crypto 等；其余（libmysqlclient、boost、protobuf、…）收集。
-# 游戏二进制 → app/lib；mysql 工具 → mysql/lib（各自 $ORIGIN/../lib）。
-mkdir -p "$APP/lib" "$APP/mysql/lib"
-WHITELIST='libc.so.6|libm.so.6|libpthread|libdl.so.2|librt.so.1|libstdc++.so.6|libgcc_s.so.1|ld-linux|libz.so.1|libbz2.so|liblzma|libreadline.so|libtinfo|libncurses|libssl.so|libcrypto.so|libresolv|libnsl'
-COPIED=""
-bundle_libs() {
-  local srcdir="$1" dstdir="$2"
-  local BIN
-  for BIN in "$srcdir"/*; do
-    [ -f "$BIN" ] || continue
-    while IFS= read -r line; do
-      local lib path base
-      lib=$(echo "$line" | awk '{print $1}')
-      path=$(echo "$line" | awk '{print $3}')
-      base=$(basename "$lib")
-      if echo "$base" | grep -qE "^($WHITELIST)"; then continue; fi
-      if [ "$path" != "not" ] && [ -f "$path" ] && [[ "$COPIED" != *"|$base|"* ]]; then
-        cp -aL "$path" "$dstdir/" && COPIED="$COPIED|$base|"
-      fi
-    done < <(ldd "$BIN" 2>/dev/null)
-  done
-}
-bundle_libs "$APP/bin" "$APP/lib"
-bundle_libs "$APP/mysql/bin" "$APP/mysql/lib"
-# shellcheck disable=SC2016  # $ORIGIN 必须保持字面量
-patchelf --set-rpath '$ORIGIN/../lib' "$APP/bin/"* "$APP/mysql/bin/"* 2>/dev/null || true
-echo "bundled: $(echo "$COPIED" | tr '|' ' ')"
-
 echo "== conf dists =="
 # worldserver/authserver dists + module dists
 find "$STAGING/server/etc" -name "*.conf.dist" -exec cp -a {} "$APP/etc/" \; 2>/dev/null || true
@@ -157,5 +126,36 @@ echo "== license files =="
 mkdir -p "$APP/licenses"
 cp -a "$EXTRACT/LICENSE" "$APP/licenses/MySQL-LICENSE" 2>/dev/null ||   cp -a "$EXTRACT/COPYING" "$APP/licenses/MySQL-COPYING" 2>/dev/null || true
 cp -a "$EXTRACT/README" "$APP/licenses/MySQL-README" 2>/dev/null || true
+
+echo "== bundled shared libs ==="
+# 动态库策略：构建基线 glibc ≤ fnOS；非系统运行库随包携带 + RPATH。
+# 系统白名单（Debian 12 内置，不打包）：glibc/libstdc++/libgcc/zlib/
+# bz2/readline/ssl/crypto 等；其余（libmysqlclient、boost、protobuf、…）收集。
+# 游戏二进制 → app/lib；mysql 工具 → mysql/lib（各自 $ORIGIN/../lib）。
+mkdir -p "$APP/lib" "$APP/mysql/lib"
+WHITELIST='libc.so.6|libm.so.6|libpthread|libdl.so.2|librt.so.1|libstdc++.so.6|libgcc_s.so.1|ld-linux|libz.so.1|libbz2.so|liblzma|libreadline.so|libtinfo|libncurses|libssl.so|libcrypto.so|libresolv|libnsl'
+COPIED=""
+bundle_libs() {
+  local srcdir="$1" dstdir="$2"
+  local BIN
+  for BIN in "$srcdir"/*; do
+    [ -f "$BIN" ] || continue
+    while IFS= read -r line; do
+      local lib path base
+      lib=$(echo "$line" | awk '{print $1}')
+      path=$(echo "$line" | awk '{print $3}')
+      base=$(basename "$lib")
+      if echo "$base" | grep -qE "^($WHITELIST)"; then continue; fi
+      if [ "$path" != "not" ] && [ -f "$path" ] && [[ "$COPIED" != *"|$base|"* ]]; then
+        cp -aL "$path" "$dstdir/" && COPIED="$COPIED|$base|"
+      fi
+    done < <(ldd "$BIN" 2>/dev/null)
+  done
+}
+bundle_libs "$APP/bin" "$APP/lib"
+bundle_libs "$APP/mysql/bin" "$APP/mysql/lib"
+# shellcheck disable=SC2016  # $ORIGIN 必须保持字面量
+patchelf --set-rpath '$ORIGIN/../lib' "$APP/bin/"* "$APP/mysql/bin/"* 2>/dev/null || true
+echo "bundled: $(echo "$COPIED" | tr '|' ' ')"
 
 echo "payload assembled at $APP"
