@@ -157,8 +157,9 @@ bundle_libs() {
 }
 bundle_libs "$APP/bin" "$APP/lib"
 bundle_libs "$APP/mysql/bin" "$APP/mysql/lib"
-# shellcheck disable=SC2016  # $ORIGIN 必须保持字面量
-patchelf --set-rpath '$ORIGIN/../lib' "$APP/bin/"* "$APP/mysql/bin/"* 2>/dev/null || true
+# Oracle 的二进制自带 RPATH=$ORIGIN/../lib/private —— 把捆绑库同时
+# 放进 private/，保证 mysqld / 客户端在无环境变量时也能解析。
+cp -a "$APP/mysql/lib/"*.so* "$APP/mysql/lib/private/" 2>/dev/null || true
 echo "bundled: $(echo "$COPIED" | tr '|' ' ')"
 
 echo "payload assembled at $APP"
