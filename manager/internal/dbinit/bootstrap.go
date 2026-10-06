@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	mysqldriver "github.com/go-sql-driver/mysql"
 
 	"github.com/gswxy/gswxy-realm/manager/internal/logging"
 	"github.com/gswxy/gswxy-realm/manager/internal/platform"
@@ -276,7 +277,13 @@ func ProvisionAccounts(p platform.Paths, creds *Credentials, log *logging.Logger
 func setRootPassword(p platform.Paths, creds *Credentials, log *logging.Logger) error {
 	// 引导连接必须走 Unix Socket：MySQL 的 initialize 只建 root@localhost，
 	// 且 skip_name_resolve 下 TCP 127.0.0.1 不会匹配 localhost 账号。
-	dsn := "root@unix(" + SocketPath(p) + ")/?charset=utf8mb4&multiStatements=true"
+	// fnOS 路径含 '@'（@appdata），必须用结构化 Config 构造 DSN。
+	cfg := mysqldriver.NewConfig()
+	cfg.User = "root"
+	cfg.Net = "unix"
+	cfg.Addr = SocketPath(p)
+	cfg.Params = map[string]string{"charset": "utf8mb4"}
+	dsn := cfg.FormatDSN()
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return err
