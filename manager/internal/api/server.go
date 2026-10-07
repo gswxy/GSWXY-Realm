@@ -63,47 +63,47 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/preflight", s.session(s.handlePreflight))
 
 	// lifecycle
-	mux.HandleFunc("POST /api/start", s.admin(s.handleStart))
-	mux.HandleFunc("POST /api/stop", s.admin(s.handleStop))
-	mux.HandleFunc("POST /api/restart", s.admin(s.handleRestart))
+	mux.HandleFunc("POST /api/start", s.session(s.admin(s.handleStart)))
+	mux.HandleFunc("POST /api/stop", s.session(s.admin(s.handleStop)))
+	mux.HandleFunc("POST /api/restart", s.session(s.admin(s.handleRestart)))
 
 	// setup
-	mux.HandleFunc("POST /api/setup/start", s.admin(s.handleSetupStart))
+	mux.HandleFunc("POST /api/setup/start", s.session(s.admin(s.handleSetupStart)))
 	mux.HandleFunc("GET /api/setup/status", s.session(s.handleSetupStatus))
 	mux.HandleFunc("POST /api/setup/password", s.handleSetupPassword)
 
 	// client data
 	mux.HandleFunc("GET /api/data/status", s.session(s.handleDataStatus))
-	mux.HandleFunc("POST /api/data/download", s.admin(s.handleDataDownload))
-	mux.HandleFunc("POST /api/data/cancel", s.admin(s.handleDataCancel))
-	mux.HandleFunc("POST /api/data/import", s.admin(s.handleDataImport))
+	mux.HandleFunc("POST /api/data/download", s.session(s.admin(s.handleDataDownload)))
+	mux.HandleFunc("POST /api/data/cancel", s.session(s.admin(s.handleDataCancel)))
+	mux.HandleFunc("POST /api/data/import", s.session(s.admin(s.handleDataImport)))
 
 	// config
 	mux.HandleFunc("GET /api/config/list", s.session(s.handleConfigList))
 	mux.HandleFunc("GET /api/config/schema", s.session(s.handleConfigSchema))
-	mux.HandleFunc("POST /api/config/set", s.admin(s.handleConfigSet))
+	mux.HandleFunc("POST /api/config/set", s.session(s.admin(s.handleConfigSet)))
 	mux.HandleFunc("GET /api/config/raw", s.session(s.handleConfigRaw))
-	mux.HandleFunc("POST /api/config/raw", s.admin(s.handleConfigRawSave))
-	mux.HandleFunc("POST /api/config/reset", s.admin(s.handleConfigReset))
-	mux.HandleFunc("POST /api/config/regenerate", s.admin(s.handleConfigRegen))
+	mux.HandleFunc("POST /api/config/raw", s.session(s.admin(s.handleConfigRawSave)))
+	mux.HandleFunc("POST /api/config/reset", s.session(s.admin(s.handleConfigReset)))
+	mux.HandleFunc("POST /api/config/regenerate", s.session(s.admin(s.handleConfigRegen)))
 
 	// playerbot
 	mux.HandleFunc("GET /api/playerbot/summary", s.session(s.handleBotSummary))
 	mux.HandleFunc("GET /api/playerbot/profiles", s.session(s.handleBotProfiles))
-	mux.HandleFunc("POST /api/playerbot/profile", s.admin(s.handleBotApplyProfile))
+	mux.HandleFunc("POST /api/playerbot/profile", s.session(s.admin(s.handleBotApplyProfile)))
 
 	// accounts
 	mux.HandleFunc("GET /api/accounts", s.session(s.handleAccounts))
-	mux.HandleFunc("POST /api/accounts/create", s.admin(s.handleAccountCreate))
-	mux.HandleFunc("POST /api/accounts/password", s.admin(s.handleAccountPassword))
-	mux.HandleFunc("POST /api/accounts/gmlevel", s.admin(s.handleAccountGM))
-	mux.HandleFunc("POST /api/accounts/ban", s.admin(s.handleAccountBan))
-	mux.HandleFunc("POST /api/accounts/unban", s.admin(s.handleAccountUnban))
+	mux.HandleFunc("POST /api/accounts/create", s.session(s.admin(s.handleAccountCreate)))
+	mux.HandleFunc("POST /api/accounts/password", s.session(s.admin(s.handleAccountPassword)))
+	mux.HandleFunc("POST /api/accounts/gmlevel", s.session(s.admin(s.handleAccountGM)))
+	mux.HandleFunc("POST /api/accounts/ban", s.session(s.admin(s.handleAccountBan)))
+	mux.HandleFunc("POST /api/accounts/unban", s.session(s.admin(s.handleAccountUnban)))
 	mux.HandleFunc("GET /api/accounts/characters", s.session(s.handleCharacters))
 
 	// console
 	mux.HandleFunc("GET /api/console/tail", s.session(s.handleConsoleTail))
-	mux.HandleFunc("POST /api/console/send", s.admin(s.handleConsoleSend))
+	mux.HandleFunc("POST /api/console/send", s.session(s.admin(s.handleConsoleSend)))
 
 	// logs
 	mux.HandleFunc("GET /api/logs/list", s.session(s.handleLogList))
@@ -111,12 +111,12 @@ func (s *Server) Handler() http.Handler {
 
 	// backup
 	mux.HandleFunc("GET /api/backup/list", s.session(s.handleBackupList))
-	mux.HandleFunc("POST /api/backup/create", s.admin(s.handleBackupCreate))
-	mux.HandleFunc("POST /api/backup/restore", s.admin(s.handleBackupRestore))
+	mux.HandleFunc("POST /api/backup/create", s.session(s.admin(s.handleBackupCreate)))
+	mux.HandleFunc("POST /api/backup/restore", s.session(s.admin(s.handleBackupRestore)))
 
 	// version / realm
 	mux.HandleFunc("GET /api/version", s.session(s.handleVersion))
-	mux.HandleFunc("POST /api/realm/name", s.admin(s.handleRealmName))
+	mux.HandleFunc("POST /api/realm/name", s.session(s.admin(s.handleRealmName)))
 
 	return s.logMiddleware(mux)
 }
@@ -129,14 +129,14 @@ func (s *Server) session(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		}
-		c, err := r.Cookie("gswxy_session")
-		if err != nil || !s.Auth.Verify(c.Value) {
+		tok := tokenFrom(r)
+		if tok == "" || !s.Auth.Verify(tok) {
 			fail(w, http.StatusUnauthorized, "需要登录")
 			return
 		}
 		if r.Method == http.MethodPost {
-			tok := r.Header.Get("X-CSRF-Token")
-			if tok == "" || len(c.Value) < 16 || tok != c.Value[:16] {
+			csrf := r.Header.Get("X-CSRF-Token")
+			if csrf == "" || len(tok) < 16 || csrf != tok[:16] {
 				fail(w, http.StatusForbidden, "CSRF 校验失败")
 				return
 			}

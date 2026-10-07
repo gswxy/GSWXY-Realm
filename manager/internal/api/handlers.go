@@ -33,7 +33,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tok := s.Auth.Issue("admin")
-	http.SetCookie(w, s.Auth.secureCookie())
+	http.SetCookie(w, s.Auth.secureCookie(tok))
 	writeJSON(w, 200, map[string]string{"token": tok, "csrf": csrfOf(tok)})
 }
 
@@ -66,7 +66,7 @@ func (s *Server) handleSetupPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tok := s.Auth.Issue("admin")
-	http.SetCookie(w, s.Auth.secureCookie())
+	http.SetCookie(w, s.Auth.secureCookie(tok))
 	writeJSON(w, 200, map[string]string{"token": tok, "csrf": csrfOf(tok)})
 }
 

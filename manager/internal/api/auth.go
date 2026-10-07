@@ -97,14 +97,31 @@ func (a *Auth) AllowLogin(ip string) bool {
 
 // middleware helpers ----
 
-func (a *Auth) secureCookie() *http.Cookie {
+// SameSite=None（iframe 可用）需要 Secure+HTTPS；Manager 走 HTTP，
+// 因此 cookie 只作为同源顶级页面的便捷载体，跨站 iframe 场景由
+// Authorization: Bearer 头承担（见 session 中间件）。
+func (a *Auth) secureCookie(token string) *http.Cookie {
 	return &http.Cookie{
 		Name:     "gswxy_session",
+		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 		MaxAge:   int(sessionTTL.Seconds()),
 	}
+}
+
+// tokenFrom extracts the session token: Authorization header first
+// (works inside cross-site iframes where cookies are withheld), then
+// the cookie (plain browser navigation).
+func tokenFrom(r *http.Request) string {
+	if ah := r.Header.Get("Authorization"); strings.HasPrefix(ah, "Bearer ") {
+		return strings.TrimPrefix(ah, "Bearer ")
+	}
+	if c, err := r.Cookie("gswxy_session"); err == nil && c.Value != "" {
+		return c.Value
+	}
+	return ""
 }
 
 func clientIP(r *http.Request) string {

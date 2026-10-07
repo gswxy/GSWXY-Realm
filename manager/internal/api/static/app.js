@@ -11,9 +11,10 @@ let CURRENT = "#/overview";
 // ---------- API ----------
 async function api(method, path, body, isForm) {
   const headers = {};
-  if (TOKEN) { headers["Authorization"] = "Bearer ignored"; }
   if (TOKEN) {
-    document.cookie = "gswxy_session=" + TOKEN + "; path=/";
+    // Bearer 令牌鉴权：不依赖 cookie（fnOS 桌面是跨站 iframe，cookie
+    // 会被浏览器扣下；空值 HttpOnly cookie 也会挡掉 JS 补设）
+    headers["Authorization"] = "Bearer " + TOKEN;
     headers["X-CSRF-Token"] = CSRF;
   }
   let opt = { method, headers };

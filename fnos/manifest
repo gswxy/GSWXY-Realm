@@ -1,5 +1,5 @@
 appname="com.gswxy.realm"
-version="1.0.0"
+version="1.0.1"
 display_name="GSWXY Realm"
 desc="GSWXY Realm —— fnOS 原生 AzerothCore Playerbots 一体化服务器发行版。<br>安装即可开服：内置数据库运行环境、自动下载官方客户端数据、自动导入中文本地化数据；AuthServer / WorldServer / 内置数据库由 GSWXY Manager 统一守护，提供中文 Web 管理界面（概览 / 服务器 / Playerbot / 账号 / 配置 / 日志 / 备份）。<br>Powered by AzerothCore + mod-playerbots（3.3.5a）。"
 platform="x86"
