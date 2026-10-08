@@ -44,16 +44,12 @@ func (a *App) dbLine(host string, user, pass, db string) string {
 
 // injectCredentials rewrites the generated run configs with the real
 // database connection strings (never stored in the repo or UI).
-func (a *App) injectCredentials() error {
+func (a *App) injectCredentials(creds *dbinit.Credentials) error {
 	replacements := map[string]string{
 		"LoginDatabaseInfo":      a.dbLine("127.0.0.1", "acore", "PLACEHOLDER", "acore_auth"),
 		"WorldDatabaseInfo":      a.dbLine("127.0.0.1", "acore", "PLACEHOLDER", "acore_world"),
 		"CharacterDatabaseInfo":  a.dbLine("127.0.0.1", "acore", "PLACEHOLDER", "acore_characters"),
 		"PlayerbotsDatabaseInfo": a.dbLine("127.0.0.1", "acore", "PLACEHOLDER", "acore_playerbots"),
-	}
-	creds, err := dbinit.LoadCreds(a.Paths)
-	if err != nil || creds == nil {
-		return fmt.Errorf("数据库凭据缺失")
 	}
 	// 主配置（run 目录）+ 模块配置（etc/modules/*.conf）都要注入。
 	confs := []string{"worldserver.conf", "authserver.conf"}
@@ -83,11 +79,20 @@ func (a *App) injectCredentials() error {
 }
 
 // regenerateFull generates configs then injects credentials + DataDir.
+// Credentials may legitimately be absent (user edits config before running
+// first-time setup); generation must still succeed — setup's own regen
+// injects them once the database exists.
 func (a *App) regenerateFull() error {
 	if err := a.regenerateConfigs(); err != nil {
 		return err
 	}
-	if err := a.injectCredentials(); err != nil {
+	creds, err := dbinit.LoadCreds(a.Paths)
+	if err != nil {
+		return err
+	}
+	if creds == nil {
+		a.Log.Warn("regenerate: database credentials not ready; connection strings deferred to setup")
+	} else if err := a.injectCredentials(creds); err != nil {
 		return err
 	}
 	// DataDir 指向 payload data 目录（client-data 符号链接所在）；

@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -151,5 +150,3 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 func fail(w http.ResponseWriter, code int, msg string) {
 	writeJSON(w, code, map[string]string{"error": msg})
 }
-
-var errAuthNeeded = fmt.Errorf("unauthorized")

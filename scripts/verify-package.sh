@@ -74,8 +74,9 @@ echo "== 版本一致性 =="
 "$PY" - "$FPK" "$TMP" "$PAYLOAD" <<'EOF'
 import json, re, sys, os, urllib.parse
 fpk, tmp, payload = sys.argv[1:4]
-m = re.search(r'version="([^"]+)"', open(f"{tmp}/manifest", encoding="utf8").read())
-mv = m.group(1) if m else None
+# fnpack 归一化 manifest 时可能去掉引号，两种形式都要认
+m = re.search(r'version\s*=\s*"?([^"\n]+)"?', open(f"{tmp}/manifest", encoding="utf8").read())
+mv = m.group(1).strip() if m else None
 base = os.path.basename(fpk)                       # GSWXY-Realm-<ver>-x86_64.fpk
 mm = re.match(r"GSWXY-Realm-(.+)-x86_64\.fpk$", base)
 fv = urllib.parse.unquote(mm.group(1)) if mm else None
