@@ -76,6 +76,14 @@ type Data struct {
 		SpeedBps  float64 `json:"speed_bps"`
 		Error     string  `json:"error,omitempty"`
 	} `json:"download"`
+
+	// Backup bookkeeping (job status lives in the backup manager).
+	Backup struct {
+		AutoEnabled bool   `json:"auto_enabled"`
+		LastAutoAt  string `json:"last_auto_at,omitempty"`
+		LastCreated string `json:"last_created,omitempty"`
+		LastRestore string `json:"last_restore,omitempty"`
+	} `json:"backup"`
 }
 
 // PatchRecord remembers one applied SQL patch.
@@ -153,7 +161,7 @@ func (s *Store) MarkStepDone(step string) error {
 }
 
 // PendingStep returns the first setup step without a completed record.
-func (d *Data) PendingStep() string {
+func (d Data) PendingStep() string {
 	for _, st := range stepOrder {
 		if _, ok := d.Setup.Completed[st]; !ok {
 			return st

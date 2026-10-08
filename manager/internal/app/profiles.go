@@ -139,7 +139,8 @@ func (a *App) BotProfiles() []map[string]any {
 }
 
 // ApplyBotProfile writes the profile values into the user layer and
-// regenerates run configs. Returns the applied diff.
+// regenerates run configs. Returns the applied diff; a failed regeneration
+// is an error (never "applied successfully").
 func (a *App) ApplyBotProfile(name string) (map[string]string, error) {
 	var profiles []botProfile
 	_ = json.Unmarshal(botProfilesRaw, &profiles)
@@ -166,10 +167,15 @@ func (a *App) ApplyBotProfile(name string) (map[string]string, error) {
 		}
 		_ = a.CM.SetUser("playerbots.conf", k, v)
 	}
-	_ = a.RegenerateAll()
+	if err := a.RegenerateAll(); err != nil {
+		return nil, fmt.Errorf("配置已写入但生成运行配置失败: %w", err)
+	}
 	a.Log.Audit("system", "playerbot.profile", chosen.Name)
 	return diff, nil
 }
+
+// SetupRunning reports whether a setup goroutine is live in this process.
+func (a *App) SetupRunning() bool { return a.setupRunning.Load() }
 
 // schemaDefault returns (default, found) for one key.
 func (a *App) schemaDefault(conf, key string) (string, bool) {

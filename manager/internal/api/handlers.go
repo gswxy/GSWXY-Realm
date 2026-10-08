@@ -1,17 +1,20 @@
 package api
 
 import (
-	"database/sql"
+	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gswxy/gswxy-realm/manager/internal/accounts"
 	"github.com/gswxy/gswxy-realm/manager/internal/app"
 	"github.com/gswxy/gswxy-realm/manager/internal/confman"
+	"github.com/gswxy/gswxy-realm/manager/internal/state"
 )
 
 // ---- auth handlers ----
@@ -37,8 +40,14 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, map[string]string{"token": tok, "csrf": csrfOf(tok)})
 }
 
+// handleLogout rotates the signing key: the cookie is cleared AND every
+// outstanding Bearer token becomes invalid immediately.
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
+	if err := s.Admin.RotateSessionKey(); err != nil {
+		s.Log.Error("rotate session key: %v", err)
+	}
 	http.SetCookie(w, &http.Cookie{Name: "gswxy_session", Value: "", MaxAge: -1, Path: "/"})
+	s.Log.Audit(clientIP(r), "auth.logout", "")
 	writeJSON(w, 200, map[string]string{"ok": "1"})
 }
 
@@ -67,6 +76,7 @@ func (s *Server) handleSetupPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	tok := s.Auth.Issue("admin")
 	http.SetCookie(w, s.Auth.secureCookie(tok))
+	s.Log.Audit(clientIP(r), "auth.password.set", "")
 	writeJSON(w, 200, map[string]string{"token": tok, "csrf": csrfOf(tok)})
 }
 
@@ -85,26 +95,14 @@ func (s *Server) handleStop(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, map[string]string{"ok": "1"})
 }
 
+// handleRestart 与前端三个进程的独立重启按钮一一对应；all 为全量重启。
 func (s *Server) handleRestart(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Target string `json:"target"`
 	}
 	_ = decodeJSON(r, &req)
-	switch req.Target {
-	case "worldserver":
-		_ = s.App.Sup.Stop("worldserver")
-		if err := s.App.Sup.Start("worldserver"); err != nil {
-			fail(w, 500, err.Error())
-			return
-		}
-	case "", "all":
-		s.App.StopAll()
-		if err := s.App.StartAll(); err != nil {
-			fail(w, 500, err.Error())
-			return
-		}
-	default:
-		fail(w, 400, "未知目标")
+	if err := s.App.RestartTarget(req.Target); err != nil {
+		fail(w, 500, err.Error())
 		return
 	}
 	writeJSON(w, 200, map[string]string{"ok": "1"})
@@ -116,31 +114,54 @@ func (s *Server) handleOverview(w http.ResponseWriter, r *http.Request) {
 	st := s.State.Get()
 	out := map[string]any{
 		"processes":   s.App.Sup.StatusSnapshot(),
+		"readiness":   s.App.ServiceReadiness(),
 		"setup":       st.Setup,
 		"realm":       st.Realm,
 		"locale":      st.Locale,
 		"client_data": st.ClientData,
 		"version":     s.App.Ver,
+		"backup":      st.Backup,
+		"events":      s.recentEvents(),
 	}
-	if db, err := s.App.DB(); err == nil {
-		var realPlayers, online int
-		_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters
-			WHERE online = 1 AND account NOT IN
-			  (SELECT DISTINCT account FROM acore_characters.playerbots)`).Scan(&realPlayers)
-		_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters WHERE online = 1`).Scan(&online)
-		bots := online - realPlayers
-		out["population"] = map[string]int{
-			"real_players": realPlayers, "bots": bots, "total": online,
-		}
+	// 统一口径的在线统计；数据库未就绪时置空（前端显示 —，不显示假 0）。
+	if pop, err := s.App.OnlinePopulation(); err == nil {
+		out["population"] = pop
+	} else {
+		out["population_error"] = err.Error()
+	}
+	pub, loc := s.App.EffectiveRealmAddresses()
+	out["realm_effective"] = map[string]any{
+		"address": pub, "local_address": loc, "port": s.App.RealmPort(),
 	}
 	writeJSON(w, 200, out)
+}
+
+// recentEvents surfaces the last audit records (management actions) plus
+// recent manager log errors — the overview "最近事件" card. Passwords and
+// credentials are never written to these lines in the first place.
+func (s *Server) recentEvents() []string {
+	lines, err := s.App.TailLog("审计日志", 8, "")
+	if err != nil || len(lines) == 0 {
+		return nil
+	}
+	// newest last -> newest first
+	out := make([]string, 0, len(lines))
+	for i := len(lines) - 1; i >= 0; i-- {
+		out = append(out, lines[i])
+	}
+	return out
 }
 
 func (s *Server) handlePreflight(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, s.App.Preflight())
 }
 
+// handleSetupStart 拒绝并发初始化：已有任务在跑时返回 409。
 func (s *Server) handleSetupStart(w http.ResponseWriter, r *http.Request) {
+	if s.App.SetupRunning() {
+		fail(w, 409, "初始化已在进行中")
+		return
+	}
 	go func() {
 		if err := s.App.RunSetup(func(step, detail string) {
 			s.Log.Info("setup %s: %s", step, detail)
@@ -170,6 +191,8 @@ func (s *Server) handleDataStatus(w http.ResponseWriter, r *http.Request) {
 		"installed": st.ClientData,
 		"progress":  s.App.CD.ProgressSnapshot(),
 		"missing":   s.App.CD.RequiredDirs(res),
+		// NAS 本地导入候选：downloads/manual 下匹配的 Data.zip
+		"manual_candidates": s.App.CD.ManualCandidates(res),
 	})
 }
 
@@ -189,6 +212,26 @@ func (s *Server) handleDataDownload(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleDataCancel(w http.ResponseWriter, r *http.Request) {
 	s.App.CD.Cancel()
 	writeJSON(w, 200, map[string]string{"ok": "1"})
+}
+
+// handleDataScan imports a Data.zip the user dropped into downloads/manual
+// through the fnOS file manager (no browser upload needed for 1+ GB files).
+func (s *Server) handleDataScan(w http.ResponseWriter, r *http.Request) {
+	res, err := s.App.CD.LoadResource()
+	if err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	path, err := s.App.CD.ScanManualDir(res)
+	if err != nil {
+		fail(w, 400, err.Error())
+		return
+	}
+	if err := s.App.CD.Download(res, path); err != nil {
+		fail(w, 400, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]string{"ok": "1", "file": filepath.Base(path)})
 }
 
 // handleDataImport accepts an uploaded Data.zip (tier-3 manual source).
@@ -269,6 +312,8 @@ func validConf(c string) bool {
 	return false
 }
 
+// handleConfigSet 服务端同样校验（不依赖前端）：键必须在 schema 中，
+// 值类型匹配；配置生成失败如实报错而不是提示成功。
 func (s *Server) handleConfigSet(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Conf  string `json:"conf"`
@@ -280,11 +325,28 @@ func (s *Server) handleConfigSet(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "参数不合法")
 		return
 	}
+	schema, err := s.App.ConfigSchemaCached(req.Conf)
+	if err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	entry, ok := schema.Get(req.Key)
+	if !ok {
+		fail(w, 400, "未知配置项: "+req.Key)
+		return
+	}
+	if err := confman.ValidateValue(entry, req.Value); err != nil {
+		fail(w, 400, err.Error())
+		return
+	}
 	if err := s.App.CM.SetUser(req.Conf, req.Key, req.Value); err != nil {
 		fail(w, 500, err.Error())
 		return
 	}
-	_ = s.App.RegenerateAll()
+	if err := s.App.RegenerateAll(); err != nil {
+		fail(w, 500, "配置已保存但生成运行配置失败: "+err.Error())
+		return
+	}
 	writeJSON(w, 200, map[string]string{"ok": "1", "restart_hint": restartHint(s.App, req.Conf, req.Key)})
 }
 
@@ -339,7 +401,10 @@ func (s *Server) handleConfigRawSave(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, err.Error())
 		return
 	}
-	_ = s.App.RegenerateAll()
+	if err := s.App.RegenerateAll(); err != nil {
+		fail(w, 500, "已保存但生成运行配置失败: "+err.Error())
+		return
+	}
 	writeJSON(w, 200, map[string]string{"ok": "1"})
 }
 
@@ -362,7 +427,10 @@ func (s *Server) handleConfigReset(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, err.Error())
 		return
 	}
-	_ = s.App.RegenerateAll()
+	if err := s.App.RegenerateAll(); err != nil {
+		fail(w, 500, "已还原但生成运行配置失败: "+err.Error())
+		return
+	}
 	writeJSON(w, 200, map[string]string{"ok": "1"})
 }
 
@@ -376,56 +444,40 @@ func (s *Server) handleConfigRegen(w http.ResponseWriter, r *http.Request) {
 
 // ---- playerbot ----
 
+// handleBotSummary 统一统计口径（机器人=随机机器人账号前缀），区分
+// 在线与存量，SQL 错误如实返回而不是显示 0。
 func (s *Server) handleBotSummary(w http.ResponseWriter, r *http.Request) {
-	db, err := s.App.DB()
+	pop, err := s.App.OnlinePopulation()
 	if err != nil {
 		fail(w, 500, err.Error())
 		return
 	}
-	out := map[string]any{}
-	var namePool, online, alliance, horde int
-	_ = db.QueryRow(`SELECT COUNT(*) FROM acore_playerbots.playerbots_names`).Scan(&namePool)
-	_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters WHERE online = 1`).Scan(&online)
-	_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters WHERE online = 1 AND race IN (1,3,4,7,11)`).Scan(&alliance)
-	_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters WHERE online = 1 AND race IN (2,5,6,8,10)`).Scan(&horde)
-	out["name_pool"] = namePool
-	out["online_total"] = online
-	out["alliance"] = alliance
-	out["horde"] = horde
-	out["bots"] = online - s.realPlayers(db)
-	out["real_players"] = s.realPlayers(db)
-
-	levels := map[string]int{}
-	if rows, err := db.Query(`SELECT level, COUNT(*) FROM acore_characters.characters GROUP BY level`); err == nil {
-		for rows.Next() {
-			var lv, n int
-			if rows.Scan(&lv, &n) == nil {
-				levels[strconv.Itoa(lv)] = n
-			}
-		}
-		rows.Close()
+	out := map[string]any{"population": pop}
+	if n, err := s.App.NamePoolSize(); err == nil {
+		out["name_pool"] = n
 	}
-	out["levels"] = levels
-
-	classes := map[string]int{}
-	if rows, err := db.Query(`SELECT class, COUNT(*) FROM acore_characters.characters GROUP BY class`); err == nil {
-		for rows.Next() {
-			var cl, n int
-			if rows.Scan(&cl, &n) == nil {
-				classes[strconv.Itoa(cl)] = n
-			}
-		}
-		rows.Close()
+	if n, err := s.App.TotalCharacters(); err == nil {
+		out["total_characters"] = n
 	}
-	out["classes"] = classes
+	if a, h, err := s.App.FactionSplit(true); err == nil {
+		out["online_alliance"], out["online_horde"] = a, h
+	}
+	if a, h, err := s.App.FactionSplit(false); err == nil {
+		out["alliance"], out["horde"] = a, h
+	}
+	if m, err := s.App.KeyValueCount("level", true); err == nil {
+		out["online_levels"] = m
+	}
+	if m, err := s.App.KeyValueCount("class", true); err == nil {
+		out["online_classes"] = m
+	}
+	if m, err := s.App.KeyValueCount("level", false); err == nil {
+		out["levels"] = m
+	}
+	if m, err := s.App.KeyValueCount("class", false); err == nil {
+		out["classes"] = m
+	}
 	writeJSON(w, 200, out)
-}
-
-func (s *Server) realPlayers(db *sql.DB) int {
-	var n int
-	_ = db.QueryRow(`SELECT COUNT(*) FROM acore_characters.characters
-		WHERE online = 1 AND account NOT IN (SELECT account FROM acore_playerbots.playerbots_accounts)`).Scan(&n)
-	return n
 }
 
 func (s *Server) handleBotProfiles(w http.ResponseWriter, r *http.Request) {
@@ -474,6 +526,10 @@ func (s *Server) handleAccountCreate(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "请求格式错误")
 		return
 	}
+	if req.GMLevel < 0 || req.GMLevel > 3 {
+		fail(w, 400, "GM 等级必须是 0-3")
+		return
+	}
 	db, err := s.App.DB()
 	if err != nil {
 		fail(w, 500, err.Error())
@@ -486,7 +542,10 @@ func (s *Server) handleAccountCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.GMLevel > 0 {
-		_ = mgr.SetGMLevel(req.Username, req.GMLevel)
+		if err := mgr.SetGMLevel(req.Username, req.GMLevel); err != nil {
+			fail(w, 500, "账号已创建，但设置 GM 等级失败: "+err.Error())
+			return
+		}
 	}
 	writeJSON(w, 200, map[string]any{"id": id})
 }
@@ -521,6 +580,10 @@ func (s *Server) handleAccountGM(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "请求格式错误")
 		return
 	}
+	if req.GMLevel < 0 || req.GMLevel > 3 {
+		fail(w, 400, "GM 等级必须是 0-3")
+		return
+	}
 	db, err := s.App.DB()
 	if err != nil {
 		fail(w, 500, err.Error())
@@ -541,6 +604,10 @@ func (s *Server) handleAccountBan(w http.ResponseWriter, r *http.Request) {
 	}
 	if decodeJSON(r, &req) != nil {
 		fail(w, 400, "请求格式错误")
+		return
+	}
+	if reason := strings.TrimSpace(req.Reason); reason == "" {
+		fail(w, 400, "封禁需要填写原因")
 		return
 	}
 	db, err := s.App.DB()
@@ -577,6 +644,10 @@ func (s *Server) handleAccountUnban(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleCharacters(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
+	if id <= 0 {
+		fail(w, 400, "参数不合法")
+		return
+	}
 	db, err := s.App.DB()
 	if err != nil {
 		fail(w, 500, err.Error())
@@ -629,7 +700,7 @@ func (s *Server) handleLogList(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleLogTail(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
-	n := 200
+	n := 300
 	if v, err := strconv.Atoi(r.URL.Query().Get("n")); err == nil && v > 0 && v <= 2000 {
 		n = v
 	}
@@ -641,10 +712,48 @@ func (s *Server) handleLogTail(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, lines)
 }
 
+// handleLogExport bundles recent logs + version info as a diagnostics text
+// file. Secrets never appear in these logs (audit redacts passwords;
+// credential files are not logs).
+func (s *Server) handleLogExport(w http.ResponseWriter, r *http.Request) {
+	var b strings.Builder
+	b.WriteString("GSWXY Realm 诊断信息导出\n")
+	b.WriteString("生成时间: " + time.Now().Format("2006-01-02 15:04:05") + "\n\n")
+	v := s.App.Ver
+	fmt.Fprintf(&b, "版本: %s (%s)  Core=%s Playerbots=%s\n\n", v.Version, v.Channel,
+		v.Core.Commit, v.Playerbots.Commit)
+	b.WriteString("== 进程状态 ==\n")
+	for k, val := range s.App.Sup.StatusSnapshot() {
+		fmt.Fprintf(&b, "%s = %s\n", k, val)
+	}
+	st := s.State.Get()
+	fmt.Fprintf(&b, "\n== 初始化 ==\ncurrent=%s initialized=%v error=%s\n\n",
+		st.Setup.Current, st.Setup.Initialized, st.Setup.Error)
+	for _, f := range s.App.LogFiles() {
+		fmt.Fprintf(&b, "== %s (最后 120 行) ==\n", f["name"])
+		lines, err := s.App.TailLog(f["name"], 120, "")
+		if err != nil {
+			fmt.Fprintf(&b, "读取失败: %v\n", err)
+			continue
+		}
+		for _, l := range lines {
+			b.WriteString(l + "\n")
+		}
+		b.WriteString("\n")
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Disposition", `attachment; filename="gswxy-diagnostics.txt"`)
+	_, _ = w.Write([]byte(b.String()))
+}
+
 // ---- backups ----
 
 func (s *Server) handleBackupList(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 200, s.App.BK.List())
+}
+
+func (s *Server) handleBackupStatus(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, 200, s.App.BK.Status())
 }
 
 func (s *Server) handleBackupCreate(w http.ResponseWriter, r *http.Request) {
@@ -658,6 +767,7 @@ func (s *Server) handleBackupCreate(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, err.Error())
 		return
 	}
+	_ = s.State.Update(func(d *state.Data) { d.Backup.LastCreated = time.Now().Format(time.RFC3339) })
 	writeJSON(w, 200, map[string]string{"file": filepath.Base(path)})
 }
 
@@ -677,14 +787,31 @@ func (s *Server) handleBackupRestore(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		if err := s.App.BK.Restore(req.File, s.App.Bins.MysqlClient, s.App.Bins.MysqlDump, creds.Root); err != nil {
 			s.Log.Error("restore failed: %v", err)
-		} else {
-			s.App.RecreateDB()
+			return
 		}
+		s.App.RecreateDB()
+		_ = s.State.Update(func(d *state.Data) { d.Backup.LastRestore = time.Now().Format(time.RFC3339) })
 	}()
 	writeJSON(w, 200, map[string]string{"ok": "restore_started"})
 }
 
-// ---- version / realm ----
+// handleBackupAuto toggles the daily automatic backup.
+func (s *Server) handleBackupAuto(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Enabled bool `json:"enabled"`
+	}
+	if decodeJSON(r, &req) != nil {
+		fail(w, 400, "参数不合法")
+		return
+	}
+	if err := s.App.SetAutoBackup(req.Enabled); err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]bool{"ok": true, "enabled": req.Enabled})
+}
+
+// ---- version / realm / update ----
 
 func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
 	st := s.State.Get()
@@ -693,6 +820,18 @@ func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
 		"client_data": st.ClientData,
 		"locale":      st.Locale,
 	})
+}
+
+// handleUpdateCheck 查询 GitHub Releases（只读，不自动安装）。
+func (s *Server) handleUpdateCheck(w http.ResponseWriter, r *http.Request) {
+	channel := "stable"
+	if c := r.URL.Query().Get("channel"); c == "nightly" {
+		channel = "nightly"
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+	res := s.Updater.Check(ctx, s.App.Ver.Version, channel)
+	writeJSON(w, 200, res)
 }
 
 func (s *Server) handleRealmAddresses(w http.ResponseWriter, r *http.Request) {
@@ -723,8 +862,9 @@ func (s *Server) handleRealmAddressesSave(w http.ResponseWriter, r *http.Request
 	writeJSON(w, 200, map[string]string{"ok": "1"})
 }
 
-// handleLauncher serves the generated Windows .bat (browser navigation:
-// the session cookie now carries the token).
+// handleLauncher serves the generated Windows .bat. Auth accepts the
+// Bearer header (iframe) or cookie (plain navigation) via the session
+// middleware; the frontend downloads it as a blob with the header.
 func (s *Server) handleLauncher(w http.ResponseWriter, r *http.Request) {
 	bat := s.App.LauncherBAT()
 	w.Header().Set("Content-Type", "application/octet-stream")

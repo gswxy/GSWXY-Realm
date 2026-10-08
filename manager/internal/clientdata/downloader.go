@@ -391,8 +391,6 @@ func (m *Manager) setProgress(done, total int64, bps float64) {
 	m.mu.Unlock()
 }
 
-func (m *Manager) fail2(err error) { m.fail(err) }
-
 // Cancel aborts the active download (if any).
 func (m *Manager) Cancel() {
 	m.mu.Lock()
@@ -401,6 +399,43 @@ func (m *Manager) Cancel() {
 	if c != nil {
 		c()
 	}
+}
+
+// ManualCandidates lists Data.zip files the user dropped into
+// downloads/manual via the fnOS file manager (NAS-local import path).
+func (m *Manager) ManualCandidates(res *Resource) []string {
+	dir := filepath.Join(m.paths.Downloads(), "manual")
+	var out []string
+	for _, name := range []string{res.Filename, "Data.zip"} {
+		p := filepath.Join(dir, name)
+		if st, err := os.Stat(p); err == nil && st.Mode().IsRegular() && st.Size() > 0 {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// ScanManualDir validates and returns the local Data.zip candidate; the
+// subsequent Download(res, path) run performs size/sha verification before
+// unpacking.
+func (m *Manager) ScanManualDir(res *Resource) (string, error) {
+	cands := m.ManualCandidates(res)
+	if len(cands) == 0 {
+		return "", fmt.Errorf("未在 %s 找到 Data.zip（可从 fnOS 文件管理器把官方 Data.zip 放入该目录后重试）",
+			filepath.Join(m.paths.Downloads(), "manual"))
+	}
+	for _, p := range cands {
+		st, err := os.Stat(p)
+		if err != nil {
+			continue
+		}
+		if res.SizeBytes > 0 && st.Size() != res.SizeBytes {
+			return "", fmt.Errorf("文件大小不符: %s 为 %d 字节（期望 %d），请重新下载完整文件",
+				filepath.Base(p), st.Size(), res.SizeBytes)
+		}
+		return p, nil
+	}
+	return "", fmt.Errorf("候选文件不可读")
 }
 
 // ProgressSnapshot returns the current progress (value copy).

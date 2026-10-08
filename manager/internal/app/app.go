@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -124,8 +125,32 @@ func New(p platform.Paths) (*App, error) {
 		}
 		return "root", c.Root, c.Port
 	}
+	// 恢复前静默 world/auth（绝不停 mysqld——导入需要它），恢复后按需拉起。
+	a.BK.StopGameServers = func() bool {
+		any := a.Sup.Running("worldserver") || a.Sup.Running("authserver")
+		for _, name := range []string{"worldserver", "authserver"} {
+			if a.Sup.Running(name) {
+				_ = a.Sup.Stop(name)
+			}
+		}
+		return any
+	}
+	a.BK.StartGameServers = func() error {
+		if !a.Sup.Running("mysqld") {
+			if err := a.ensureDBRunning(); err != nil {
+				return err
+			}
+		}
+		if err := a.Sup.Start("authserver"); err != nil {
+			return err
+		}
+		return a.Sup.Start("worldserver")
+	}
 	a.Bins = a.resolveBins()
 	a.registerProcs()
+	// 首装向导参数（bootstrap.json）一次性落地：密码/名称/机器人数量。
+	a.ConsumeBootstrap()
+	a.startAutoBackupLoop()
 	return a, nil
 }
 
@@ -311,6 +336,123 @@ func (a *App) StopAll() {
 }
 
 // ---- setup flow ----
+
+// startAutoBackupLoop runs the optional daily backup: once per hour it
+// checks whether the newest archive is older than 24h and creates one if
+// not. Retention is enforced by the backup manager (count + size budget).
+func (a *App) startAutoBackupLoop() {
+	go func() {
+		for range time.Tick(time.Hour) {
+			d := a.State.Get()
+			if !d.Backup.AutoEnabled {
+				continue
+			}
+			last := d.Backup.LastAutoAt
+			if last == "" {
+				// Fall back to the newest archive's mtime.
+				if files, _ := filepath.Glob(filepath.Join(a.Paths.Backups(), "gswxy-backup-*.tar.gz")); len(files) > 0 {
+					sort.Strings(files)
+					if st, err := os.Stat(files[len(files)-1]); err == nil {
+						last = st.ModTime().Format(time.RFC3339)
+					}
+				}
+			}
+			if t, err := time.Parse(time.RFC3339, last); err == nil && time.Since(t) < 24*time.Hour {
+				continue
+			}
+			creds, err := a.LoadDBCreds()
+			if err != nil {
+				continue
+			}
+			if _, err := a.BK.Create(a.Bins.MysqlDump, creds.Root); err != nil {
+				a.Log.Warn("auto backup: %v", err)
+				continue
+			}
+			_ = a.State.Update(func(dd *state.Data) { dd.Backup.LastAutoAt = time.Now().Format(time.RFC3339) })
+			a.Log.Info("auto backup created")
+		}
+	}()
+}
+
+// SetAutoBackup toggles the daily schedule.
+func (a *App) SetAutoBackup(on bool) error {
+	return a.State.Update(func(d *state.Data) { d.Backup.AutoEnabled = on })
+}
+
+// RestartTarget restarts one managed process, honoring dependencies:
+// worldserver/authserver restart standalone; mysqld takes the game servers
+// down first and brings back whichever were running.
+func (a *App) RestartTarget(target string) error {
+	switch target {
+	case "worldserver", "authserver":
+		if err := a.Sup.Stop(target); err != nil {
+			return err
+		}
+		return a.Sup.Start(target)
+	case "mysqld":
+		worldWas := a.Sup.Running("worldserver")
+		authWas := a.Sup.Running("authserver")
+		for _, name := range []string{"worldserver", "authserver"} {
+			if a.Sup.Running(name) {
+				if err := a.Sup.Stop(name); err != nil {
+					return fmt.Errorf("停止 %s 失败: %w", name, err)
+				}
+			}
+		}
+		if err := a.Sup.Stop("mysqld"); err != nil {
+			return err
+		}
+		if err := a.ensureDBRunning(); err != nil {
+			return fmt.Errorf("数据库重启失败: %w", err)
+		}
+		if authWas {
+			if err := a.Sup.Start("authserver"); err != nil {
+				return err
+			}
+		}
+		if worldWas {
+			return a.Sup.Start("worldserver")
+		}
+		return nil
+	case "", "all":
+		a.StopAll()
+		return a.StartAll()
+	default:
+		return fmt.Errorf("未知目标: %s", target)
+	}
+}
+
+// ServiceReadiness distinguishes "process alive" from "port accepting
+// connections" (a worldserver still loading its DB is running but not
+// ready to accept players).
+func (a *App) ServiceReadiness() map[string]string {
+	out := map[string]string{}
+	d := a.State.Get()
+	probe := func(name string, port int) {
+		if !a.Sup.Running(name) {
+			out[name] = "stopped"
+			return
+		}
+		if portReachable("127.0.0.1", port, 1200*time.Millisecond) {
+			out[name] = "ready"
+		} else {
+			out[name] = "starting"
+		}
+	}
+	probe("mysqld", d.Database.Port)
+	probe("authserver", 3724)
+	probe("worldserver", a.RealmPort())
+	return out
+}
+
+func portReachable(host string, port int, timeout time.Duration) bool {
+	c, err := net.DialTimeout("tcp", net.JoinHostPort(host, strconv.Itoa(port)), timeout)
+	if err != nil {
+		return false
+	}
+	_ = c.Close()
+	return true
+}
 
 // PreflightCheck is one startup readiness probe.
 type PreflightCheck struct {

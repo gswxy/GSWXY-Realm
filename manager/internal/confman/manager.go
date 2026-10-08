@@ -25,7 +25,9 @@ type RecSource interface {
 	Recommended(conf, key string) (string, bool)
 }
 
-// Effective is the resolved value triple for one key.
+// Effective is the resolved value triple for one key (the /api/config/list
+// row). Carries everything the WebUI renders: grouping (Section), original
+// upstream description (Comment), control type and restart requirement.
 type Effective struct {
 	Key         string `json:"key"`
 	Conf        string `json:"conf"`
@@ -34,6 +36,10 @@ type Effective struct {
 	User        string `json:"user"`
 	Value       string `json:"value"` // effective
 	Overridden  bool   `json:"overridden"`
+	Section     string `json:"section"`
+	Comment     string `json:"comment"`
+	Type        string `json:"type"` // bool|int|float|string
+	Restart     bool   `json:"restart"`
 	UpstreamChanged string `json:"upstream_changed,omitempty"` // upstream default differs from recorded baseline
 }
 
@@ -92,6 +98,10 @@ func (m *Manager) Resolve(conf string, dist *Schema) ([]Effective, error) {
 			Upstream: e.Default,
 			User:     "",
 			Value:    e.Default,
+			Section:  e.Section,
+			Comment:  e.Comment,
+			Type:     e.Type,
+			Restart:  e.Restart,
 		}
 		if rec, ok := m.Rec.Recommended(conf, e.Key); ok {
 			eff.Recommended = rec
@@ -105,6 +115,58 @@ func (m *Manager) Resolve(conf string, dist *Schema) ([]Effective, error) {
 		out = append(out, eff)
 	}
 	return out, nil
+}
+
+// ValidateValue checks a candidate user value against the schema entry
+// type (server-side twin of the frontend form validation). Returns a
+// normalized error for the API caller.
+func ValidateValue(e *Entry, value string) error {
+	if len(value) > 1000 || strings.ContainsAny(value, "\n\r") {
+		return fmt.Errorf("取值不合法（过长或含换行）")
+	}
+	switch e.Type {
+	case "bool":
+		switch strings.ToLower(strings.TrimSpace(value)) {
+		case "0", "1", "true", "false", "yes", "no":
+			return nil
+		}
+		return fmt.Errorf("%s 需要 0/1 或 true/false", e.Key)
+	case "int":
+		if _, err := strconvAtoi(strings.TrimSpace(value)); err != nil {
+			return fmt.Errorf("%s 需要整数", e.Key)
+		}
+	case "float":
+		if _, err := strconvParseFloat(strings.TrimSpace(value)); err != nil {
+			return fmt.Errorf("%s 需要数字", e.Key)
+		}
+	}
+	return nil
+}
+
+func strconvAtoi(v string) (int, error) {
+	var n int
+	if v == "" {
+		return 0, fmt.Errorf("empty")
+	}
+	i := 0
+	neg := false
+	if v[0] == '-' {
+		neg = true
+		i = 1
+	}
+	if i >= len(v) {
+		return 0, fmt.Errorf("not an int")
+	}
+	for ; i < len(v); i++ {
+		if v[i] < '0' || v[i] > '9' {
+			return 0, fmt.Errorf("not an int")
+		}
+		n = n*10 + int(v[i]-'0')
+	}
+	if neg {
+		n = -n
+	}
+	return n, nil
 }
 
 // Generate writes the final conf: full document with every key resolved,

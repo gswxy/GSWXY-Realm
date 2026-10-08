@@ -80,6 +80,15 @@ func (s *Store) SessionKey() string {
 	return s.data.SessionKey
 }
 
+// RotateSessionKey replaces the signing key, invalidating every issued
+// token immediately (logout on a single-admin app).
+func (s *Store) RotateSessionKey() error {
+	s.mu.Lock()
+	s.data.SessionKey = randomKey(32)
+	s.mu.Unlock()
+	return s.save()
+}
+
 func (s *Store) save() error {
 	if err := os.MkdirAll(filepath.Dir(s.path), 0o700); err != nil {
 		return err

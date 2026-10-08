@@ -29,23 +29,32 @@ type session struct {
 	ExpiresAt time.Time `json:"e"`
 }
 
-// Auth guards the API with sessions, CSRF and rate limiting.
+// Auth guards the API with sessions, CSRF and rate limiting. The signing
+// key is fetched through keyFn on every operation so rotating it (logout)
+// invalidates outstanding tokens immediately.
 type Auth struct {
-	key     []byte
-	log     *logging.Logger
-	mu      sync.Mutex
+	keyFn func() []byte
+	log   *logging.Logger
+	mu    sync.Mutex
 	attempt map[string][]time.Time // ip -> timestamps
 }
 
-func NewAuth(key []byte, log *logging.Logger) *Auth {
-	return &Auth{key: key, log: log, attempt: map[string][]time.Time{}}
+func NewAuth(keyFn func() []byte, log *logging.Logger) *Auth {
+	return &Auth{keyFn: keyFn, log: log, attempt: map[string][]time.Time{}}
+}
+
+func (a *Auth) key() []byte {
+	if a.keyFn != nil {
+		return a.keyFn()
+	}
+	return nil
 }
 
 // Issue mints a token for user.
 func (a *Auth) Issue(user string) string {
 	s := session{User: user, ExpiresAt: time.Now().Add(sessionTTL)}
 	raw, _ := json.Marshal(s)
-	mac := hmac.New(sha256.New, a.key)
+	mac := hmac.New(sha256.New, a.key())
 	mac.Write(raw)
 	return hex.EncodeToString(raw) + "." + hex.EncodeToString(mac.Sum(nil))
 }
@@ -64,7 +73,7 @@ func (a *Auth) Verify(token string) bool {
 	if err != nil {
 		return false
 	}
-	mm := hmac.New(sha256.New, a.key)
+	mm := hmac.New(sha256.New, a.key())
 	mm.Write(raw)
 	if !hmac.Equal(mac, mm.Sum(nil)) {
 		return false

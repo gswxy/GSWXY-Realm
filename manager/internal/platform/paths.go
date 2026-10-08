@@ -14,6 +14,7 @@
 package platform
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -156,4 +157,21 @@ func IsUnder(root, child string) bool {
 		return false
 	}
 	return rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
+}
+
+// ReadState loads a state.json-style document as a generic map (merge
+// helper for backup restore; missing file yields an empty map).
+func ReadState(path string) (map[string]any, error) {
+	raw, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		return map[string]any{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	m := map[string]any{}
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }

@@ -66,7 +66,8 @@ func (a *App) SetRealmName(name string) error {
 }
 
 // SetRealmAddresses persists the configured addresses (empty = auto) and
-// applies them immediately when the database is reachable.
+// applies them immediately when the database is reachable. A DB failure is
+// returned (the UI shows it) — the values themselves stay persisted.
 func (a *App) SetRealmAddresses(address, localAddress string) error {
 	for _, v := range []string{address, localAddress} {
 		v = strings.TrimSpace(v)
@@ -85,7 +86,10 @@ func (a *App) SetRealmAddresses(address, localAddress string) error {
 	publicCache.at = time.Time{} // 保存后强制重新检测
 	publicMu.Unlock()
 	// 数据库尚未就绪（如初始化前）时先落盘，setup/启动时会经 registerRealm 应用。
-	_ = a.registerRealm()
+	if err := a.registerRealm(); err != nil {
+		a.Log.Warn("realm address saved but DB update failed: %v", err)
+		return fmt.Errorf("地址已保存，但写入数据库失败: %w", err)
+	}
 	return nil
 }
 

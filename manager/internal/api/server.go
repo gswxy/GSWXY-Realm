@@ -17,6 +17,7 @@ import (
 	"github.com/gswxy/gswxy-realm/manager/internal/app"
 	"github.com/gswxy/gswxy-realm/manager/internal/logging"
 	"github.com/gswxy/gswxy-realm/manager/internal/state"
+	"github.com/gswxy/gswxy-realm/manager/internal/update"
 )
 
 //go:embed all:static
@@ -27,11 +28,12 @@ var staticRoot, _ = fs.Sub(staticFS, "static")
 
 // Server wires App + Auth into an http.Handler.
 type Server struct {
-	App   *app.App
-	Log   *logging.Logger
-	Auth  *Auth
-	Admin *admin.Store
-	State *state.Store
+	App     *app.App
+	Log     *logging.Logger
+	Auth    *Auth
+	Admin   *admin.Store
+	State   *state.Store
+	Updater *update.Checker
 }
 
 // Handler builds the route table (Go 1.22+ method routing).
@@ -77,6 +79,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/data/download", s.session(s.admin(s.handleDataDownload)))
 	mux.HandleFunc("POST /api/data/cancel", s.session(s.admin(s.handleDataCancel)))
 	mux.HandleFunc("POST /api/data/import", s.session(s.admin(s.handleDataImport)))
+	mux.HandleFunc("POST /api/data/scan", s.session(s.admin(s.handleDataScan)))
 
 	// config
 	mux.HandleFunc("GET /api/config/list", s.session(s.handleConfigList))
@@ -111,15 +114,21 @@ func (s *Server) Handler() http.Handler {
 
 	// backup
 	mux.HandleFunc("GET /api/backup/list", s.session(s.handleBackupList))
+	mux.HandleFunc("GET /api/backup/status", s.session(s.handleBackupStatus))
 	mux.HandleFunc("POST /api/backup/create", s.session(s.admin(s.handleBackupCreate)))
 	mux.HandleFunc("POST /api/backup/restore", s.session(s.admin(s.handleBackupRestore)))
+	mux.HandleFunc("POST /api/backup/auto", s.session(s.admin(s.handleBackupAuto)))
 
-	// version / realm
+	// version / realm / update
 	mux.HandleFunc("GET /api/version", s.session(s.handleVersion))
+	mux.HandleFunc("GET /api/update/check", s.session(s.handleUpdateCheck))
 	mux.HandleFunc("POST /api/realm/name", s.session(s.admin(s.handleRealmName)))
 	mux.HandleFunc("GET /api/realm/addresses", s.session(s.handleRealmAddresses))
 	mux.HandleFunc("POST /api/realm/addresses", s.session(s.admin(s.handleRealmAddressesSave)))
 	mux.HandleFunc("GET /api/launcher", s.session(s.handleLauncher))
+
+	// logs
+	mux.HandleFunc("GET /api/logs/export", s.session(s.handleLogExport))
 
 	return s.logMiddleware(mux)
 }

@@ -4,7 +4,6 @@
 package confman
 
 import (
-	"bufio"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,41 +32,86 @@ type Schema struct {
 
 var (
 	reSetting = regexp.MustCompile(`^([A-Za-z][A-Za-z0-9._]*)\s*=\s*(.*?)\s*$`)
-	reSection = regexp.MustCompile(`^#+\s*([A-Za-z][A-Za-z0-9 _/&.-]{2,60})\s#*\s*$`)
-	reSubHead = regexp.MustCompile(`^#\s+[A-Z][A-Z0-9 .&/-]{2,60}:?\s*$`)
+	// reSubHead matches section title lines, both styles upstream ships:
+	//   "#   SERVER SYSTEM SETTINGS"      (worldserver/authserver)
+	//   "# GENERAL SETTINGS           #"  (playerbots box headers)
+	reSubHead = regexp.MustCompile(`^#\s+([A-Z][A-Z0-9 .&/-]{2,60}?)\s*#*\s*$`)
 )
 
 // ParseDist parses an AzerothCore-style .conf.dist file.
+//
+// Section headers are the visual banners upstream ships:
+//
+//	####################################
+//	#    SERVER SYSTEM SETTINGS
+//	####################################
+//
+// i.e. an indented ALL-CAPS title line adjacent to a #### border. The
+// SECTION INDEX blocks at the top of each file contain the same shape of
+// lines WITHOUT border adjacency — those are a table of contents and must
+// not be treated as headers.
 func ParseDist(path string) (*Schema, error) {
-	f, err := os.Open(path)
+	raw, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	lines := strings.Split(string(raw), "\n")
 
 	sc := &Schema{File: filepath.Base(path), byKey: map[string]*Entry{}}
-	scanner := bufio.NewScanner(f)
-	scanner.Buffer(make([]byte, 1024*1024), 1024*1024)
-
 	var comment []string
 	section := "General"
-	// Track previous non-comment line to decide whether a comment block
-	// belongs to the setting that follows (standard AC layout).
-	for scanner.Scan() {
-		line := scanner.Text()
+
+	isBorder := func(s string) bool {
+		t := strings.TrimSpace(s)
+		return strings.HasPrefix(t, "##") && strings.Count(t, "#") >= 8
+	}
+	// isPadLine matches the decorative filler inside box headers
+	// ("#                          #") and the lone "#" separators.
+	isPadLine := func(s string) bool {
+		t := strings.TrimSpace(s)
+		return t == "#" || (strings.HasPrefix(t, "#") && strings.HasSuffix(t, "#") &&
+			strings.Trim(t, "# \t") == "")
+	}
+	// underBorder reports whether the title line at i sits under a border,
+	// allowing up to 3 decorative pad lines in between (box headers).
+	underBorder := func(i int) bool {
+		pads := 0
+		for j := i - 1; j >= 0; j-- {
+			t := strings.TrimSpace(lines[j])
+			if t == "" {
+				continue
+			}
+			if isBorder(lines[j]) {
+				return true
+			}
+			if isPadLine(lines[j]) && pads < 3 {
+				pads++
+				continue
+			}
+			return false
+		}
+		return false
+	}
+
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
 		trimmed := strings.TrimSpace(line)
 		switch {
 		case trimmed == "" || trimmed == "#":
 			continue
+		case isBorder(line):
+			// Borders only frame; they never reset the pending comment
+			// block (a key's description ends right after a border).
+			continue
+		case isPadLine(line):
+			continue
 		case strings.HasPrefix(trimmed, "#"):
-			// Section headers: solid # border lines then a title.
-			if m := reSection.FindStringSubmatch(strings.TrimLeft(line, "# \t")); m != nil &&
-				strings.Count(strings.TrimSpace(line), "#") > 3 {
-				sec := strings.TrimSpace(m[1])
-				if looksLikeSection(sec) {
-					section = sec
-					continue
-				}
+			// Real headers sit under a border (directly or through pad
+			// lines); the SECTION INDEX table-of-contents lines do not.
+			if m := reSubHead.FindStringSubmatch(line); m != nil && underBorder(i) {
+				section = strings.TrimSpace(m[1])
+				comment = comment[:0]
+				continue
 			}
 			comment = append(comment, strings.TrimPrefix(trimmed, "#"))
 		default:
@@ -102,20 +146,6 @@ func ParseDist(path string) (*Schema, error) {
 	return sc, nil
 }
 
-// looksLikeSection filters comment prose that pattern-matches a header.
-func looksLikeSection(s string) bool {
-	if strings.Contains(s, "=") || strings.Contains(s, ".") && !strings.Contains(s, " ") {
-		return false
-	}
-	upper := 0
-	for _, r := range s {
-		if r >= 'A' && r <= 'Z' || r == ' ' || r == '.' || r == '_' || r == '-' {
-			upper++
-		}
-	}
-	return upper*10 > len([]rune(s))*7 // mostly uppercase/punct
-}
-
 func unquote(v string) string {
 	v = strings.TrimSuffix(strings.TrimPrefix(v, "\""), "\"")
 	return v
@@ -123,9 +153,11 @@ func unquote(v string) string {
 
 func inferType(v string) string {
 	switch v {
-	case "0", "1", "true", "false", "True", "False", "yes", "no", "Yes", "No":
+	case "true", "false", "True", "False", "yes", "no", "Yes", "No", "YES", "NO":
 		return "bool"
 	}
+	// NOTE: "0"/"1" stay int — many numeric settings default to 1 (rates,
+	// counts); treating them as bool would reject valid values like "5".
 	if isInt(v) {
 		return "int"
 	}

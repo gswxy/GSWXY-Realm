@@ -20,10 +20,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gswxy/gswxy-realm/manager/internal/admin"
 	"github.com/gswxy/gswxy-realm/manager/internal/api"
 	"github.com/gswxy/gswxy-realm/manager/internal/app"
 	"github.com/gswxy/gswxy-realm/manager/internal/platform"
+	"github.com/gswxy/gswxy-realm/manager/internal/update"
+	"github.com/gswxy/gswxy-realm/manager/internal/version"
 )
 
 const defaultPort = 18700
@@ -59,7 +60,8 @@ func main() {
 	case "status":
 		statusDaemon()
 	case "version", "--version":
-		fmt.Println("GSWXY Realm Manager 1.0.0")
+		v := version.Load(platform.Detect().BuildInfo())
+		fmt.Printf("GSWXY Realm Manager %s (%s)\n", v.Version, v.Channel)
 	default:
 		usage()
 		os.Exit(2)
@@ -88,6 +90,15 @@ func runRegenOnly() {
 
 // runDaemon serves the API+UI in the foreground.
 func runDaemon(port int) {
+	// 开发后门绝不能静默存在于正式发行环境。
+	if os.Getenv("GSRM_DEV_NOAUTH") == "1" {
+		p := platform.Detect()
+		if p.OnFnOS {
+			fmt.Fprintln(os.Stderr, "GSRM_DEV_NOAUTH 在 fnOS 生产环境被拒绝启动")
+			os.Exit(1)
+		}
+		fmt.Fprintln(os.Stderr, "WARN: GSRM_DEV_NOAUTH=1 — 管理接口无鉴权（仅限开发环境）")
+	}
 	a, err := app.New(platform.Detect())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "manager init: %v\n", err)
@@ -105,8 +116,11 @@ func runDaemon(port int) {
 		a.Log.Info("GSWXY Realm Manager stopped")
 	}()
 
-	auth := api.NewAuth([]byte(sessionKey(a.Admin)), a.Log)
-	srv := &api.Server{App: a, Log: a.Log, Auth: auth, Admin: a.Admin, State: a.State}
+	auth := api.NewAuth(func() []byte { return []byte(a.Admin.SessionKey()) }, a.Log)
+	srv := &api.Server{
+		App: a, Log: a.Log, Auth: auth, Admin: a.Admin,
+		State: a.State, Updater: update.New(),
+	}
 
 	addr := fmt.Sprintf("0.0.0.0:%d", port)
 	ln, err := net.Listen("tcp", addr)
@@ -131,9 +145,6 @@ func runDaemon(port int) {
 
 	_ = http.Serve(ln, srv.Handler())
 }
-
-// sessionKey derives the signing key from the admin store.
-func sessionKey(ad *admin.Store) string { return ad.SessionKey() }
 
 func writeSelfPid(a *app.App) {
 	_ = os.WriteFile(filepath.Join(a.Paths.Var, "manager.pid"),
