@@ -1,16 +1,16 @@
 [
   {
-    "stepTitle": "GSWXY Realm 初始设置",
+    "stepTitle": "艾泽旅伴 初始设置",
     "items": [
       {
         "type": "tips",
-        "text": "安装完成后，打开 GSWXY Realm 应用完成初始化（数据库、中文数据、客户端数据下载均可自动完成）。"
+        "text": "安装完成后，打开「艾泽旅伴」应用完成初始化（数据库、中文数据、客户端数据下载均可自动完成）。"
       },
       {
         "type": "text",
         "name": "realm_name",
         "label": "游戏服务器名称",
-        "default": "GSWXY Realm",
+        "default": "艾泽旅伴",
         "validate": {
           "required": true,
           "max": 32
@@ -32,7 +32,7 @@
         "default": "50",
         "validate": {
           "required": true,
-          "pattern": "^[0-9]+$"
+          "pattern": "^(?:[1-9][0-9]{1,2}|500)$"
         }
       }
     ]

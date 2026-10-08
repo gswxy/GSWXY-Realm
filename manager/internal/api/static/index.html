@@ -3,29 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GSWXY Realm</title>
+<title>艾泽旅伴 · GSWXY Realm</title>
+<link rel="icon" type="image/png" href="/images/icon-64.png">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div id="app">
   <aside id="sidebar">
     <div class="brand">
-      <div class="brand-logo">🌐</div>
+      <img class="brand-logo" src="/images/icon-64.png" alt="艾泽旅伴">
       <div>
-        <div class="brand-name">GSWXY Realm</div>
-        <div class="brand-sub">Playerbots Edition</div>
+        <div class="brand-name">艾泽旅伴</div>
+        <div class="brand-sub">GSWXY Realm · Playerbots</div>
       </div>
     </div>
     <nav id="nav">
-      <a href="#/overview" class="active">🖥️ 概览</a>
-      <a href="#/server">⚙️ 服务器</a>
-      <a href="#/playerbot">🤖 Playerbot</a>
-      <a href="#/accounts">👤 账号</a>
-      <a href="#/config">🎚️ 配置</a>
-      <a href="#/data">📦 数据</a>
-      <a href="#/logs">📜 日志</a>
-      <a href="#/backup">💾 备份</a>
-      <a href="#/version">ℹ️ 版本</a>
+      <a href="#/overview" class="active">概览</a>
+      <a href="#/server">服务器</a>
+      <a href="#/playerbot">机器人</a>
+      <a href="#/accounts">账号</a>
+      <a href="#/config">配置</a>
+      <a href="#/data">数据</a>
+      <a href="#/logs">日志</a>
+      <a href="#/backup">备份</a>
+      <a href="#/version">版本</a>
     </nav>
     <div class="sidebar-foot">
       <button id="theme-toggle">🌙 深色模式</button>
@@ -49,30 +50,40 @@
 
     <!-- 概览 -->
     <section id="page-overview" class="page">
-      <div class="header-row"><h1>概览</h1>
+      <div class="hero card">
+        <div>
+          <h1 id="ov-overall">—</h1>
+          <div class="muted" id="ov-sub">读取状态中…</div>
+        </div>
         <div class="btns">
           <button class="primary" data-act="start">▶ 启动全部</button>
           <button class="danger" data-act="stop">■ 安全停止</button>
         </div>
       </div>
-      <div class="grid3">
-        <div class="stat card"><div class="stat-label">WorldServer</div><div class="stat-value" id="ov-world">—</div></div>
-        <div class="stat card"><div class="stat-label">AuthServer</div><div class="stat-value" id="ov-auth">—</div></div>
-        <div class="stat card"><div class="stat-label">数据库</div><div class="stat-value" id="ov-db">—</div></div>
-      </div>
-      <div class="grid3">
-        <div class="stat card"><div class="stat-label">真实玩家</div><div class="stat-value" id="ov-real">—</div></div>
-        <div class="stat card"><div class="stat-label">在线机器人</div><div class="stat-value" id="ov-bots">—</div></div>
-        <div class="stat card"><div class="stat-label">在线总角色</div><div class="stat-value" id="ov-total">—</div></div>
-      </div>
+      <div class="grid3" id="ov-services"></div>
+      <div class="grid3" id="ov-population"></div>
       <div class="card">
-        <h3>初始化状态</h3>
-        <div id="ov-setup"></div>
-        <div class="btns" id="ov-setup-actions"></div>
+        <h3>连接与进入游戏</h3>
+        <div id="ov-realm" class="kv"></div>
+        <div class="btns" style="margin-top:10px">
+          <button class="primary" id="ov-launcher">⬇ 下载客户端启动器 (.bat)</button>
+        </div>
+        <p class="muted" id="ov-realm-hint" style="margin-top:8px"></p>
       </div>
-      <div class="card">
-        <h3>版本信息</h3>
-        <div id="ov-versions" class="kv"></div>
+      <div class="grid2">
+        <div class="card">
+          <h3>初始化状态</h3>
+          <div id="ov-setup"></div>
+          <div class="btns" id="ov-setup-actions"></div>
+        </div>
+        <div class="card">
+          <h3>最近事件</h3>
+          <div id="ov-events" class="events"></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>备份与版本摘要</h3><div id="ov-summary" class="kv"></div></div>
+        <div class="card"><h3>服务详情</h3><div id="ov-procs" class="kv"></div></div>
       </div>
     </section>
 
@@ -80,24 +91,35 @@
     <section id="page-server" class="page">
       <h1>服务器</h1>
       <div class="card">
-        <h3>自检（运行前检查）</h3>
+        <h3>启动前自检</h3>
         <table class="tbl" id="pf-table"><thead><tr><th>项目</th><th>状态</th><th>详情</th><th>修复建议</th></tr></thead><tbody></tbody></table>
-        <button class="primary" data-act="start">全部通过后，启动服务器</button>
-      </div>
-      <div class="card">
-        <h3>进程</h3>
-        <table class="tbl" id="proc-table"><thead><tr><th>进程</th><th>状态</th><th>PID</th><th>操作</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div class="card">
-        <h3>Realm</h3>
-        <div class="row">
-          <input type="text" id="realm-name" placeholder="服务器名称">
-          <button id="realm-save" class="primary">保存</button>
+        <div class="btns">
+          <button class="primary" data-act="start">全部通过后，启动服务器</button>
+          <button id="pf-refresh">重新自检</button>
         </div>
       </div>
       <div class="card">
-        <h3>网络地址</h3>
-        <p class="muted">公网地址给外网玩家连，本地地址给局域网玩家连；留空保存则自动检测。</p>
+        <h3>进程</h3>
+        <table class="tbl" id="proc-table">
+          <thead><tr><th>进程</th><th>状态</th><th>端口</th><th>运行时间</th><th>操作</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>WorldServer 控制台</h3>
+        <pre id="console-view" class="pre" style="max-height:220px">（WorldServer 启动后可查看输出）</pre>
+        <div class="row">
+          <input type="text" id="console-input" placeholder="输入控制台命令（如 .server info）后回车">
+          <button class="primary" id="console-send">发送</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>服务器名称与网络地址</h3>
+        <p class="muted">Realm 名称会显示在客户端服务器列表；地址留空保存则自动检测。公网地址给外网玩家，本地地址给局域网玩家。</p>
+        <div class="row">
+          <input type="text" id="realm-name" placeholder="服务器名称（如：艾泽旅伴）">
+          <button id="realm-save" class="primary">保存名称</button>
+        </div>
         <div class="row">
           <input type="text" id="net-public" placeholder="公网地址/域名（留空自动检测）">
         </div>
@@ -105,47 +127,69 @@
           <input type="text" id="net-local" placeholder="本地/LAN 地址（留空自动检测）">
         </div>
         <div class="btns">
-          <button id="net-save" class="primary">保存</button>
+          <button id="net-save" class="primary">保存地址</button>
           <button id="net-refresh">重新检测</button>
         </div>
         <div id="net-effective" class="muted" style="margin-top:8px"></div>
+        <p class="muted" id="net-note" style="margin-top:8px">提示：自动检测的"公网 IP"只代表出口地址，不等于外网可达。公网开服需在路由器放行 3724/8085 端口并做好安全策略；管理界面（18700）不建议暴露公网。</p>
       </div>
       <div class="card">
         <h3>客户端启动器</h3>
         <p class="muted">下载 .bat 放到魔兽 3.3.5a 客户端文件夹里，双击即自动改 realmlist 并进游戏。</p>
-        <a class="btn primary" id="launcher-dl" href="/api/launcher">⬇ 下载启动器 (.bat)</a>
+        <button class="primary" id="launcher-dl">⬇ 下载启动器 (.bat)</button>
         <p class="muted" id="realmlist-hint" style="margin-top:8px"></p>
       </div>
     </section>
 
     <!-- Playerbot -->
     <section id="page-playerbot" class="page">
-      <h1>Playerbot</h1>
+      <div class="header-row"><h1>机器人</h1>
+        <div class="muted">Playerbots 机器人玩家是本应用的核心：升级、副本、战场、公会全程陪伴</div>
+      </div>
       <div class="grid3" id="pb-stats"></div>
       <div class="card">
-        <h3>配置模板</h3>
-        <p class="muted">模板本质是对真实 Playerbot 配置的批量修改，应用前请查看变更。</p>
-        <div id="pb-profiles"></div>
+        <h3>常用设置</h3>
+        <p class="muted">这些是玩家最常调整的机器人参数，直接映射到真实配置；修改后需重启 WorldServer 生效。</p>
+        <div id="pb-quick"></div>
+        <div class="btns"><button class="primary" id="pb-quick-save">保存常用设置</button></div>
       </div>
       <div class="card">
-        <h3>分布</h3>
-        <div id="pb-dists"></div>
+        <h3>配置模板</h3>
+        <p class="muted">模板是对真实 Playerbot 配置的批量修改；点击「查看全部变更」核对后再应用。</p>
+        <div id="pb-profiles"></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>阵营与职业分布 <span class="muted" id="pb-dist-mode-hint">（在线）</span></h3>
+          <div class="btns">
+            <button id="pb-dist-online" class="tab-btn active">在线</button>
+            <button id="pb-dist-all" class="tab-btn">全部角色</button>
+          </div>
+          <div id="pb-dists" class="kv"></div>
+        </div>
+        <div class="card">
+          <h3>等级分布 <span class="muted" id="pb-lvl-mode-hint">（在线）</span></h3>
+          <div id="pb-levels"></div>
+        </div>
       </div>
     </section>
 
     <!-- 账号 -->
     <section id="page-accounts" class="page">
       <div class="header-row"><h1>账号</h1>
-        <button class="primary" id="acc-new">+ 创建账号</button>
+        <button class="primary" id="acc-new">＋ 创建账号</button>
       </div>
       <div class="row">
         <input type="text" id="acc-search" placeholder="搜索账号名">
         <button id="acc-search-btn">搜索</button>
       </div>
+      <div class="card" style="padding:0;overflow-x:auto">
       <table class="tbl" id="acc-table">
-        <thead><tr><th>ID</th><th>账号</th><th>GM</th><th>状态</th><th>最后登录</th><th>操作</th></tr></thead>
+        <thead><tr><th>ID</th><th>账号</th><th>GM 等级</th><th>状态</th><th>最后登录</th><th>操作</th></tr></thead>
         <tbody></tbody>
       </table>
+      </div>
+      <p class="muted">GM 等级：0 普通玩家 · 1 协理员（基础管理命令）· 2 游戏管理员 · 3 开发者（全部命令）。账号创建后即可用客户端登录。</p>
     </section>
 
     <!-- 配置 -->
@@ -157,20 +201,35 @@
         <button data-conf="playerbots.conf">Playerbot</button>
         <button data-mode="raw">原始编辑器</button>
       </div>
-      <div class="row">
-        <input type="text" id="cfg-search" placeholder="搜索配置项 / 中文说明">
-        <select id="cfg-section"><option value="">全部分组</option></select>
+
+      <div id="cfg-gui">
+        <div class="tabs sub" id="cfg-mode">
+          <button data-mode="common" class="active">常用设置</button>
+          <button data-mode="advanced">高级设置（全部配置项）</button>
+        </div>
+
+        <div id="cfg-common">
+          <p class="muted">普通玩家最常用的服务器与机器人参数。悬停查看说明；保存后按提示重启生效。</p>
+          <div id="cfg-common-list"></div>
+        </div>
+
+        <div id="cfg-advanced" style="display:none">
+          <div class="row">
+            <input type="text" id="cfg-search" placeholder="搜索配置项 / 中文说明 / 原始描述">
+            <select id="cfg-section"><option value="">全部分组</option></select>
+          </div>
+          <div id="cfg-list"></div>
+        </div>
       </div>
-      <div id="cfg-list"></div>
 
       <div id="cfg-raw" style="display:none">
         <div class="card">
           <h3>用户配置（原始编辑）</h3>
-          <p class="muted">此文件会覆盖上游默认值；运行时最终配置由本文件 + 上游 .conf.dist 生成。</p>
+          <p class="muted">此文件只包含你的覆盖值，会叠加在上游默认之上；数据库连接等敏感项由系统注入，不受此处影响。</p>
           <textarea id="cfg-raw-editor" rows="22" spellcheck="false"></textarea>
           <div class="btns">
             <button class="primary" id="cfg-raw-save">保存并重新生成</button>
-            <button id="cfg-raw-reset">恢复默认（清空用户配置）</button>
+            <button class="danger" id="cfg-raw-reset">恢复默认（清空用户配置）</button>
           </div>
         </div>
         <div class="card">
@@ -184,18 +243,29 @@
     <section id="page-data" class="page">
       <h1>数据</h1>
       <div class="card">
-        <h3>AC 客户端数据</h3>
+        <h3>客户端数据（DBC / 地图 / 建筑 / 寻路）</h3>
         <div id="data-status" class="kv"></div>
         <div class="btns">
-          <button class="primary" id="data-download">⬇ 从官方源下载</button>
+          <button class="primary" id="data-download">⬇ 从官方源下载（自动镜像回退）</button>
           <button id="data-cancel" disabled>取消下载</button>
         </div>
         <div class="progress-wrap"><div id="data-progress"></div></div>
         <div class="muted" id="data-progress-text"></div>
+      </div>
+      <div class="card">
+        <h3>NAS 本地导入（推荐大文件用户使用）</h3>
+        <p class="muted" id="data-manual-path">用 fnOS 文件管理器把官方 <b>Data.zip</b> 放入应用数据目录的 <span class="mono">downloads/manual/</span> 文件夹，然后点「扫描并导入」。免浏览器上传 1.1 GB 大文件。</p>
+        <div class="btns">
+          <button class="primary" id="data-scan">📂 扫描并导入</button>
+        </div>
+        <div class="muted" id="data-manual-candidates" style="margin-top:6px"></div>
+      </div>
+      <div class="card">
+        <h3>浏览器上传（备选）</h3>
         <details>
-          <summary>手动导入 Data.zip（下载代理均不可用时）</summary>
-          <input type="file" id="data-file">
-          <button id="data-import">上传并校验</button>
+          <summary>上传本机已下载的 Data.zip</summary>
+          <input type="file" id="data-file" accept=".zip">
+          <button id="data-import" class="primary">上传并校验</button>
         </details>
       </div>
     </section>
@@ -205,11 +275,19 @@
       <div class="header-row"><h1>日志</h1>
         <div class="btns">
           <select id="log-name"></select>
-          <input type="text" id="log-filter" placeholder="过滤（如 ERROR / WARNING）">
+          <select id="log-level">
+            <option value="">全部级别</option>
+            <option value="ERROR" selected>错误 + 警告</option>
+            <option value="ERROR_ONLY">仅错误</option>
+          </select>
+          <input type="text" id="log-filter" placeholder="关键字过滤">
+          <label class="inline"><input type="checkbox" id="log-auto" checked> 自动刷新</label>
           <button id="log-refresh">刷新</button>
+          <button id="log-export">导出诊断包</button>
         </div>
       </div>
-      <pre id="log-view" class="pre log"></pre>
+      <pre id="log-view" class="pre log" style="min-height:120px">（无日志）</pre>
+      <p class="muted">默认显示错误与警告。日志不会记录任何密码或数据库凭据。</p>
     </section>
 
     <!-- 备份 -->
@@ -217,23 +295,52 @@
       <div class="header-row"><h1>备份与恢复</h1>
         <button class="primary" id="bk-create">立即备份</button>
       </div>
-      <p class="muted">备份包含 auth / characters 数据库、world 关键表、用户配置与状态；不包含可重新下载的客户端数据。恢复前会自动生成当前状态备份。</p>
+      <div class="card">
+        <h3>备份任务状态</h3>
+        <div id="bk-status" class="kv"></div>
+        <label class="inline" style="margin-top:8px"><input type="checkbox" id="bk-auto"> 每日自动备份（保留最近 30 份且总占用上限 24 GB，超出自动清理最旧的）</label>
+      </div>
+      <p class="muted">备份完整包含：账号数据库、角色数据库、机器人数据库（playerbots）、世界库中文化相关表、用户配置与状态。客户端数据（可重新下载）不包含在内。恢复会先自动备份当前状态，再停止游戏服务器导入。</p>
+      <div class="card" style="padding:0;overflow-x:auto">
       <table class="tbl" id="bk-table">
-        <thead><tr><th>文件</th><th>大小</th><th>操作</th></tr></thead>
+        <thead><tr><th>备份文件</th><th>时间</th><th>大小</th><th>操作</th></tr></thead>
         <tbody></tbody>
       </table>
+      </div>
     </section>
 
     <!-- 版本 -->
     <section id="page-version" class="page">
       <h1>版本</h1>
-      <div class="card"><div id="ver-view" class="kv"></div></div>
+      <div class="card"><h3>当前安装</h3><div id="ver-view" class="kv"></div></div>
       <div class="card">
-        <p class="muted">GSWXY Realm 由 GitHub Actions 从锁定的上游版本自动构建，可在仓库 Releases 页面获取新版本 FPK。</p>
+        <h3>检查更新</h3>
+        <p class="muted">通过 GitHub Releases 检查（只读，不会自动安装）。下载新 FPK 后请到 fnOS 应用中心手动安装升级，升级不会动你的账号、角色与机器人数据。</p>
+        <div class="btns">
+          <select id="upd-channel">
+            <option value="stable" selected>稳定版</option>
+            <option value="nightly">测试版（nightly）</option>
+          </select>
+          <button class="primary" id="upd-check">检查更新</button>
+        </div>
+        <div id="upd-result" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <p class="muted">艾泽旅伴（GSWXY Realm）由 GitHub Actions 从锁定上游版本自动构建；Core 与 mod-playerbots 版本锁定见仓库 versions/upstream.json，任何正式版本都可精确复现。本应用为社区第三方发行版，与暴雪娱乐无关。</p>
       </div>
     </section>
   </main>
 </div>
+
+<!-- 通用弹窗与提示 -->
+<div id="modal-mask" hidden>
+  <div id="modal" role="dialog" aria-modal="true">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div class="btns" id="modal-actions" style="justify-content:flex-end;margin-top:16px"></div>
+  </div>
+</div>
+<div id="toasts"></div>
 <script src="/app.js"></script>
 </body>
 </html>

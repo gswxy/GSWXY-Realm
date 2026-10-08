@@ -2,94 +2,89 @@
   {
     "name": "natural",
     "label": "自然世界",
-    "description": "较少的机器人数量，自然在线节奏，适合长期沉浸式游玩。",
+    "description": "较少的机器人数量，周期性上下线模拟真实服务器的自然在线节奏，适合长期沉浸式游玩。",
     "values": {
       "AiPlayerbot.MinRandomBots": "30",
       "AiPlayerbot.MaxRandomBots": "60",
-      "AiPlayerbot.MinRandomBotInWorld": "10",
-      "AiPlayerbot.MaxRandomBotInWorld": "30",
-      "AiPlayerbot.RandomBotLoginAtStartup": "0",
-      "AiPlayerbot.RandomBotLoginCount": "15",
-      "AiPlayerbot.RandomBotsPerInterval": "5",
-      "AiPlayerbot.RandomBotSchedules": "5400",
-      "AiPlayerbot.EnableGuild": "1",
+      "AiPlayerbot.EnablePeriodicOnlineOffline": "1",
+      "AiPlayerbot.PeriodicOnlineOfflineRatio": "2.0",
+      "AiPlayerbot.MinRandomBotInWorldTime": "1800",
+      "AiPlayerbot.MaxRandomBotInWorldTime": "14400",
       "AiPlayerbot.RandomBotJoinLfg": "1",
       "AiPlayerbot.RandomBotAutoJoinBG": "0",
-      "AiPlayerbot.WorldChat": "1"
+      "AiPlayerbot.RandomBotGuildCount": "20",
+      "AiPlayerbot.RandomBotTalk": "1",
+      "AiPlayerbot.RandomBotSayWithoutMaster": "1"
     }
   },
   {
     "name": "solo-companion",
     "label": "单人陪玩",
-    "description": "机器人主要围绕真人玩家组队、跟随与互动，适合一个人玩出满员团的感觉。",
+    "description": "机器人自动做任务、学技能、换装备，随时可与你组队；一个人也能玩出满员团的感觉。",
     "values": {
       "AiPlayerbot.MinRandomBots": "40",
       "AiPlayerbot.MaxRandomBots": "80",
-      "AiPlayerbot.MinRandomBotInWorld": "10",
-      "AiPlayerbot.MaxRandomBotInWorld": "25",
-      "AiPlayerbot.RandomBotLoginAtStartup": "1",
-      "AiPlayerbot.RandomBotLoginCount": "20",
+      "AiPlayerbot.EnablePeriodicOnlineOffline": "0",
       "AiPlayerbot.LogInGroupOnly": "0",
-      "AiPlayerbot.LogInGuildOnly": "0",
-      "AiPlayerbot.AutoLearnQuests": "1",
-      "AiPlayerbot.AutoGearUp": "1",
+      "AiPlayerbot.RandomBotJoinLfg": "1",
+      "AiPlayerbot.AutoDoQuests": "1",
+      "AiPlayerbot.AutoLearnQuestSpells": "1",
+      "AiPlayerbot.AutoLearnTrainerSpells": "1",
       "AiPlayerbot.AutoUpgradeEquip": "1",
-      "AiPlayerbot.EnableInviteAnimals": "1",
-      "AiPlayerbot.WorldChat": "1",
-      "AiPlayerbot.SayInProgress": "1"
+      "AiPlayerbot.AutoEquipUpgradeLoot": "1",
+      "AiPlayerbot.AutoPickTalents": "1",
+      "AiPlayerbot.AutoTeleportForLevel": "1",
+      "AiPlayerbot.RandomBotTalk": "1",
+      "AiPlayerbot.RandomBotSayWithoutMaster": "1"
     }
   },
   {
     "name": "dungeon-first",
     "label": "副本优先",
-    "description": "机器人积极加入 LFG、组队下副本，自动拾取与装备分配偏团队。",
+    "description": "更多机器人并积极加入地下城查找器（LFG），组队下副本更轻松，负载中等偏高。",
     "values": {
       "AiPlayerbot.MinRandomBots": "80",
       "AiPlayerbot.MaxRandomBots": "150",
-      "AiPlayerbot.RandomBotLoginCount": "40",
+      "AiPlayerbot.EnablePeriodicOnlineOffline": "0",
       "AiPlayerbot.RandomBotJoinLfg": "1",
       "AiPlayerbot.RandomBotAutoJoinBG": "0",
-      "AiPlayerbot.AutoLearnQuests": "1",
-      "AiPlayerbot.AutoGearUp": "1",
+      "AiPlayerbot.RandomBotGuildCount": "40",
+      "AiPlayerbot.AutoDoQuests": "1",
       "AiPlayerbot.AutoUpgradeEquip": "1",
-      "AiPlayerbot.AutoTrain": "1",
-      "AiPlayerbot.EnableGuild": "1",
-      "AiPlayerbot.RandomBotGuildCount": "40"
+      "AiPlayerbot.AutoEquipUpgradeLoot": "1",
+      "AiPlayerbot.AutoLearnTrainerSpells": "1"
     }
   },
   {
     "name": "pvp-active",
     "label": "PvP 活跃",
-    "description": "机器人积极报名战场与竞技场，野外对抗更热闹。",
+    "description": "机器人积极报名战场（含奥山）与竞技场，野外和战场对抗更热闹，负载中等偏高。",
     "values": {
       "AiPlayerbot.MinRandomBots": "60",
       "AiPlayerbot.MaxRandomBots": "120",
-      "AiPlayerbot.RandomBotLoginCount": "30",
       "AiPlayerbot.RandomBotAutoJoinBG": "1",
+      "AiPlayerbot.RandomBotAutoJoinBGAVCount": "1",
       "AiPlayerbot.RandomBotJoinLfg": "1",
-      "AiPlayerbot.EnableGuild": "1",
-      "AiPlayerbot.WorldChat": "1",
-      "AiPlayerbot.AutoGearUp": "1"
+      "AiPlayerbot.RandomBotGuildCount": "20",
+      "AiPlayerbot.AutoUpgradeEquip": "1",
+      "AiPlayerbot.RandomBotTalk": "1"
     }
   },
   {
     "name": "low-perf",
     "label": "低性能模式",
-    "description": "大幅减少机器人数量与 AI 计算频率，适合性能有限的 NAS。",
+    "description": "大幅减少机器人数量并放慢 AI 更新节奏，关闭社交行为，适合 CPU 核数少的 NAS。",
     "values": {
       "AiPlayerbot.MinRandomBots": "10",
       "AiPlayerbot.MaxRandomBots": "20",
-      "AiPlayerbot.MinRandomBotInWorld": "5",
-      "AiPlayerbot.MaxRandomBotInWorld": "10",
-      "AiPlayerbot.RandomBotLoginCount": "5",
-      "AiPlayerbot.RandomBotsPerInterval": "2",
-      "AiPlayerbot.RandomBotsPerTick": "20",
-      "AiPlayerbot.BotsPerTick": "5",
+      "AiPlayerbot.EnablePeriodicOnlineOffline": "0",
       "AiPlayerbot.RandomBotUpdateInterval": "60",
-      "AiPlayerbot.RandomBotAutoJoinBG": "0",
       "AiPlayerbot.RandomBotJoinLfg": "0",
-      "AiPlayerbot.EnableGuild": "0",
-      "AiPlayerbot.PerformanceAllowMoreBots": "0"
+      "AiPlayerbot.RandomBotAutoJoinBG": "0",
+      "AiPlayerbot.RandomBotGuildCount": "5",
+      "AiPlayerbot.RandomBotSayWithoutMaster": "0",
+      "AiPlayerbot.RandomBotTalk": "1",
+      "AiPlayerbot.PerfMonEnabled": "0"
     }
   }
 ]

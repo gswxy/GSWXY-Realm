@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  艾泽旅伴 · GSWXY Realm 应用图标（矢量源文件，由 build_icon.py 生成）
+  设计：古老魔法传送门（双金环 + 铆钉石 + 拱心石）+ 旅伴之光（金色萤火）。
+  深蓝 + 旧金配色。修改设计 → 编辑 build_icon.py → 运行它 → 运行 render.py。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="艾泽旅伴">
+  <defs>
+    <radialGradient id="void" cx="0.5" cy="0.44" r="0.78">
+      <stop offset="0" stop-color="#2e5aa8"/>
+      <stop offset="0.5" stop-color="#1d3866"/>
+      <stop offset="1" stop-color="#0d1830"/>
+    </radialGradient>
+    <linearGradient id="goldEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcb968"/>
+      <stop offset="1" stop-color="#a67c2e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd977" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#f2b93b" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#f2b93b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 深蓝圆角底（浅色/深色桌面均可辨认） -->
+  <rect x="10" y="10" width="236" height="236" rx="58" fill="#101d36"/>
+  <rect x="10" y="10" width="236" height="236" rx="58" fill="none" stroke="#1b2c4e" stroke-width="2"/>
+
+  <!-- 传送门虚空与门内冷色旋涡 -->
+  <ellipse cx="128" cy="132" rx="54" ry="68" fill="url(#void)"/>
+  <path d="M 102 170 C 86 145 98 106 128 93 C 150 83 167 96 171 116
+           C 163 104 146 98 133 106 C 113 116 106 141 117 164 Z"
+        fill="#5b86d6" opacity="0.45"/>
+  <path d="M 152 97 C 165 110 169 135 158 154 C 150 169 136 175 125 170
+           C 139 167 150 157 156 141 C 161 127 158 110 148 99 Z"
+        fill="#8fb3ec" opacity="0.32"/>
+
+  <!-- 门框：内环（粗）+ 外环（细）+ 铆钉石 + 顶部拱心石 -->
+  <g fill="none">
+    <ellipse cx="128" cy="132" rx="57" ry="71"
+             stroke="url(#goldEdge)" stroke-width="8"/>
+    <ellipse cx="128" cy="132" rx="70" ry="84"
+             stroke="#8a6d2f" stroke-width="4"/>
+  </g>
+  <path d="M 192.00 119.00 L 196.50 124.00 L 192.00 129.00 L 187.50 124.00 Z" fill="#e8c476"/>
+    <circle cx="183.43" cy="171.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="160.00" cy="199.55" r="3.4" fill="#d9b05f"/>
+    <circle cx="128.00" cy="210.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="96.00" cy="199.55" r="3.4" fill="#d9b05f"/>
+    <circle cx="72.57" cy="171.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="64.00" cy="132.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="72.57" cy="93.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="96.00" cy="64.45" r="3.4" fill="#d9b05f"/>
+    <circle cx="128.00" cy="54.00" r="3.4" fill="#d9b05f"/>
+    <circle cx="160.00" cy="64.45" r="3.4" fill="#d9b05f"/>
+    <circle cx="183.43" cy="93.00" r="3.4" fill="#d9b05f"/>
+
+  <!-- 旅伴萤火：门右上方悬浮的金色光点与四芒星 -->
+  <circle cx="207" cy="57" r="19" fill="url(#glow)"/>
+  <circle cx="207" cy="57" r="6.5" fill="#ffd977"/>
+  <path d="M 207 43 L 210 54 L 221 57 L 210 60 L 207 71 L 204 60 L 193 57 L 204 54 Z"
+        fill="#ffe6a6" opacity="0.92"/>
+</svg>

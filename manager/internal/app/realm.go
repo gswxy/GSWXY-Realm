@@ -23,7 +23,7 @@ func (a *App) registerRealm() error {
 	d := a.State.Get()
 	name := d.Realm.Name
 	if name == "" {
-		name = "GSWXY Realm"
+		name = "艾泽旅伴"
 	}
 	pub, loc := a.EffectiveRealmAddresses()
 	port := a.RealmPort()
@@ -188,32 +188,55 @@ var (
 		val string
 		at  time.Time
 	}
+	publicProbing bool
 )
 
-// detectPublicIP best-effort queries a public echo service (60s cache);
-// returns "" when offline (caller falls back to the local address).
+// detectPublicIP 返回缓存的公网地址（60s 有效）。探测在后台进行：
+// 接口调用绝不阻塞——UI 的 Realm 地址卡片不能等 4 秒网络超时。
+// 离线时返回 ""（调用方回退到本地地址）。
 func (a *App) detectPublicIP() string {
 	publicMu.Lock()
-	defer publicMu.Unlock()
 	if time.Since(publicCache.at) < time.Minute {
-		return publicCache.val
+		v := publicCache.val
+		publicMu.Unlock()
+		return v
 	}
-	client := &http.Client{Timeout: 4 * time.Second}
-	for _, url := range []string{"https://api.ipify.org", "http://ip.3322.net/"} {
-		resp, err := client.Get(url)
-		if err != nil {
-			continue
-		}
-		b, _ := io.ReadAll(io.LimitReader(resp.Body, 64))
-		resp.Body.Close()
-		ip := strings.TrimSpace(string(b))
-		if net.ParseIP(ip) != nil {
-			publicCache.val, publicCache.at = ip, time.Now()
-			return ip
-		}
+	probe := !publicProbing
+	publicProbing = true
+	publicMu.Unlock()
+
+	if probe {
+		go func() {
+			defer func() {
+				publicMu.Lock()
+				publicProbing = false
+				publicMu.Unlock()
+			}()
+			client := &http.Client{Timeout: 4 * time.Second}
+			for _, url := range []string{"https://api.ipify.org", "http://ip.3322.net/"} {
+				resp, err := client.Get(url)
+				if err != nil {
+					continue
+				}
+				b, _ := io.ReadAll(io.LimitReader(resp.Body, 64))
+				resp.Body.Close()
+				ip := strings.TrimSpace(string(b))
+				if net.ParseIP(ip) != nil {
+					publicMu.Lock()
+					publicCache.val, publicCache.at = ip, time.Now()
+					publicMu.Unlock()
+					return
+				}
+			}
+			publicMu.Lock()
+			publicCache.at = time.Now() // 探测失败也标记时间，避免风暴
+			publicMu.Unlock()
+		}()
 	}
-	publicCache.at = time.Now()
-	return publicCache.val
+	publicMu.Lock()
+	v := publicCache.val
+	publicMu.Unlock()
+	return v
 }
 
 // LauncherBAT renders the Windows launcher for the effective address.

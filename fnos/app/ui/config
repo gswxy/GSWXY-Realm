@@ -1,7 +1,7 @@
 {
   ".url": {
     "com.gswxy.realm.url": {
-      "title": "GSWXY Realm",
+      "title": "艾泽旅伴",
       "icon": "images/icon-{0}.png",
       "type": "iframe",
       "protocol": "http",
