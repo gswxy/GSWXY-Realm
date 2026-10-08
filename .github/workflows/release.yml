@@ -27,11 +27,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 版本一致性守卫
+        run: |
+          # 发布版本号必须与 manifest 一致：杜绝 tag/manifest/FPK 文件名
+          # /build-info.json 互相矛盾。
+          MANIFEST=$(python3 -c "import re; print(re.search(r'version=\"([^\"]+)\"', open('fnos/manifest', encoding='utf8').read()).group(1))")
+          if [ "$MANIFEST" != "${{ inputs.version }}" ]; then
+            echo "::error::fnos/manifest 版本为 $MANIFEST，与发布版本 ${{ inputs.version }} 不一致。请先更新 manifest。" >&2
+            exit 1
+          fi
+          if [ "${{ inputs.channel }}" = "stable" ] && ! echo "$MANIFEST" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::stable 通道版本必须是纯语义化版本（x.y.z），不能带后缀：$MANIFEST" >&2
+            exit 1
+          fi
+          echo "版本一致性 OK：$MANIFEST（${{ inputs.channel }}）"
+
       - name: 读取版本锁
         id: lock
         run: |
           echo "core=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['core']['commit'])")" >> "$GITHUB_OUTPUT"
           echo "pb=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['playerbots']['commit'])")" >> "$GITHUB_OUTPUT"
+          echo "db=$(python3 -c "import json;print(json.load(open('versions/upstream.json'))['database_runtime']['flavor']+' '+json.load(open('versions/upstream.json'))['database_runtime']['version'])")" >> "$GITHUB_OUTPUT"
 
       - name: 拉取上游源码（锁定 SHA）
         run: bash scripts/fetch-upstream.sh build/src
@@ -103,22 +119,26 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
-          name: GSWXY Realm ${{ inputs.version }}
+          name: 艾泽旅伴 · GSWXY Realm ${{ inputs.version }}
           draft: false
           prerelease: ${{ inputs.channel == 'nightly' }}
           body: |
-            ## GSWXY Realm ${{ inputs.version }}（${{ inputs.channel }}）
+            ## 艾泽旅伴 · GSWXY Realm ${{ inputs.version }}（${{ inputs.channel }}）
 
-            fnOS 原生 AzerothCore Playerbots 一体化服务器发行版。
+            fnOS 原生 AzerothCore + Playerbots（魔兽 3.3.5a）一体化服务器发行版。
+            本项目为社区第三方发行版，与暴雪娱乐无关。
 
             ### 上游版本
             - Core: ${{ steps.lock.outputs.core }}
             - mod-playerbots: ${{ steps.lock.outputs.pb }}
-            - AC Client Data: 见 versions/upstream.json
-            - 数据库运行时: MariaDB（内置）
+            - 数据库运行时: ${{ steps.lock.outputs.db }}（内置，仅本机监听）
+            - AC 客户端数据: 见 versions/upstream.json（安装后自动下载）
 
-            ### 安装
-            下载 `GSWXY-Realm-*.fpk`，在 fnOS 应用中心手动安装，打开应用按向导完成初始化。
+            ### 安装与升级
+            - 全新安装：fnOS 应用中心 → 手动安装 → 选择下载的 `.fpk`
+            - 从旧版升级：直接安装新 FPK 覆盖；账号、角色、机器人、配置、
+              备份与客户端数据全部保留（升级前建议在「备份」页做一次备份）
+            - 校验完整性：下载同目录 `.sha256`，`sha256sum -c` 核对
 
             **Powered by AzerothCore + mod-playerbots**
           files: |

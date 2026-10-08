@@ -77,8 +77,36 @@ jobs:
 
       - name: 生成 build-info.json
         env:
-          GSRM_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || '1.0.0-nightly' }}
-          GSRM_CHANNEL: nightly
+          GSRM_RUN_ID: ${{ github.run_id }}
+        run: |
+          # nightly 版本 = manifest 版本 + -nightly.<run_number>，
+          # 并同步改写工作区 manifest，保证 FPK 文件名 / manifest /
+          # build-info.json 三者一致（verify-package.sh 会校验）。
+          BASE=$(python3 - <<'EOF'
+          import re
+          m = re.search(r'version="([^"]+)"', open("fnos/manifest", encoding="utf8").read())
+          print(m.group(1))
+          EOF
+          )
+          VERSION="${BASE}-nightly.${{ github.run_number }}"
+          python3 - "$VERSION" <<'EOF'
+          import re, sys
+          v = sys.argv[1]
+          p = "fnos/manifest"
+          s = open(p, encoding="utf8").read()
+          s = re.sub(r'(?m)^version="[^"]*"', f'version="{v}"', s)
+          open(p, "w", encoding="utf8").write(s)
+          print("manifest version ->", v)
+          EOF
+          echo "GSRM_VERSION=$VERSION" >> "$GITHUB_ENV"
+        # GSRM_CHANNEL 固定 nightly：nightly 绝不冒充稳定版
+      - name: 写入版本环境
+        run: echo "GSRM_CHANNEL=nightly" >> "$GITHUB_ENV"
+
+      - name: 生成 build-info（使用统一版本）
+        env:
+          GSRM_VERSION: ${{ env.GSRM_VERSION }}
+          GSRM_CHANNEL: ${{ env.GSRM_CHANNEL }}
           GSRM_RUN_ID: ${{ github.run_id }}
         run: bash scripts/gen-build-info.sh
 

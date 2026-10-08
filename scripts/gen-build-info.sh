@@ -5,8 +5,25 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="${APP:-$ROOT/fnos/app}"
-VERSION="${GSRM_VERSION:-1.0.0}"
-CHANNEL="${GSRM_CHANNEL:-nightly}"
+
+# 唯一版本来源：fnos/manifest。GSRM_VERSION 仅用于 CI 显式覆盖
+# （如 nightly 追加 -nightly.N 后缀），且覆盖值必须以 manifest 版本开头。
+MANIFEST_VERSION=$(python3 - <<'EOF'
+import re
+m = re.search(r'version="([^"]+)"', open("fnos/manifest", encoding="utf8").read())
+print(m.group(1) if m else "")
+EOF
+)
+if [ -n "${GSRM_VERSION:-}" ]; then
+  VERSION="$GSRM_VERSION"
+  case "$VERSION" in
+    "$MANIFEST_VERSION"|"$MANIFEST_VERSION"-*) ;;
+    *) echo "ERROR: GSRM_VERSION=$VERSION 与 manifest 版本 $MANIFEST_VERSION 不一致" >&2; exit 1 ;;
+  esac
+else
+  VERSION="${MANIFEST_VERSION:-1.0.0}"
+fi
+CHANNEL="${GSRM_CHANNEL:-$([ "${VERSION#*-}" != "$VERSION" ] && echo nightly || echo stable)}"
 RUN_ID="${GSRM_RUN_ID:-local}"
 BUILT_AT="${GSRM_BUILT_AT:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 

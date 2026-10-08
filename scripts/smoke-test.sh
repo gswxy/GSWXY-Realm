@@ -47,4 +47,41 @@ fi
 echo "== resources.json =="
 python3 -c "import json,sys; r=json.load(open('$APP/resources.json')); assert r['url'].startswith('https://')"
 
+echo "== 配置键防回归：botprofiles/recommended 的键必须存在于上游 dist =="
+python3 - "$ROOT" "$APP" <<'EOF'
+import json, re, sys, pathlib
+root, app = map(pathlib.Path, sys.argv[1:3])
+
+def keys_of(path):
+    ks = set()
+    for line in path.read_text(encoding="utf8", errors="ignore").splitlines():
+        m = re.match(r"^([A-Za-z][A-Za-z0-9._]*)\s*=", line)
+        if m:
+            ks.add(m.group(1))
+    return ks
+
+dists = {
+    "worldserver.conf": keys_of(app / "etc/worldserver.conf.dist"),
+    "authserver.conf": keys_of(app / "etc/authserver.conf.dist"),
+    # playerbots.conf 的逻辑名对应模块 dist
+    "playerbots.conf": keys_of(app / "etc/modules/playerbots.conf.dist"),
+}
+
+def check(source, label):
+    bad = []
+    for conf, kv in source.items():
+        for key in kv:
+            if key not in dists[conf]:
+                bad.append(f"{conf}: {key}")
+    if bad:
+        sys.exit(f"KEY REGRESSION in {label}: 这些键不在上游 dist 里: {bad}")
+
+profiles = json.loads((root / "manager/internal/app/botprofiles.json").read_text(encoding="utf8"))
+check({"playerbots.conf": {k for p in profiles for k in p["values"]}}, "botprofiles.json")
+
+rec = json.loads((root / "manager/internal/recommend/recommended.json").read_text(encoding="utf8"))
+check(rec, "recommended.json")
+print("config keys ok")
+EOF
+
 echo "SMOKE OK"

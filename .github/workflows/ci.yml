@@ -29,6 +29,9 @@ jobs:
       - name: go test
         working-directory: manager
         run: go test ./... -v
+      - name: go test -race
+        working-directory: manager
+        run: go test -race -count=1 ./...
       - name: build (linux/amd64)
         working-directory: manager
         run: |

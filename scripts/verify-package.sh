@@ -69,6 +69,31 @@ for p in [f"{tmp}/config/privilege", f"{tmp}/config/resource",
 print("json ok")
 EOF
 
+echo "== 版本一致性 =="
+# FPK 文件名 / manifest / build-info.json 三者版本必须一致
+"$PY" - "$FPK" "$TMP" "$PAYLOAD" <<'EOF'
+import json, re, sys, os, urllib.parse
+fpk, tmp, payload = sys.argv[1:4]
+m = re.search(r'version="([^"]+)"', open(f"{tmp}/manifest", encoding="utf8").read())
+mv = m.group(1) if m else None
+base = os.path.basename(fpk)                       # GSWXY-Realm-<ver>-x86_64.fpk
+mm = re.match(r"GSWXY-Realm-(.+)-x86_64\.fpk$", base)
+fv = urllib.parse.unquote(mm.group(1)) if mm else None
+bi = "n/a"
+try:
+    bi = json.load(open(f"{payload}/build-info.json", encoding="utf8")).get("version", "")
+except FileNotFoundError:
+    print("WARN: build-info.json not in payload")
+ok = True
+if fv and mv and fv != mv:
+    print(f"FAIL: fpk filename version {fv} != manifest {mv}"); ok = False
+if bi != "n/a" and mv and bi != mv:
+    print(f"FAIL: build-info version {bi} != manifest {mv}"); ok = False
+if not ok:
+    sys.exit(1)
+print(f"version consistent: manifest={mv} fpk={fv} build-info={bi}")
+EOF
+
 echo "== checksum =="
 sha256sum "$FPK"
 
