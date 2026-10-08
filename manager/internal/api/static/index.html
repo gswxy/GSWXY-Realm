@@ -28,6 +28,7 @@
       <a href="#/version">ℹ️ 版本</a>
     </nav>
     <div class="sidebar-foot">
+      <button id="theme-toggle">🌙 深色模式</button>
       <a href="#/login" id="login-link">登录</a>
       <span>Powered by AzerothCore + mod-playerbots</span>
     </div>
@@ -93,7 +94,27 @@
           <input type="text" id="realm-name" placeholder="服务器名称">
           <button id="realm-save" class="primary">保存</button>
         </div>
-        <p class="muted">客户端 realmlist：set realmlist &lt;NAS的IP地址&gt;</p>
+      </div>
+      <div class="card">
+        <h3>网络地址</h3>
+        <p class="muted">公网地址给外网玩家连，本地地址给局域网玩家连；留空保存则自动检测。</p>
+        <div class="row">
+          <input type="text" id="net-public" placeholder="公网地址/域名（留空自动检测）">
+        </div>
+        <div class="row">
+          <input type="text" id="net-local" placeholder="本地/LAN 地址（留空自动检测）">
+        </div>
+        <div class="btns">
+          <button id="net-save" class="primary">保存</button>
+          <button id="net-refresh">重新检测</button>
+        </div>
+        <div id="net-effective" class="muted" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <h3>客户端启动器</h3>
+        <p class="muted">下载 .bat 放到魔兽 3.3.5a 客户端文件夹里，双击即自动改 realmlist 并进游戏。</p>
+        <a class="btn primary" id="launcher-dl" href="/api/launcher">⬇ 下载启动器 (.bat)</a>
+        <p class="muted" id="realmlist-hint" style="margin-top:8px"></p>
       </div>
     </section>
 

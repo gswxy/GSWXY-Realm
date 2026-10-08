@@ -117,6 +117,9 @@ func (s *Server) Handler() http.Handler {
 	// version / realm
 	mux.HandleFunc("GET /api/version", s.session(s.handleVersion))
 	mux.HandleFunc("POST /api/realm/name", s.session(s.admin(s.handleRealmName)))
+	mux.HandleFunc("GET /api/realm/addresses", s.session(s.handleRealmAddresses))
+	mux.HandleFunc("POST /api/realm/addresses", s.session(s.admin(s.handleRealmAddressesSave)))
+	mux.HandleFunc("GET /api/launcher", s.session(s.handleLauncher))
 
 	return s.logMiddleware(mux)
 }

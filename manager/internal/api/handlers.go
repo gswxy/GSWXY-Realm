@@ -695,6 +695,43 @@ func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) handleRealmAddresses(w http.ResponseWriter, r *http.Request) {
+	d := s.State.Get()
+	pub, loc := s.App.EffectiveRealmAddresses()
+	apub, aloc := s.App.AutoRealmAddresses()
+	writeJSON(w, 200, map[string]any{
+		"configured": map[string]string{"address": d.Realm.Address, "local_address": d.Realm.LocalAddress},
+		"effective":  map[string]string{"address": pub, "local_address": loc},
+		"auto":       map[string]string{"address": apub, "local_address": aloc},
+		"port":       s.App.RealmPort(),
+	})
+}
+
+func (s *Server) handleRealmAddressesSave(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Address      string `json:"address"`
+		LocalAddress string `json:"local_address"`
+	}
+	if decodeJSON(r, &req) != nil {
+		fail(w, 400, "请求格式错误")
+		return
+	}
+	if err := s.App.SetRealmAddresses(req.Address, req.LocalAddress); err != nil {
+		fail(w, 400, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]string{"ok": "1"})
+}
+
+// handleLauncher serves the generated Windows .bat (browser navigation:
+// the session cookie now carries the token).
+func (s *Server) handleLauncher(w http.ResponseWriter, r *http.Request) {
+	bat := s.App.LauncherBAT()
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", `attachment; filename="GSWXY-Realm-Launcher.bat"`)
+	_, _ = w.Write(bat)
+}
+
 func (s *Server) handleRealmName(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Name string `json:"name"`

@@ -202,14 +202,37 @@ async function loadServer() {
     loadServer();
   });
 
-  const st = await api("GET", "/api/version");
-  $("#realm-name").value = (st.build && "") || "";
+  const st = await api("GET", "/api/overview");
+  $("#realm-name").value = (st.realm && st.realm.name) || "";
+  await loadNetAddrs();
 }
 
 $("#realm-save").onclick = async () => {
   await api("POST", "/api/realm/name", { name: $("#realm-name").value });
   alert("已保存");
 };
+
+async function loadNetAddrs() {
+  const d = await api("GET", "/api/realm/addresses");
+  $("#net-public").value = d.configured.address || "";
+  $("#net-local").value = d.configured.local_address || "";
+  const pub = d.effective.address, loc = d.effective.local_address;
+  const src = (p, auto) => p === auto ? "（自动检测）" : "（手动设置）";
+  $("#net-effective").innerHTML =
+    `当前生效 —— 公网：<b>${esc(pub)}</b>${src(pub, d.auto.address)} · 本地：<b>${esc(loc)}</b>${src(loc, d.auto.local_address)} · 端口：<b>${d.port}</b>`;
+  $("#realmlist-hint").textContent = `手动设置：客户端 realmlist 填 set realmlist ${loc}`;
+  const dl = $("#launcher-dl");
+  dl.href = "/api/launcher";
+}
+$("#net-save").onclick = async () => {
+  try {
+    await api("POST", "/api/realm/addresses",
+      { address: $("#net-public").value.trim(), local_address: $("#net-local").value.trim() });
+    await loadNetAddrs();
+    alert("已保存并应用到服务器");
+  } catch (e) { alert(e.message); }
+};
+$("#net-refresh").onclick = loadNetAddrs;
 
 // ---------- Playerbot ----------
 async function loadPlayerbot() {
@@ -524,6 +547,16 @@ function debounce(fn, ms) {
   let t;
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
+
+// ---------- 主题 ----------
+const themeBtn = $("#theme-toggle");
+function applyTheme(t) {
+  document.documentElement.classList.toggle("dark", t === "dark");
+  themeBtn.textContent = t === "dark" ? "☀️ 浅色模式" : "🌙 深色模式";
+  localStorage.setItem("gsrm_theme", t);
+}
+themeBtn.onclick = () => applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
+applyTheme(localStorage.getItem("gsrm_theme") || "light");
 
 // ---------- 启动 ----------
 $("#login-btn").onclick = doLogin;

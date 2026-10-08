@@ -61,7 +61,9 @@ type Data struct {
 
 	// Realm configuration captured at first run.
 	Realm struct {
-		Name string `json:"name"`
+		Name         string `json:"name"`
+		Address      string `json:"address"`       // 公网地址；空=自动检测
+		LocalAddress string `json:"local_address"` // 本地/LAN 地址；空=自动检测
 	} `json:"realm"`
 
 	// Download job progress (transient mirror of the downloader).
