@@ -1,13 +1,20 @@
 {
-  "_comment": "公共 GitHub Release 代理池（fallback）。官方源永远第一优先级，写死在 versions/upstream.json 的 client_data.url。代理失效不得影响手动导入功能。{version}/{filename} 会被替换为资源版本与文件名。",
-  "mirrors": [
+  "_comment": "国内访问 GitHub 的公共加速线路（集中配置，便于更新）。所有线路必须以 https:// 前缀代理原始 GitHub URL，不得篡改内容；下载器与更新检查会实测连通性与完整性，失效线路自动跳过。2026-10-08 从国内网络实测：ghproxy.net 与 gh-proxy.com 可用（gh-proxy.com 还能代理 api.github.com），mirror.ghproxy.com 已失效移除。",
+  "client_data_mirrors": [
     {
-      "name": "公共代理 1",
+      "name": "ghproxy.net",
       "url": "https://ghproxy.net/https://github.com/wowgaming/client-data/releases/download/{version}/{filename}"
     },
     {
-      "name": "公共代理 2",
-      "url": "https://mirror.ghproxy.com/https://github.com/wowgaming/client-data/releases/download/{version}/{filename}"
+      "name": "gh-proxy.com",
+      "url": "https://gh-proxy.com/https://github.com/wowgaming/client-data/releases/download/{version}/{filename}"
     }
-  ]
+  ],
+  "github_api_mirrors": [
+    "https://gh-proxy.com/https://api.github.com"
+  ],
+  "fpk_mirror": {
+    "name": "国内加速（gh-proxy.com）",
+    "url": "https://gh-proxy.com/https://github.com/gswxy/GSWXY-Realm/releases/download/{tag}/{filename}"
+  }
 }

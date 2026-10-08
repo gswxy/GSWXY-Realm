@@ -939,22 +939,33 @@ $("#cfg-raw-reset").onclick = async () => {
 };
 
 // ---------- 数据 ----------
+let dataSourceSel = null; // 保留用户选择的线路
 async function loadData() {
   const st = await api("GET", "/api/data/status");
   const ins = st.installed || {};
+  const localeTag = (st.label || "").includes("enUS") ? "" : "（enUS）";
   $("#data-status").innerHTML = `
-    <b>要求版本</b><span>${esc(st.required)} ${esc(st.label || "")}</span>
+    <b>要求版本</b><span>${esc(st.required)} ${esc(st.label || "")}${localeTag}</span>
     <b>已安装版本</b><span>${esc(ins.version || "未安装")}</span>
     <b>状态</b><span>${st.missing && st.missing.length === 0 && ins.installed
       ? pill("完整可用", "ok") : pill("需要下载/补全", "warn")}</span>
     <b>缺失目录</b><span>${st.missing && st.missing.length ? esc(st.missing.join(", ")) : "无"}</span>`;
+  // 线路选择器：自动 + 官方 + 已配置镜像（由后端下发，不虚构）
+  const sel = $("#data-source");
+  const cur = dataSourceSel ?? sel.value;
+  sel.innerHTML = `<option value="auto">自动选择（推荐，国内友好）</option>
+    <option value="official">官方 GitHub 直连</option>` +
+    (st.sources || []).filter(s => s.id.startsWith("mirror:"))
+      .map(s => `<option value="${esc(s.id)}">镜像：${esc(s.name)}</option>`).join("");
+  sel.value = (st.sources || []).some(s => s.id === cur) || cur === "auto" || cur === "official" ? cur : "auto";
   const p = st.progress || {};
   $("#data-cancel").disabled = !p.active;
   if (p.active) {
     const pct = p.bytes_total ? Math.round(p.bytes_done * 100 / p.bytes_total) : 0;
     $("#data-progress").style.width = pct + "%";
     $("#data-progress-text").textContent =
-      `${p.source}：${fmtBytes(p.bytes_done)} / ${fmtBytes(p.bytes_total)}（${pct}%，${fmtBytes(Math.round(p.speed_bps))}/s）`;
+      `${p.source}：${fmtBytes(p.bytes_done)} / ${fmtBytes(p.bytes_total)}（${pct}%，${fmtBytes(Math.round(p.speed_bps))}/s）` +
+      (p.mode === "auto" ? " · 自动模式会实测线路并换源" : "");
   } else if (p.error) {
     $("#data-progress").style.width = "0%";
     $("#data-progress-text").textContent = "上次失败: " + p.error;
@@ -962,15 +973,25 @@ async function loadData() {
     $("#data-progress").style.width = "0%";
     $("#data-progress-text").textContent = "";
   }
+  // 各线路尝试记录：如实展示为什么换线
+  const atts = (p.attempts || []).filter(a => !a.OK || a.error);
+  $("#data-attempts").innerHTML = atts.length
+    ? "线路尝试：" + atts.map(a =>
+        `${esc(a.source)}${a.ok ? " ✔" : " ✘ " + esc(a.error || "")}`).join("；")
+    : "";
   const cands = st.manual_candidates || [];
   $("#data-manual-candidates").innerHTML = cands.length
     ? `发现待导入文件：${cands.map(c => `<span class="mono">${esc(c.split("/").pop().split("\\").pop())}</span>`).join("、")}`
     : `（当前没有检测到 Data.zip）`;
 }
 
+$("#data-source").addEventListener("change", () => { dataSourceSel = $("#data-source").value; });
 $("#data-download").onclick = async () => {
-  try { await api("POST", "/api/data/download", {}); toast("下载任务已开始", "ok"); pollData(); }
-  catch (e) { toast(e.message, "err"); }
+  try {
+    await api("POST", "/api/data/download", { source: dataSourceSel ?? $("#data-source").value });
+    toast("下载任务已开始", "ok");
+    pollData();
+  } catch (e) { toast(e.message, "err"); }
 };
 $("#data-cancel").onclick = async () => { await api("POST", "/api/data/cancel", {}); toast("已请求取消", "warn"); };
 $("#data-scan").onclick = async () => {
@@ -1127,15 +1148,17 @@ $("#upd-check").onclick = async () => {
     } else if (r.available) {
       $("#upd-result").innerHTML = `
         <div class="card" style="margin:0">
-          <div><b>发现新版本：${esc(r.latest)}</b> ${pill("可更新", "ok")}</div>
+          <div><b>发现新版本：${esc(r.latest)}</b> ${pill("可更新", "ok")}
+            <span class="muted">· 数据来源：${esc(r.via || "GitHub")}</span></div>
           <div class="muted">发布于 ${esc((r.published_at || "").replace("T", " ").slice(0, 19))}</div>
           <div class="btns" style="margin-top:8px">
-            ${r.fpk ? `<a class="btn primary" href="${esc(r.fpk.url)}" target="_blank" rel="noopener">下载 FPK（${fmtBytes(r.fpk.size)}）</a>` : ""}
+            ${r.fpk_mirror ? `<a class="btn primary" href="${esc(r.fpk_mirror.url)}" target="_blank" rel="noopener">国内下载（${esc(r.fpk_mirror.name)}，已验证）</a>` : ""}
+            ${r.fpk ? `<a class="btn ${r.fpk_mirror ? "" : "primary"}" href="${esc(r.fpk.url)}" target="_blank" rel="noopener">GitHub 下载（${fmtBytes(r.fpk.size)}）</a>` : ""}
             ${r.sha256 ? `<a class="btn" href="${esc(r.sha256.url)}" target="_blank" rel="noopener">SHA-256 校验文件</a>` : ""}
             <a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">查看发布说明</a>
           </div>
           ${r.latest_note ? `<details style="margin-top:8px"><summary>更新内容</summary><pre class="pre" style="max-height:240px">${esc(r.latest_note)}</pre></details>` : ""}
-          <p class="muted" style="margin-top:8px">下载完成后请在 fnOS 应用中心手动安装升级；账号、角色、机器人与配置会全部保留。升级前建议先在「备份」页创建备份。</p>
+          <p class="muted" style="margin-top:8px">下载完成后请在 fnOS 应用中心手动安装升级；账号、角色、机器人与配置会全部保留。升级前建议先在「备份」页创建备份。校验：下载后可比对 SHA-256（Windows：certutil -hashfile 文件名 SHA256）。</p>
         </div>`;
     } else {
       $("#upd-result").innerHTML = `<div class="ok">已是最新版本（${esc(r.latest)}）</div>`;

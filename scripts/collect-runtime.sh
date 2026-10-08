@@ -79,13 +79,14 @@ else
   echo "WARN: config-schema.zh.json not generated yet"
 fi
 
-echo "== resources.json =="
+echo "== resources.json / mirrors.json =="
+# resources.json 描述客户端数据资源本体；下载线路集中配置在 mirrors.json
+# （clientdata 镜像 / GitHub API 镜像 / FPK 国内镜像），随包分发。
 python3 - "$ROOT" "$APP" <<'EOF'
 import json, sys
 root, app = sys.argv[1], sys.argv[2]
 u = json.load(open(root + "/versions/upstream.json"))
 cd = u["client_data"]
-mirrors = json.load(open(root + "/resources/mirrors.json"))
 res = {
     "version": cd["version"],
     "label": cd.get("label", ""),
@@ -94,10 +95,18 @@ res = {
     "size_bytes": cd.get("size_bytes", 0),
     "sha256": cd.get("sha256", "") if cd.get("sha256", "").startswith(tuple("0123456789abcdef")) else "",
     "requires": cd["requires"],
-    "mirrors": [m["url"].format(version=cd["version"], filename=cd["asset"]) for m in mirrors.get("mirrors", [])],
 }
 open(app + "/resources.json", "w").write(json.dumps(res, indent=2, ensure_ascii=False))
 print("resources.json written:", res["version"])
+EOF
+cp -a "$ROOT/resources/mirrors.json" "$APP/mirrors.json"
+python3 - "$APP/mirrors.json" <<'EOF'
+import json, sys
+m = json.load(open(sys.argv[1]))
+assert m.get("client_data_mirrors"), "mirrors.json needs client_data_mirrors"
+for mm in m["client_data_mirrors"]:
+    assert mm["url"].startswith("https://"), "mirror must be https: " + mm["url"]
+print("mirrors.json ok:", len(m["client_data_mirrors"]), "data mirrors,", len(m.get("github_api_mirrors", [])), "api mirrors")
 EOF
 
 echo "== MySQL runtime (stripped) =="

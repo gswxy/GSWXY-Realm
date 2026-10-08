@@ -244,17 +244,23 @@
       <h1>数据</h1>
       <div class="card">
         <h3>客户端数据（DBC / 地图 / 建筑 / 寻路）</h3>
+        <div class="muted" style="margin-bottom:8px">服务端数据包为官方 <b>enUS</b> 版（含 DBC 等基础数据文件），由版本锁定的 SHA-256 校验；<b>中文客户端照常使用，无需改成英文</b>——游戏内中文由数据库本地化提供。请勿用中文客户端的 Data/zhCN 目录替代。</div>
         <div id="data-status" class="kv"></div>
-        <div class="btns">
-          <button class="primary" id="data-download">⬇ 从官方源下载（自动镜像回退）</button>
+        <div class="row" style="margin-top:10px">
+          <select id="data-source" title="下载线路">
+            <option value="auto" selected>自动选择（推荐，国内友好）</option>
+            <option value="official">官方 GitHub 直连</option>
+          </select>
+          <button class="primary" id="data-download">⬇ 开始下载</button>
           <button id="data-cancel" disabled>取消下载</button>
         </div>
         <div class="progress-wrap"><div id="data-progress"></div></div>
         <div class="muted" id="data-progress-text"></div>
+        <div id="data-attempts" class="muted" style="margin-top:6px"></div>
       </div>
       <div class="card">
         <h3>NAS 本地导入（推荐大文件用户使用）</h3>
-        <p class="muted" id="data-manual-path">用 fnOS 文件管理器把官方 <b>Data.zip</b> 放入应用数据目录的 <span class="mono">downloads/manual/</span> 文件夹，然后点「扫描并导入」。免浏览器上传 1.1 GB 大文件。</p>
+        <p class="muted" id="data-manual-path">用 fnOS 文件管理器把官方 <b>enUS</b> 版 <b>Data.zip</b>（wowgaming/client-data 发布，与服务端 Core 版本匹配）放入应用数据目录的 <span class="mono">downloads/manual/</span> 文件夹，然后点「扫描并导入」。导入与下载使用相同的完整性校验（大小 + SHA-256），中文客户端的数据目录不能替代。</p>
         <div class="btns">
           <button class="primary" id="data-scan">📂 扫描并导入</button>
         </div>

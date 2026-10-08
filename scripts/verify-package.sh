@@ -47,6 +47,15 @@ mkdir -p "$PAYLOAD"
 tar -xzf "$TMP/app.tgz" -C "$PAYLOAD"
 [ -f "$PAYLOAD/bin/gswxy-manager" ] || { echo "manager binary missing" >&2; exit 1; }
 [ -f "$PAYLOAD/resources.json" ] || { echo "resources.json missing" >&2; exit 1; }
+[ -f "$PAYLOAD/mirrors.json" ] || { echo "mirrors.json missing" >&2; exit 1; }
+python3 - "$PAYLOAD/mirrors.json" <<'EOF'
+import json, sys
+m = json.load(open(sys.argv[1]))
+assert m.get("client_data_mirrors"), "no data mirrors configured"
+for mm in m["client_data_mirrors"]:
+    assert mm["url"].startswith("https://")
+print("payload mirrors ok")
+EOF
 # fnpack 归一化 payload 内权限位；fnOS install_callback 会恢复执行位，
 # 因此这里只警告不失败。
 [ -x "$PAYLOAD/bin/gswxy-manager" ] || echo "WARN: manager exec bit not set in app.tgz (install_callback will restore)"

@@ -27,6 +27,7 @@ import (
 	"github.com/gswxy/gswxy-realm/manager/internal/confman"
 	"github.com/gswxy/gswxy-realm/manager/internal/dbinit"
 	"github.com/gswxy/gswxy-realm/manager/internal/logging"
+	"github.com/gswxy/gswxy-realm/manager/internal/mirrors"
 	"github.com/gswxy/gswxy-realm/manager/internal/platform"
 	"github.com/gswxy/gswxy-realm/manager/internal/proc"
 	"github.com/gswxy/gswxy-realm/manager/internal/recommend"
@@ -99,7 +100,7 @@ func New(p platform.Paths) (*App, error) {
 		State: st,
 		Admin: ad,
 		Sup:   proc.NewSupervisor(),
-		CD:    clientdata.NewManager(p, log),
+		CD:    clientdata.NewManager(p, log, mirrors.Load(p.AppDest)),
 		Ver:   version.Load(p.BuildInfo()),
 	}
 	a.reconcileClientData()

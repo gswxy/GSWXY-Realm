@@ -13,6 +13,7 @@ import (
 
 	"github.com/gswxy/gswxy-realm/manager/internal/accounts"
 	"github.com/gswxy/gswxy-realm/manager/internal/app"
+	"github.com/gswxy/gswxy-realm/manager/internal/clientdata"
 	"github.com/gswxy/gswxy-realm/manager/internal/confman"
 	"github.com/gswxy/gswxy-realm/manager/internal/state"
 )
@@ -193,16 +194,31 @@ func (s *Server) handleDataStatus(w http.ResponseWriter, r *http.Request) {
 		"missing":   s.App.CD.RequiredDirs(res),
 		// NAS 本地导入候选：downloads/manual 下匹配的 Data.zip
 		"manual_candidates": s.App.CD.ManualCandidates(res),
+		// 可选下载线路（官方 + 已配置镜像），前端渲染线路选择器
+		"sources": s.App.CD.AvailableSources(res),
+		// 数据包语言口径：官方 enUS 包（锁定 SHA-256 校验）
+		"data_locale": "enUS 服务端数据包（官方发布，SHA-256 锁定校验）",
 	})
 }
 
 func (s *Server) handleDataDownload(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Source string `json:"source"`
+	}
+	_ = decodeJSON(r, &req)
 	res, err := s.App.CD.LoadResource()
 	if err != nil {
 		fail(w, 500, err.Error())
 		return
 	}
-	if err := s.App.CD.Download(res, ""); err != nil {
+	mode := clientdata.ModeAuto
+	switch {
+	case req.Source == "official":
+		mode = clientdata.ModeOfficial
+	case strings.HasPrefix(req.Source, "mirror:"):
+		mode = req.Source // 指定具体镜像线路
+	}
+	if err := s.App.CD.DownloadMode(res, "", mode); err != nil {
 		fail(w, 400, err.Error())
 		return
 	}

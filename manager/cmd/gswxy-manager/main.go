@@ -22,6 +22,7 @@ import (
 
 	"github.com/gswxy/gswxy-realm/manager/internal/api"
 	"github.com/gswxy/gswxy-realm/manager/internal/app"
+	"github.com/gswxy/gswxy-realm/manager/internal/mirrors"
 	"github.com/gswxy/gswxy-realm/manager/internal/platform"
 	"github.com/gswxy/gswxy-realm/manager/internal/update"
 	"github.com/gswxy/gswxy-realm/manager/internal/version"
@@ -119,7 +120,7 @@ func runDaemon(port int) {
 	auth := api.NewAuth(func() []byte { return []byte(a.Admin.SessionKey()) }, a.Log)
 	srv := &api.Server{
 		App: a, Log: a.Log, Auth: auth, Admin: a.Admin,
-		State: a.State, Updater: update.New(),
+		State: a.State, Updater: update.New(mirrors.Load(platform.Detect().AppDest)),
 	}
 
 	addr := fmt.Sprintf("0.0.0.0:%d", port)
