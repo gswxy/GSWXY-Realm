@@ -45,7 +45,8 @@ type Manifest struct {
 
 // World tables carried in backups (the ones locale import + common admin
 // workflows modify). Base game data that is untouched stays re-importable
-// from the FPK payload, keeping archives small.
+// from the FPK payload, keeping archives small. 注意：这不是完整世界库
+// 备份——manifest 与文档均按此口径描述。
 var WorldTables = []string{
 	"creature_template", "item_template", "quest_template",
 	"gameobject_template", "npc_text", "page_text", "gossip_menu_option",
@@ -79,8 +80,13 @@ type Manager struct {
 	// StopGameServers / StartGameServers are injected by the app package:
 	// restore must quiesce worldserver/authserver (never mysqld — the
 	// import needs it) and bring back whichever were running before.
-	StopGameServers  func() (wereRunning bool)
-	StartGameServers func() error
+	// Stop 返回错误 = 未能确认进程已完全停止，恢复必须中止。
+	StopGameServers  func() (worldWas, authWas bool, err error)
+	StartGameServers func(world, auth bool) error
+
+	// execDump / execImport 供测试注入假实现；默认走真实子进程。
+	execDump   func(bin string, args []string, stdout io.Writer) error
+	execImport func(bin string, args []string, stdin io.Reader) ([]byte, error)
 
 	jobMu   atomic.Bool
 	jobKind atomic.Value // string
@@ -125,6 +131,28 @@ func (m *Manager) Status() Job {
 	return j
 }
 
+// dump / import 默认子进程实现（测试覆盖这两个字段）。
+func (m *Manager) dump(bin string, args []string, stdout io.Writer) error {
+	if m.execDump != nil {
+		return m.execDump(bin, args, stdout)
+	}
+	cmd := exec.Command(bin, args...)
+	cmd.Stdout = stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = dbinit.ClientEnv(m.Paths)
+	return cmd.Run()
+}
+
+func (m *Manager) importSQL(bin string, args []string, stdin io.Reader) ([]byte, error) {
+	if m.execImport != nil {
+		return m.execImport(bin, args, stdin)
+	}
+	cmd := exec.Command(bin, args...)
+	cmd.Stdin = stdin
+	cmd.Env = dbinit.ClientEnv(m.Paths)
+	return cmd.CombinedOutput()
+}
+
 // dumpTargets is the ordered dump plan. acore_playerbots 必须完整备份：
 // 机器人绑定（account_links）、自定义策略、任务/装备缓存都在这库里。
 var dumpTargets = []struct{ db, file string }{
@@ -142,7 +170,15 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 	}
 	defer m.jobMu.Store(false)
 	m.jobErr.Store("")
-	m.setPhase("backup", "准备")
+	return m.createLocked("backup", dumpBin, rootPass)
+}
+
+// createLocked is the lock-free backup body. Callers must hold jobMu —
+// Restore also uses it for its pre-restore snapshot with the SAME lock
+// held (the historical bug: Restore called Create, which re-acquired the
+// lock and deadlocked the restore into a guaranteed failure).
+func (m *Manager) createLocked(kind, dumpBin, rootPass string) (string, error) {
+	m.setPhase(kind, "准备")
 
 	stamp := time.Now().Format("20060102-150405")
 	name := fmt.Sprintf("gswxy-backup-%s.tar.gz", stamp)
@@ -150,7 +186,7 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 
 	tmp, err := os.MkdirTemp(m.Paths.Tmp, "backup-")
 	if err != nil {
-		return "", m.jobFail("backup", err)
+		return "", m.jobFail(kind, err)
 	}
 	defer os.RemoveAll(tmp)
 
@@ -168,51 +204,65 @@ func (m *Manager) Create(dumpBin, rootPass string) (string, error) {
 	}
 
 	for _, d := range dumpTargets {
-		m.setPhase("backup", "导出 "+d.db)
+		m.setPhase(kind, "导出 "+d.db)
 		out := filepath.Join(tmp, d.file)
 		tables := []string(nil)
 		if d.db == "acore_world" {
 			tables = WorldTables
 		}
-		if err := dumpDatabase(m.Paths, dumpBin, rootPass, d.db, out, tables); err != nil {
-			return "", m.jobFail("backup", fmt.Errorf("dump %s: %w", d.db, err))
+		if err := dumpDatabase(m.Paths, m.dump, dumpBin, rootPass, d.db, out, tables); err != nil {
+			return "", m.jobFail(kind, fmt.Errorf("dump %s: %w", d.db, err))
 		}
 		sum, err := fileSHA256(out)
 		if err != nil {
-			return "", m.jobFail("backup", err)
+			return "", m.jobFail(kind, err)
 		}
 		manifest.Checksums[d.file] = sum
 		manifest.Files = append(manifest.Files, d.file)
 	}
 
-	m.setPhase("backup", "打包配置与状态")
-	copyTree(m.Paths.UserConfig(), filepath.Join(tmp, "config"))
+	m.setPhase(kind, "打包配置与状态")
+	if err := copyTree(m.Paths.UserConfig(), filepath.Join(tmp, "config")); err != nil {
+		return "", m.jobFail(kind, fmt.Errorf("打包用户配置: %w", err))
+	}
 	copyFile2(m.Paths.StateFile(), filepath.Join(tmp, "state.json"))
 	copyFile2(m.Paths.BuildInfo(), filepath.Join(tmp, "build-info.json"))
 	for _, f := range []string{"state.json", "build-info.json"} {
 		if _, err := os.Stat(filepath.Join(tmp, f)); err == nil {
 			manifest.Files = append(manifest.Files, f)
+			if sum, err := fileSHA256(filepath.Join(tmp, f)); err == nil {
+				manifest.Checksums[f] = sum
+			}
 		}
 	}
 	manifest.Files = append(manifest.Files, "config/")
 
-	m.setPhase("backup", "压缩归档")
+	m.setPhase(kind, "压缩归档")
 	mraw, _ := json.MarshalIndent(manifest, "", "  ")
 	if err := os.WriteFile(filepath.Join(tmp, "manifest.json"), mraw, 0o600); err != nil {
-		return "", m.jobFail("backup", err)
+		return "", m.jobFail(kind, err)
 	}
 	if err := packDir(tmp, path); err != nil {
-		return "", m.jobFail("backup", err)
+		return "", m.jobFail(kind, err)
 	}
 	m.Log.Audit("system", "backup.create", name)
-	m.setPhase("backup", "完成")
+	m.setPhase(kind, "完成")
 	m.prune()
 	return path, nil
 }
 
-func dumpDatabase(paths platform.Paths, dumpBin, pass, db, out string, tables []string) error {
+// dumpDatabase runs the bundled dumper; the credentials sidecar is removed
+// right after the run (never left behind on disk).
+func dumpDatabase(paths platform.Paths, run func(bin string, args []string, stdout io.Writer) error,
+	dumpBin, pass, db, out string, tables []string) error {
+	cnf, err := writeDefaultsFile(pass)
+	if err != nil {
+		return err
+	}
+	defer os.Remove(cnf)
+
 	args := []string{
-		"--defaults-extra-file=" + defaultsFile(pass),
+		"--defaults-extra-file=" + cnf,
 		"--default-character-set=utf8mb4",
 		"--single-transaction",
 		"--quick",
@@ -224,22 +274,23 @@ func dumpDatabase(paths platform.Paths, dumpBin, pass, db, out string, tables []
 		return err
 	}
 	defer f.Close()
-	cmd := exec.Command(dumpBin, args...)
-	cmd.Stdout = f
-	cmd.Stderr = os.Stderr
-	cmd.Env = dbinit.ClientEnv(paths)
-	return cmd.Run()
+	if err := run(dumpBin, args, f); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Sync()
 }
 
 // defaultsFile writes a 0600 client credentials file pinned to the bundled
 // instance (TCP 127.0.0.1 + random port). Unique per invocation: concurrent
-// dump/restore calls must not clobber each other's credentials.
+// dump/restore calls must not clobber each other's credentials. Callers
+// MUST remove the file when done.
 var defaultsSeq atomic.Int64
 
 // exported hook; set by the app package at startup (port + creds).
 var CredsHook func() (user, pass string, port int)
 
-func defaultsFile(pass string) string {
+func writeDefaultsFile(pass string) (string, error) {
 	seq := defaultsSeq.Add(1)
 	path := filepath.Join(os.TempDir(), fmt.Sprintf("gswxy-mysql-auth-%d-%d.cnf", os.Getpid(), seq))
 	content := "[client]\nuser=root\npassword=" + pass + "\n"
@@ -248,8 +299,10 @@ func defaultsFile(pass string) string {
 			content = fmt.Sprintf("[client]\nhost=127.0.0.1\nport=%d\nuser=%s\npassword=%s\n", port, u, pw)
 		}
 	}
-	_ = os.WriteFile(path, []byte(content), 0o600)
-	return path
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		return "", err
+	}
+	return path, nil
 }
 
 func copyTree(src, dst string) error {
@@ -391,8 +444,9 @@ func (m *Manager) List() []ListItem {
 	return out
 }
 
-// Restore pre-checks the archive, snapshots current state, quiesces the
-// game servers, re-imports every database and finally merges state.
+// Restore pre-checks the archive, snapshots current state (same lock
+// held — via createLocked), quiesces the game servers, re-imports every
+// database and finally merges state. Every dangerous step reports failure.
 func (m *Manager) Restore(archive, mysqlBin, dumpBin, rootPass string) error {
 	if !m.jobMu.CompareAndSwap(false, true) {
 		return fmt.Errorf("已有备份/恢复任务在进行中")
@@ -429,19 +483,25 @@ func (m *Manager) Restore(archive, mysqlBin, dumpBin, rootPass string) error {
 			manifest.GSWXYVersion, m.Version.GSWXY))
 	}
 
-	// Never destroy silently: snapshot current state first.
-	m.setPhase("restore", "生成恢复前自动备份")
-	if _, err := m.Create(dumpBin, rootPass); err != nil {
-		return m.jobFail("restore", fmt.Errorf("恢复前自动备份失败: %w", err))
+	// Never destroy silently: snapshot current state first. This runs with
+	// the SAME lock held (createLocked) — historically this called Create,
+	// whose lock acquisition could never succeed and broke every restore.
+	m.setPhase("restore", "生成恢复前快照")
+	snapshot, err := m.createLocked("restore", dumpBin, rootPass)
+	if err != nil {
+		return m.jobFail("restore", fmt.Errorf("恢复前快照失败，已放弃恢复（当前数据未受影响）: %w", err))
 	}
+	snapshotName := filepath.Base(snapshot)
 
-	// Quiesce game servers (worldserver/authserver) before importing.
+	// Quiesce game servers (worldserver/authserver) before importing. The
+	// hook must CONFIRM both stopped; mysqld stays up (import needs it).
 	m.setPhase("restore", "停止游戏服务")
-	wereRunning := false
-	if m.StopGameServers != nil {
-		wereRunning = m.StopGameServers()
+	worldWas, authWas, err := m.StopGameServers()
+	if err != nil {
+		return m.jobFail("restore", fmt.Errorf("无法确认游戏服务已停止，已放弃恢复: %w", err))
 	}
 
+	imported := []string{}
 	for _, pair := range [][2]string{
 		{"auth.sql", "acore_auth"},
 		{"characters.sql", "acore_characters"},
@@ -453,37 +513,61 @@ func (m *Manager) Restore(archive, mysqlBin, dumpBin, rootPass string) error {
 			continue // archive without this member (older format)
 		}
 		m.setPhase("restore", "导入 "+pair[1])
-		cmd := exec.Command(mysqlBin,
-			"--defaults-extra-file="+defaultsFile(rootPass),
-			"--default-character-set=utf8mb4", pair[1])
-		in, err := os.Open(p)
-		if err != nil {
-			return m.jobFail("restore", err)
+		if err := m.importOne(mysqlBin, rootPass, pair[1], p); err != nil {
+			// 部分导入状态：明确告知可用快照回滚，绝不当作成功。
+			return m.jobFail("restore", fmt.Errorf(
+				"恢复 %s 失败（已导入: %s）。当前数据库处于部分恢复状态，游戏服务保持停止；"+
+					"可重试恢复，或用恢复前快照 %s 回滚到恢复前状态: %w",
+				pair[1], strings.Join(imported, "、"), snapshotName, err))
 		}
-		cmd.Stdin = in
-		cmd.Env = dbinit.ClientEnv(m.Paths)
-		out, err := cmd.CombinedOutput()
-		in.Close()
-		if err != nil {
-			return m.jobFail("restore", fmt.Errorf("恢复 %s: %v: %s", pair[1], err, tail(string(out))))
-		}
+		imported = append(imported, pair[1])
 	}
 
 	m.setPhase("restore", "恢复用户配置与状态")
-	copyTree(filepath.Join(tmp, "config"), m.Paths.UserConfig())
+	if err := copyTree(filepath.Join(tmp, "config"), m.Paths.UserConfig()); err != nil {
+		m.Log.Warn("restore: user config copy: %v", err)
+	}
 	if err := mergeStateFile(filepath.Join(tmp, "state.json"), m.Paths.StateFile()); err != nil {
 		m.Log.Warn("restore: merge state: %v", err)
 	}
 
-	if wereRunning && m.StartGameServers != nil {
+	if worldWas || authWas {
 		m.setPhase("restore", "重启游戏服务")
-		if err := m.StartGameServers(); err != nil {
-			m.jobErr.Store("服务重启失败: " + err.Error())
+		if err := m.StartGameServers(worldWas, authWas); err != nil {
+			m.jobErr.Store("数据恢复成功，但服务重启失败: " + err.Error())
 			m.Log.Error("restore: restart servers: %v", err)
+			m.setPhase("restore", "完成（服务重启失败，请在「服务器」页手动启动）")
+			m.Log.Audit("system", "backup.restore.partial", archive)
+			return nil
 		}
 	}
 	m.Log.Audit("system", "backup.restore", archive)
 	m.setPhase("restore", "完成")
+	return nil
+}
+
+// importOne pipes one SQL dump into the bundled client; credentials
+// sidecar removed right after the run.
+func (m *Manager) importOne(mysqlBin, rootPass, db, path string) error {
+	cnf, err := writeDefaultsFile(rootPass)
+	if err != nil {
+		return err
+	}
+	defer os.Remove(cnf)
+
+	in, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := m.importSQL(mysqlBin,
+		[]string{
+			"--defaults-extra-file=" + cnf,
+			"--default-character-set=utf8mb4", db,
+		}, in)
+	if err != nil {
+		return fmt.Errorf("%v: %s", err, tail(string(out)))
+	}
 	return nil
 }
 
@@ -510,8 +594,18 @@ func verifyManifest(dir string) (*Manifest, error) {
 			return nil, fmt.Errorf("备份成员校验失败: %s", name)
 		}
 	}
-	// No checksums recorded (very old archive) — require at least the SQL
-	// members to exist so a truncated archive fails here, not mid-restore.
+	// Every declared database dump must exist and be checksum-protected:
+	// an archive that lists a member without a checksum is not trusted.
+	for _, f := range mf.Files {
+		if !strings.HasSuffix(f, ".sql") {
+			continue
+		}
+		if _, ok := mf.Checksums[f]; !ok {
+			return nil, fmt.Errorf("备份成员缺少校验记录: %s", f)
+		}
+	}
+	// No checksums recorded (very old archive) — require at least the core
+	// SQL members to exist so a truncated archive fails here, not mid-restore.
 	if len(mf.Checksums) == 0 {
 		for _, f := range []string{"auth.sql", "characters.sql"} {
 			if _, err := os.Stat(filepath.Join(dir, f)); err != nil {

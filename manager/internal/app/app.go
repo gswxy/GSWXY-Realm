@@ -125,26 +125,45 @@ func New(p platform.Paths) (*App, error) {
 		}
 		return "root", c.Root, c.Port
 	}
-	// 恢复前静默 world/auth（绝不停 mysqld——导入需要它），恢复后按需拉起。
-	a.BK.StopGameServers = func() bool {
-		any := a.Sup.Running("worldserver") || a.Sup.Running("authserver")
+	// 恢复前静默 world/auth（绝不停 mysqld——导入需要它），且必须确认
+	// 两个进程真的停了才算成功；恢复后只拉起原本在运行的那个。
+	a.BK.StopGameServers = func() (worldWas, authWas bool, err error) {
+		worldWas = a.Sup.Running("worldserver")
+		authWas = a.Sup.Running("authserver")
 		for _, name := range []string{"worldserver", "authserver"} {
 			if a.Sup.Running(name) {
-				_ = a.Sup.Stop(name)
+				if err := a.Sup.Stop(name); err != nil {
+					return worldWas, authWas, fmt.Errorf("停止 %s 失败: %w", name, err)
+				}
 			}
 		}
-		return any
+		// 确认停止：等待进程退出（崩溃退避中的进程视作已停）。
+		deadline := time.Now().Add(45 * time.Second)
+		for _, name := range []string{"worldserver", "authserver"} {
+			for a.Sup.Running(name) && time.Now().Before(deadline) {
+				time.Sleep(300 * time.Millisecond)
+			}
+			if a.Sup.Running(name) {
+				return worldWas, authWas, fmt.Errorf("%s 未在超时内停止", name)
+			}
+		}
+		return worldWas, authWas, nil
 	}
-	a.BK.StartGameServers = func() error {
+	a.BK.StartGameServers = func(world, auth bool) error {
 		if !a.Sup.Running("mysqld") {
 			if err := a.ensureDBRunning(); err != nil {
 				return err
 			}
 		}
-		if err := a.Sup.Start("authserver"); err != nil {
-			return err
+		if auth {
+			if err := a.Sup.Start("authserver"); err != nil {
+				return err
+			}
 		}
-		return a.Sup.Start("worldserver")
+		if world {
+			return a.Sup.Start("worldserver")
+		}
+		return nil
 	}
 	a.Bins = a.resolveBins()
 	a.registerProcs()
